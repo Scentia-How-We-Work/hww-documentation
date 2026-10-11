@@ -10,12 +10,23 @@ import Commercials from './components/Commercials'
 import Nav from './components/Nav'
 import './App.css'
 
+const sections = [
+  {id: 'overview', title: 'Overview'},
+  {id: 'problem', title: 'The Problem'},
+  {id: 'solution', title: 'The Solution'},
+  {id: 'scope', title: 'Scope'},
+  {id: 'timeline', title: 'Timeline'},
+  {id: 'risks', title: 'Risks'},
+  {id: 'dependencies', title: 'Dependencies'},
+  {id: 'assumptions', title: 'Assumptions'}
+]
+
 function App() {
   return (
-    <main id="top" className="prd-layout">
-      <Nav />
+    <main id="top" className="flex min-h-screen bg-mist-50 text-mist-900">
+      <Nav sections={sections}/>
 
-      <div className="prd-content">
+      <div className="mx-auto w-full max-w-5xl px-8 py-12">
         <Header title={prd.pageTitle} />
 
         <Section 
@@ -63,7 +74,6 @@ function App() {
             ]}
             rows={prd.problem.businessCase.expectedImprovement}
           />
-          {/* TODO: turn Commercial Benefit into component */}
           <Commercials 
             content={prd.problem.businessCase.commercialBenefit}
           />
@@ -161,16 +171,10 @@ function App() {
           id="assumptions"
           title="8. Assumptions"
         >
-
-        <Text title="Assumptions" />
         <List items={prd.assumptions}/>
         
         </Section>
       </div>
-
-      <a href="top" className="scroll-top">
-        ^ Scroll to Top
-      </a>
 
     </main>
   )

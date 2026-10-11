@@ -7,7 +7,7 @@ const prd = {
   pageTitle: "[Project Title] PRD v.1",
 
   overview: {
-    title: "[Project Name",
+    title: "[Project Name]",
     team: "Product Tech and AI",
     contributors: "[Names / Roles]",
     stakeholders: "Names/ Roles",

@@ -1,13 +1,18 @@
 function Media({ images }) {
   return (
-    <div>
+    <div className="space-y-3">
       {images.map(function (item, index) {
         return (
-          <img
+          <div
             key={index}
-            src={item.image}
-            alt={item.alt}
-          />
+            className="overflow-hidden rounded-lg"
+          >
+            <img
+              src={item.image}
+              alt={item.alt}
+              className="h-auto w-full object-contain"
+            />
+          </div>
         )
       })}
     </div>

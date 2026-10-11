@@ -1,26 +1,37 @@
 function Table({ columns, rows }) {
   return (
-    <table>
-      <thead>
-        <tr>
-          {columns.map((column) => (
-            <th key={column.key}>{column.label}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row, rowIndex) => (
-          <tr key={rowIndex}>
+    <div className="overflow-x-auto rounded-lg border border-mist-200">
+      <table className="w-full border-collapse text-left">
+        <thead className="bg-mist-50">
+          <tr>
             {columns.map((column) => (
-              <td key={column.key}>
-                {row[column.key]}
-              </td>
+              <th 
+                key={column.key}
+                className="border-b border-mist-200 px-4 py-3 text-sm font-semibold text-mist-700 bg-white"
+              >{column.label}</th>
             ))}
           </tr>
-        ))
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((row, rowIndex) => (
+            <tr 
+              key={rowIndex}
+              className="border-b border-mist-100 last:border-b-0 bg-white"
+            >
+              {columns.map((column) => (
+                <td 
+                  key={column.key}
+                  className="px-4 py-3 text-sm text-mist-600"
+                >
+                  {row[column.key]}
+                </td>
+              ))}
+            </tr>
+          ))
+          }
+        </tbody>
+      </table>
+    </div>
   )
 }
 

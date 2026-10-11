@@ -1,11 +1,13 @@
 function Section({ id, title, children}) {
   return (
-    <section id={id} className="prd-section">
-      <h2>
+    <section id={id} className="py-5 scroll-mt-8">
+      <h2 className="mb-3 text-3xl font-medium text-mist-800">
         {title}
       </h2>
-
+    <div className="space-y-3 text-mist-800">
       {children}
+    </div>
+
     </section>
   )
 }

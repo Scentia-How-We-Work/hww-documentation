@@ -1,29 +1,59 @@
 function Overview({ overview }) {
   return (
-    <div>
-      <p>
-        <strong>Project Title:</strong> {overview.title}
-      </p>
+    <div className="grid gap-4 md:grid-cols-2">
+      <div className="rounded-lg border border-mist-200 bg-white p-5">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
+          Project Title
+        </p>
+        <p className="text-base font-medium text-mist-800">
+          {overview.title}
+        </p>
+      </div>
 
-      <p>
-        <strong>Team:</strong> {overview.team}
-      </p>
+      <div className="rounded-lg border border-mist-200 bg-white p-5">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
+          Team
+        </p>
+        <p className="text-base font-medium text-mist-800">
+          {overview.team}
+        </p>
+      </div>
 
-      <p>
-        <strong>Contributors:</strong> {overview.contributors}
-      </p>
+      <div className="rounded-lg border border-mist-200 bg-white p-5">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
+          Contributors
+        </p>
+        <p className="text-base font-medium text-mist-800">
+          {overview.contributors}
+        </p>
+      </div>
 
-      <p>
-        <strong>Key Stakeholders:</strong> {overview.stakeholders}
-      </p>
+      <div className="rounded-lg border border-mist-200 bg-white p-5">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
+          Key Stakeholders
+        </p>
+        <p className="text-base font-medium text-mist-800">
+          {overview.stakeholders}
+        </p>
+      </div>
 
-      <p>
-        <strong>Primary Contact:</strong> {overview.primaryContact}
-      </p>
+      <div className="rounded-lg border border-mist-200 bg-white p-5">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
+          Primary Contact
+        </p>
+        <p className="text-base font-medium text-mist-800">
+          {overview.primaryContact}
+        </p>
+      </div>
 
-      <p>
-        <strong>Target Delivery:</strong> {overview.targetDelivery}
-      </p>
+      <div className="rounded-lg border border-mist-200 bg-white p-5">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
+          Target Delivery
+        </p>
+        <p className="text-base font-medium text-mist-800">
+          {overview.targetDelivery}
+        </p>
+      </div>
     </div>
   )
 }
