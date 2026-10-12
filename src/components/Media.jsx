@@ -10,7 +10,7 @@ function Media({ images }) {
             <img
               src={item.image}
               alt={item.alt}
-              className="h-auto w-full object-contain"
+              // className="h-auto w-full object-contain"
             />
           </div>
         )

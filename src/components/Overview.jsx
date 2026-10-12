@@ -23,27 +23,66 @@ function Overview({ overview }) {
         <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
           Contributors
         </p>
-        <p className="text-base font-medium text-mist-800">
-          {overview.contributors}
-        </p>
+        <div>
+          {overview.contributors.map(function (contributor, index) {
+            return (
+              <div 
+              key={index}
+              className="text-base font-medium text-mist-800 flex flex-wrap items-center gap-x-2"
+              >
+                <span>{contributor.name},  {contributor.role} - </span>
+                <a
+                  href={`mailto:${contributor.email}`}
+                  className="text-sm text-sky-600 hover:underline"
+                >
+                  {contributor.email}
+                </a>
+              </div>
+            )
+          })}
+        </div>
+
       </div>
 
       <div className="rounded-lg border border-mist-200 bg-white p-5">
         <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
           Key Stakeholders
         </p>
-        <p className="text-base font-medium text-mist-800">
-          {overview.stakeholders}
-        </p>
+        <div>
+          {overview.stakeholders.map(function (stakeholder, index) {
+            return (
+              <div 
+              key={index}
+              className="text-base font-medium text-mist-800 flex flex-wrap items-center gap-x-2"
+              >
+                <span>{stakeholder.name},  {stakeholder.role} - </span>
+                <a
+                  href={`mailto:${stakeholder.email}`}
+                  className="text-sm text-sky-600 hover:underline"
+                >
+                  {stakeholder.email}
+                </a>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       <div className="rounded-lg border border-mist-200 bg-white p-5">
         <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
           Primary Contact
         </p>
-        <p className="text-base font-medium text-mist-800">
-          {overview.primaryContact}
-        </p>
+        <div className="text-base font-medium text-mist-800 flex flex-wrap items-center gap-x-2">
+          <span>
+            {overview.primaryContact.name}, {overview.primaryContact.role} - 
+          </span>
+          <a
+            href={`mailto:${overview.primaryContact.email}`}
+            className="text-sm text-sky-600 hover:underline"
+          >
+            {overview.primaryContact.email}
+          </a>
+        </div>
       </div>
 
       <div className="rounded-lg border border-mist-200 bg-white p-5">

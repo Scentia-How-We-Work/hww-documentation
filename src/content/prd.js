@@ -1,7 +1,4 @@
-// Add nav
 // Add dark mode
-
-import placeholder from "../assets/placeholder.png";
 
 const prd = {
   pageTitle: "[Project Title] PRD v.1",
@@ -9,9 +6,35 @@ const prd = {
   overview: {
     title: "[Project Name]",
     team: "Product Tech and AI",
-    contributors: "[Names / Roles]",
-    stakeholders: "Names/ Roles",
-    primaryContact: "Erin Smith, BA - esmith@scentia.com.au",
+    contributors: [
+      {
+        name: "Name 1",
+        role: "Role",
+        email: "email@email.com.au",
+      },
+      {
+        name: "Name 2",
+        role: "Role",
+        email: "email@email.com.au",
+      },
+    ],
+    stakeholders: [
+      {
+        name: "Name 1",
+        role: "Role",
+        email: "email@email.com.au",
+      },
+      {
+        name: "Name 2",
+        role: "Role",
+        email: "email@email.com.au",
+      },
+    ],
+    primaryContact: {
+      name: "Erin Smith",
+      role: "BA",
+      email: "esmith@scentia.com.au",
+    },
     targetDelivery: "Q4 end - 31.12.26",
   },
 
@@ -78,7 +101,7 @@ const prd = {
       "[Briefly describe the future state process, proposed solution, MVP to be delivered.]",
     workflows: [
       {
-        image: placeholder,
+        image: "https://placebear.com/1920/1080",
         alt: "Placeholder Image",
       },
     ],
@@ -89,7 +112,7 @@ const prd = {
     ],
     wireframes: [
       {
-        image: placeholder,
+        image: "https://placebear.com/1920/1080",
         alt: "Placeholder Image",
       },
     ],

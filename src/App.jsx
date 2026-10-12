@@ -1,5 +1,4 @@
 import prd from './content/prd'
-import Header from './components/Header'
 import Section from './components/Section'
 import Overview from './components/Overview'
 import Text from './components/Text'
@@ -23,11 +22,13 @@ const sections = [
 
 function App() {
   return (
-    <main id="top" className="flex min-h-screen bg-mist-50 text-mist-900">
-      <Nav sections={sections}/>
+    <main id="top" className="flex h-screen bg-mist-50 text-mist-900">
+      <Nav 
+        sections={sections}
+        title={prd.pageTitle}
+      />
 
-      <div className="mx-auto w-full max-w-5xl px-8 py-12">
-        <Header title={prd.pageTitle} />
+      <div className="mx-auto h-screen w-full max-w-5xl px-8 py-12 overflow-y-auto snap-y snap-mandatory scroll-smooth">
 
         <Section 
           id="overview"
