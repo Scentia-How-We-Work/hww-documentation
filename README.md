@@ -1,16 +1,94 @@
-# React + Vite
+# PRD Template
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A reusable React template for turning Product Requirements Documents into clean, responsive HTML microsites.
 
-Currently, two official plugins are available:
+The template is designed so each PRD can be created as its own repository, with project-specific content separated from the reusable page structure and styling.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
 
-## React Compiler
+- React
+- Vite
+- JavaScript
+- Tailwind CSS
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the ESLint configuration
+Clone the repository and install dependencies:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+```
+
+Start the local development server:
+
+```bash
+npm run dev
+```
+
+Vite will provide a local URL, typically:
+
+```text
+http://localhost:5173
+```
+
+## Creating a New PRD
+
+1. Create a new repository from this template.
+2. Update the PRD content in `src/content/prd.js`.
+3. Add any project-specific workflow diagrams, wireframes, or other images to `src/assets`.
+4. Update the relevant image imports in `prd.js`.
+5. Run the project locally with `npm run dev`.
+6. Commit and publish the completed PRD.
+
+## Project Structure
+
+```text
+src/
+├── assets/          # Images, workflows and wireframes
+├── components/      # Reusable PRD components
+├── content/
+│   └── prd.js       # Project-specific PRD content
+├── App.jsx          # PRD page structure
+├── App.css
+├── index.css
+└── main.jsx
+```
+
+## Components
+
+The template uses reusable components for common PRD content, including:
+
+- Navigation
+- Header
+- Sections
+- Overview
+- Text content
+- Tables
+- Ordered lists
+- Commercial benefits
+- Media / images
+
+## PRD Structure
+
+The template currently supports:
+
+1. Overview
+2. The Problem
+3. The Solution
+4. Scope
+5. Timeline
+6. Risks
+7. Dependencies
+8. Assumptions / Open Questions
+
+Navigation links are generated from the configured sections and jump directly to the relevant part of the page.
+
+## Editing Content
+
+Most project-specific content should be updated in:
+
+```text
+src/content/prd.js
+```
+
+The React components control how that content is displayed, allowing the same design and structure to be reused across multiple PRDs.
