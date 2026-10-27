@@ -1,16 +1,16 @@
 function Commercials({ content }) {
   return (
-    <div>
-      <h4 className="mb-3">
+    <div className="flex flex-col gap-3">
+      <h4 className="text-xs font-medium uppercase tracking-wider text-subtle">
         {content.title}
       </h4>
 
-      <div className="rounded-lg border border-mist-200 bg-white px-4 py-3 text-sm text-mist-600 space-y-3">
-        <p className="text-mist-600">
+      <div className="flex flex-col border-t border-ink">
+        <p className="border-b border-line py-[18px] text-base text-ink">
           {content.timeSaving}
         </p>
 
-        <p className="text-mist-600">
+        <p className="border-b border-line py-[18px] text-base text-ink">
           {content.costBenefit}
         </p>
       </div>

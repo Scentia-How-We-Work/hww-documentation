@@ -1,13 +1,26 @@
-function Section({ id, title, children}) {
-  return (
-    <section id={id} className="py-5 scroll-mt-8 min-h-screen snap-start">
-      <h2 className="mb-3 text-3xl font-medium text-mist-800">
-        {title}
-      </h2>
-    <div className="space-y-3 text-mist-800">
-      {children}
-    </div>
+function Section({ id, number, title, headline, primary, children }) {
+  const HeadlineTag = primary ? 'h1' : 'h2'
 
+  return (
+    <section id={id} className="py-16 scroll-mt-8 min-h-screen snap-start">
+      <div className="mb-12 flex flex-col gap-5">
+        <p className="text-sm font-medium text-accent">
+          {number} — {title}
+        </p>
+        <HeadlineTag
+          className={
+            primary
+              ? 'text-6xl font-light leading-none tracking-tighter'
+              : 'text-[44px] font-light leading-tight tracking-tight'
+          }
+        >
+          {headline || title}
+        </HeadlineTag>
+      </div>
+
+      <div className="flex flex-col gap-12">
+        {children}
+      </div>
     </section>
   )
 }

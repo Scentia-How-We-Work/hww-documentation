@@ -40,6 +40,7 @@
     "targetDelivery": "Q1 end - 31.03.27"
   },
   "problem": {
+    "headline": "Every invoice is keyed in and chased by hand",
     "currentState": "Supplier invoices arrive by email as PDFs and are manually keyed into the finance system by the Accounts Payable team. Each invoice is then emailed to a budget owner for approval, and approvals are chased manually when they stall. Invoices regularly miss payment terms, and there is no single view of where an invoice is in the process.",
     "strategicAlignment": "Reducing manual processing in back-office functions is a key pillar of the company's operational efficiency strategy. Faster, more reliable supplier payments also support our goal of becoming a preferred partner for key suppliers.",
     "businessCase": {

@@ -37,17 +37,21 @@ function App() {
   const prd = project.prd
 
   return (
-    <main id="top" className="flex h-screen bg-mist-50 text-mist-900">
+    <main id="top" className="flex h-screen">
       <Nav 
         sections={sections}
         title={prd.pageTitle}
       />
 
-      <div className="mx-auto h-screen w-full max-w-5xl px-8 py-12 overflow-y-auto snap-y snap-mandatory scroll-smooth">
+      <div className="h-screen min-w-0 flex-1 overflow-y-auto snap-y snap-mandatory scroll-smooth px-16 pb-28">
+        <div className="max-w-[880px]">
 
         <Section 
           id="overview"
-          title="1. Overview"
+          number="01"
+          title="Overview"
+          headline={prd.overview.title}
+          primary
         >
 
           <Overview overview={prd.overview}/>
@@ -56,7 +60,9 @@ function App() {
 
         <Section 
           id="problem"
-          title="2. The Problem"
+          number="02"
+          title="The Problem"
+          headline={prd.problem.headline}
         >
 
           <Text 
@@ -69,35 +75,43 @@ function App() {
             content={prd.problem.strategicAlignment} 
           />
 
-          <Text title="Business Case" />
+          <div className="flex flex-col gap-8">
+            <Text title="Business Case" />
 
-          <h4>Baseline</h4>
-          <Table
-            columns={[
-              {key: 'metric', label: 'Metric'},
-              {key: 'currentState', label: 'Current State'}
-            ]}
-            rows={prd.problem.businessCase.baseline}
-          />
+            <div className="flex flex-col gap-4">
+              <h4 className="text-sm font-medium">Baseline</h4>
+              <Table
+                columns={[
+                  {key: 'metric', label: 'Metric'},
+                  {key: 'currentState', label: 'Current State'}
+                ]}
+                rows={prd.problem.businessCase.baseline}
+              />
+            </div>
 
-          <h4>Expected Improvement</h4>
-          <Table
-            columns={[
-              {key: 'metric', label: 'Metric'},
-              {key: 'currentState', label: 'Current'},
-              {key: 'target', label: 'Target'},
-              {key: 'improvement', label: 'Improvement'}
-            ]}
-            rows={prd.problem.businessCase.expectedImprovement}
-          />
-          <Commercials 
-            content={prd.problem.businessCase.commercialBenefit}
-          />
+            <div className="flex flex-col gap-4">
+              <h4 className="text-sm font-medium">Expected Improvement</h4>
+              <Table
+                columns={[
+                  {key: 'metric', label: 'Metric'},
+                  {key: 'currentState', label: 'Current'},
+                  {key: 'target', label: 'Target'},
+                  {key: 'improvement', label: 'Improvement'}
+                ]}
+                rows={prd.problem.businessCase.expectedImprovement}
+              />
+            </div>
+
+            <Commercials 
+              content={prd.problem.businessCase.commercialBenefit}
+            />
+          </div>
         </Section> 
 
         <Section 
           id="solution"
-          title="3. The Solution"
+          number="03"
+          title="The Solution"
         >
 
           <Text 
@@ -105,40 +119,39 @@ function App() {
             content={prd.solution.futureState} 
           />
 
-          <Text title="Workflows" />
           <Media 
+            title="Workflows"
             images={prd.solution.workflows} 
           />
 
-          <Text title="Key Features" />
-          <List items={prd.solution.keyFeatures}/>
+          <List title="Key Features" items={prd.solution.keyFeatures}/>
 
-          <Text title="Wireframes" />
           <Media 
+            title="Wireframes"
             images={prd.solution.wireframes} 
           />
         </Section>
 
         <Section 
           id="scope"
-          title="4. Scope"
+          number="04"
+          title="Scope"
         >
 
-          <Text title="Goals" />
-          <List items={prd.scope.goals}/>
+          <List title="Goals" items={prd.scope.goals}/>
 
-          <Text title="Non Goals" />
-          <List items={prd.scope.nonGoals}/>
+          <List title="Non Goals" items={prd.scope.nonGoals}/>
 
         </Section>
 
         <Section 
           id="timeline"
-          title="5. Timeline"
+          number="05"
+          title="Timeline"
         >
 
-        <Text title="Key Milestones" />
           <Table
+            title="Key Milestones"
             columns={[
               {key: 'target', label: 'Target Date'},
               {key: 'milestone', label: 'Milestone'},
@@ -151,7 +164,8 @@ function App() {
 
         <Section 
           id="risks"
-          title="6. Risks"
+          number="06"
+          title="Risks"
         >
 
           <Table
@@ -168,7 +182,8 @@ function App() {
 
         <Section 
           id="dependencies"
-          title="7. Dependencies"
+          number="07"
+          title="Dependencies"
         >
 
           <Table
@@ -185,11 +200,13 @@ function App() {
 
         <Section 
           id="assumptions"
-          title="8. Assumptions"
+          number="08"
+          title="Assumptions"
         >
         <List items={prd.assumptions}/>
         
         </Section>
+        </div>
       </div>
 
     </main>

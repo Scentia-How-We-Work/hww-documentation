@@ -1,98 +1,57 @@
+function Row({ label, children }) {
+  return (
+    <div className="flex flex-wrap gap-x-8 gap-y-1.5 border-b border-line py-[18px]">
+      <p className="basis-44 pt-0.5 text-xs font-medium uppercase tracking-wider text-subtle">
+        {label}
+      </p>
+      <div className="min-w-0 flex-1 basis-80 text-base">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function Person({ person }) {
+  return (
+    <div className="flex flex-wrap gap-x-4 gap-y-0.5">
+      <span className="basis-36">{person.name}</span>
+      <span className="flex-1 basis-48 text-muted">{person.role}</span>
+      <a
+        href={`mailto:${person.email}`}
+        className="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+      >
+        {person.email}
+      </a>
+    </div>
+  )
+}
+
 function Overview({ overview }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <div className="rounded-lg border border-mist-200 bg-white p-5">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
-          Project Title
-        </p>
-        <p className="text-base font-medium text-mist-800">
-          {overview.title}
-        </p>
-      </div>
+    <div className="flex flex-col border-t border-ink">
+      <Row label="Team">{overview.team}</Row>
 
-      <div className="rounded-lg border border-mist-200 bg-white p-5">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
-          Team
-        </p>
-        <p className="text-base font-medium text-mist-800">
-          {overview.team}
-        </p>
-      </div>
+      <Row label="Target Delivery">{overview.targetDelivery}</Row>
 
-      <div className="rounded-lg border border-mist-200 bg-white p-5">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
-          Contributors
-        </p>
-        <div>
+      <Row label="Primary Contact">
+        <Person person={overview.primaryContact} />
+      </Row>
+
+      <Row label="Contributors">
+        <div className="flex flex-col gap-3">
           {overview.contributors.map(function (contributor, index) {
-            return (
-              <div 
-              key={index}
-              className="text-base font-medium text-mist-800 flex flex-wrap items-center gap-x-2"
-              >
-                <span>{contributor.name},  {contributor.role} - </span>
-                <a
-                  href={`mailto:${contributor.email}`}
-                  className="text-sm text-sky-600 hover:underline"
-                >
-                  {contributor.email}
-                </a>
-              </div>
-            )
+            return <Person key={index} person={contributor} />
           })}
         </div>
+      </Row>
 
-      </div>
-
-      <div className="rounded-lg border border-mist-200 bg-white p-5">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
-          Key Stakeholders
-        </p>
-        <div>
+      <Row label="Key Stakeholders">
+        <div className="flex flex-col gap-3">
           {overview.stakeholders.map(function (stakeholder, index) {
-            return (
-              <div 
-              key={index}
-              className="text-base font-medium text-mist-800 flex flex-wrap items-center gap-x-2"
-              >
-                <span>{stakeholder.name},  {stakeholder.role} - </span>
-                <a
-                  href={`mailto:${stakeholder.email}`}
-                  className="text-sm text-sky-600 hover:underline"
-                >
-                  {stakeholder.email}
-                </a>
-              </div>
-            )
+            return <Person key={index} person={stakeholder} />
           })}
         </div>
-      </div>
-
-      <div className="rounded-lg border border-mist-200 bg-white p-5">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
-          Primary Contact
-        </p>
-        <div className="text-base font-medium text-mist-800 flex flex-wrap items-center gap-x-2">
-          <span>
-            {overview.primaryContact.name}, {overview.primaryContact.role} - 
-          </span>
-          <a
-            href={`mailto:${overview.primaryContact.email}`}
-            className="text-sm text-sky-600 hover:underline"
-          >
-            {overview.primaryContact.email}
-          </a>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-mist-200 bg-white p-5">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-mist-500">
-          Target Delivery
-        </p>
-        <p className="text-base font-medium text-mist-800">
-          {overview.targetDelivery}
-        </p>
-      </div>
+      </Row>
     </div>
   )
 }

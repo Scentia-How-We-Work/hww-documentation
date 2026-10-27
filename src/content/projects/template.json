@@ -35,6 +35,7 @@
     "targetDelivery": "Q4 end - 31.12.26"
   },
   "problem": {
+    "headline": "[One-line summary of the problem]",
     "currentState": "[2-3 sentences defining the problem we are trying to solve and the narrative behind it - what the process looks like for users now.]",
     "strategicAlignment": "[2-3 sentences on why this is relevant to the wider company strategy.]",
     "businessCase": {

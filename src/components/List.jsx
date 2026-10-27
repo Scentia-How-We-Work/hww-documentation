@@ -1,14 +1,19 @@
 function List({ title, items }) {
   return (
-    <div>
-      <h3 className="mb-3 text-xl font-semibold text-mist-800">
-        {title}
-      </h3>
+    <div className="flex flex-col gap-3">
+      {title && (
+        <h3 className="text-xs font-medium uppercase tracking-wider text-subtle">
+          {title}
+        </h3>
+      )}
 
-      <ol className="list-decimal space-y-2 pl-6 text-mist-600">
+      <ol className="flex flex-col border-t border-line">
         {items.map(function (item, index) {
           return (
-            <li key={index} className="pl-1 leading-7">
+            <li key={index} className="flex gap-4 border-b border-line py-3.5 leading-7 text-ink-soft">
+              <span className="w-6 shrink-0 text-sm leading-7 text-subtle">
+                {String(index + 1).padStart(2, '0')}
+              </span>
               {item}
             </li>
           )

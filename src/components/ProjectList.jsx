@@ -1,31 +1,32 @@
 function ProjectList({ projects, missingId }) {
   return (
-    <main className="min-h-screen bg-mist-50 text-mist-900">
-      <div className="mx-auto max-w-3xl px-8 py-12">
-        <h1 className="mb-6 text-3xl font-medium text-mist-800">
+    <main className="min-h-screen">
+      <div className="mx-auto max-w-3xl px-8 py-20">
+        <p className="mb-5 text-sm font-medium text-accent">PRDs</p>
+        <h1 className="mb-12 text-6xl font-light leading-none tracking-tighter">
           Projects
         </h1>
 
         {missingId && (
-          <p className="mb-6 rounded-lg border border-mist-200 bg-white px-4 py-3 text-sm text-mist-600">
+          <p className="mb-8 bg-medium-bg px-4 py-3 text-sm text-medium">
             No project found for "{missingId}". Choose one below.
           </p>
         )}
 
-        <div className="grid gap-4">
+        <div className="flex flex-col border-t border-ink">
           {projects.map(function (project) {
             return (
               <a
                 key={project.id}
                 href={`?project=${encodeURIComponent(project.id)}`}
-                className="rounded-lg border border-mist-200 bg-white p-5 transition-transform duration-200 hover:scale-[1.02]"
+                className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-b border-line py-5 transition-transform duration-200 hover:scale-[1.02]"
               >
-                <p className="text-base font-medium text-mist-800">
+                <span className="text-lg text-ink">
                   {project.prd.pageTitle}
-                </p>
-                <p className="mt-1 text-sm text-mist-500">
+                </span>
+                <span className="text-sm text-muted">
                   {project.prd.overview.team} · {project.prd.overview.targetDelivery}
-                </p>
+                </span>
               </a>
             )
           })}
