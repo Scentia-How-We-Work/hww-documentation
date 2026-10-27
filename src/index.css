@@ -26,6 +26,52 @@ body {
   @apply bg-paper font-sans text-ink antialiased;
 }
 
+/* Dark mode: follows the system setting unless the theme toggle sets data-theme */
+:root {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-paper: #161512;
+    --color-ink: #EDEBE4;
+    --color-ink-soft: #CFCCC3;
+    --color-muted: #A9A69C;
+    --color-subtle: #9A978D;
+    --color-line: #34322D;
+    --color-accent: #8FA6F0;
+    --color-accent-strong: #B5C4F5;
+
+    --color-high: #F3B08A;
+    --color-high-bg: #3D2114;
+    --color-medium: #EAC86A;
+    --color-medium-bg: #362B0E;
+    --color-low: #CFCCC3;
+    --color-low-bg: #2C2B27;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #161512;
+  --color-ink: #EDEBE4;
+  --color-ink-soft: #CFCCC3;
+  --color-muted: #A9A69C;
+  --color-subtle: #9A978D;
+  --color-line: #34322D;
+  --color-accent: #8FA6F0;
+  --color-accent-strong: #B5C4F5;
+
+  --color-high: #F3B08A;
+  --color-high-bg: #3D2114;
+  --color-medium: #EAC86A;
+  --color-medium-bg: #362B0E;
+  --color-low: #CFCCC3;
+  --color-low-bg: #2C2B27;
+}
+
+
 html {
   scroll-behavior: smooth;
 }

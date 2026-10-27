@@ -1,4 +1,5 @@
 import Header from './Header'
+import ThemeToggle from './ThemeToggle'
 
 function Nav({sections, title}) {
   return (
@@ -30,6 +31,10 @@ function Nav({sections, title}) {
             </a>
           )
         })}
+      </div>
+
+      <div className="mt-auto">
+        <ThemeToggle />
       </div>
     </nav>
   )

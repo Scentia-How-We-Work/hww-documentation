@@ -1,8 +1,13 @@
+import ThemeToggle from './ThemeToggle'
+
 function ProjectList({ projects, missingId }) {
   return (
     <main className="min-h-screen">
       <div className="mx-auto max-w-3xl px-8 py-20">
-        <p className="mb-5 text-sm font-medium text-accent">PRDs</p>
+        <div className="mb-5 flex items-baseline justify-between gap-4">
+          <p className="text-sm font-medium text-accent">PRDs</p>
+          <ThemeToggle />
+        </div>
         <h1 className="mb-12 text-6xl font-light leading-none tracking-tighter">
           Projects
         </h1>
