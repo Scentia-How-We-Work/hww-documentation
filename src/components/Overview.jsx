@@ -33,6 +33,14 @@ function Overview({ overview }) {
 
       <Row label="Target Delivery">{overview.targetDelivery}</Row>
 
+      <Row label="Key Stakeholders">
+        <div className="flex flex-col gap-3">
+          {overview.stakeholders.map(function (stakeholder, index) {
+            return <Person key={index} person={stakeholder} />
+          })}
+        </div>
+      </Row>
+
       <Row label="Primary Contact">
         <Person person={overview.primaryContact} />
       </Row>
@@ -41,14 +49,6 @@ function Overview({ overview }) {
         <div className="flex flex-col gap-3">
           {overview.contributors.map(function (contributor, index) {
             return <Person key={index} person={contributor} />
-          })}
-        </div>
-      </Row>
-
-      <Row label="Key Stakeholders">
-        <div className="flex flex-col gap-3">
-          {overview.stakeholders.map(function (stakeholder, index) {
-            return <Person key={index} person={stakeholder} />
           })}
         </div>
       </Row>
