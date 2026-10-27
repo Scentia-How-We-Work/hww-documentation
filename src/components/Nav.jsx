@@ -6,6 +6,13 @@ function Nav({sections, title}) {
 
       <Header title={title} />
 
+      <a
+        href="./"
+        className="text-sm text-sky-600 hover:underline"
+      >
+        &larr; All projects
+      </a>
+
       <div className="mt-8 flex flex-col gap-2">
         {sections.map(function (section) {
           return (

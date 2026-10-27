@@ -1,4 +1,5 @@
-import prd from './content/prd'
+import { useEffect } from 'react'
+import projects from './content/projects'
 import Section from './components/Section'
 import Overview from './components/Overview'
 import Text from './components/Text'
@@ -7,6 +8,7 @@ import List from './components/List'
 import Media from './components/Media'
 import Commercials from './components/Commercials'
 import Nav from './components/Nav'
+import ProjectList from './components/ProjectList'
 import './App.css'
 
 const sections = [
@@ -20,7 +22,20 @@ const sections = [
   {id: 'assumptions', title: 'Assumptions'}
 ]
 
+const projectId = new URLSearchParams(window.location.search).get('project')
+const project = projects.find((project) => project.id === projectId)
+
 function App() {
+  useEffect(() => {
+    document.title = project ? project.prd.pageTitle : 'PRDs'
+  }, [])
+
+  if (!project) {
+    return <ProjectList projects={projects} missingId={projectId} />
+  }
+
+  const prd = project.prd
+
   return (
     <main id="top" className="flex h-screen bg-mist-50 text-mist-900">
       <Nav 
@@ -129,7 +144,7 @@ function App() {
               {key: 'milestone', label: 'Milestone'},
               {key: 'description', label: 'Description'}
             ]}
-            rows={prd.problem.businessCase.baseline}
+            rows={prd.milestones}
           />
 
         </Section>

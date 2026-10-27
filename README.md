@@ -2,7 +2,7 @@
 
 A reusable React template for turning Product Requirements Documents into clean, responsive HTML microsites.
 
-The template is designed so each PRD can be created as its own repository, with project-specific content separated from the reusable page structure and styling.
+A single app can hold multiple PRDs. Each project's content lives in its own JSON file, separate from the reusable page structure and styling.
 
 ## Tech Stack
 
@@ -33,21 +33,31 @@ http://localhost:5173
 
 ## Creating a New PRD
 
-1. Create a new repository from this template.
-2. Update the PRD content in `src/content/prd.js`.
-3. Add any project-specific workflow diagrams, wireframes, or other images to `src/assets`.
-4. Update the relevant image imports in `prd.js`.
-5. Run the project locally with `npm run dev`.
-6. Commit and publish the completed PRD.
+1. Copy `src/content/projects/template.json` to a new file, e.g. `src/content/projects/my-project.json`. The filename becomes the project's id.
+2. Update the PRD content in the new file.
+3. Add any workflow diagrams, wireframes, or other images to `public/` (e.g. `public/my-project/workflow.png`) and reference them by path in the JSON (`"image": "/my-project/workflow.png"`). Full URLs also work.
+4. Run the project locally with `npm run dev`.
+5. Commit and publish the completed PRD.
+
+## Multiple Projects
+
+Every JSON file in `src/content/projects/` is picked up automatically. Projects are loaded from the URL using the `project` query parameter, which is the filename without `.json`:
+
+```text
+http://localhost:5173/?project=my-project
+```
+
+With no project in the URL (or an id that doesn't match a file), the app shows a list of all available projects. Each PRD's navigation has an "All projects" link back to the list.
 
 ## Project Structure
 
 ```text
 src/
-├── assets/          # Images, workflows and wireframes
+├── assets/          # App-level images
 ├── components/      # Reusable PRD components
 ├── content/
-│   └── prd.js       # Project-specific PRD content
+│   ├── projects/    # One JSON file per PRD
+│   └── projects.js  # Loads every project JSON
 ├── App.jsx          # PRD page structure
 ├── App.css
 ├── index.css
@@ -85,10 +95,10 @@ Navigation links are generated from the configured sections and jump directly to
 
 ## Editing Content
 
-Most project-specific content should be updated in:
+Project-specific content lives in the project's JSON file:
 
 ```text
-src/content/prd.js
+src/content/projects/<project-id>.json
 ```
 
 The React components control how that content is displayed, allowing the same design and structure to be reused across multiple PRDs.
