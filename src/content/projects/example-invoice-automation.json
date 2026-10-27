@@ -1,0 +1,205 @@
+{
+  "pageTitle": "Invoice Approval Automation PRD v.1",
+  "overview": {
+    "title": "Invoice Approval Automation",
+    "team": "Product Tech and AI",
+    "contributors": [
+      {
+        "name": "Alex Taylor",
+        "role": "Product Manager",
+        "email": "alex.taylor@example.com"
+      },
+      {
+        "name": "Sam Nguyen",
+        "role": "Lead Engineer",
+        "email": "sam.nguyen@example.com"
+      },
+      {
+        "name": "Jordan Lee",
+        "role": "UX Designer",
+        "email": "jordan.lee@example.com"
+      }
+    ],
+    "stakeholders": [
+      {
+        "name": "Priya Sharma",
+        "role": "Head of Finance",
+        "email": "priya.sharma@example.com"
+      },
+      {
+        "name": "Chris Walker",
+        "role": "Accounts Payable Lead",
+        "email": "chris.walker@example.com"
+      }
+    ],
+    "primaryContact": {
+      "name": "Alex Taylor",
+      "role": "Product Manager",
+      "email": "alex.taylor@example.com"
+    },
+    "targetDelivery": "Q1 end - 31.03.27"
+  },
+  "problem": {
+    "currentState": "Supplier invoices arrive by email as PDFs and are manually keyed into the finance system by the Accounts Payable team. Each invoice is then emailed to a budget owner for approval, and approvals are chased manually when they stall. Invoices regularly miss payment terms, and there is no single view of where an invoice is in the process.",
+    "strategicAlignment": "Reducing manual processing in back-office functions is a key pillar of the company's operational efficiency strategy. Faster, more reliable supplier payments also support our goal of becoming a preferred partner for key suppliers.",
+    "businessCase": {
+      "baseline": [
+        {
+          "metric": "End to end process duration",
+          "currentState": "9 days"
+        },
+        {
+          "metric": "Total employee time required",
+          "currentState": "25 minutes per invoice"
+        },
+        {
+          "metric": "Number of handoffs",
+          "currentState": "5"
+        },
+        {
+          "metric": "SLA performance",
+          "currentState": "72% paid within terms"
+        }
+      ],
+      "expectedImprovement": [
+        {
+          "metric": "End to end process duration",
+          "currentState": "9 days",
+          "target": "3 days",
+          "improvement": "67%"
+        },
+        {
+          "metric": "Total employee time required",
+          "currentState": "25 minutes per invoice",
+          "target": "6 minutes per invoice",
+          "improvement": "76%"
+        },
+        {
+          "metric": "Number of handoffs",
+          "currentState": "5",
+          "target": "2",
+          "improvement": "60%"
+        },
+        {
+          "metric": "SLA performance",
+          "currentState": "72% paid within terms",
+          "target": "95% paid within terms",
+          "improvement": "32%"
+        }
+      ],
+      "commercialBenefit": {
+        "title": "Commercial Benefit",
+        "timeSaving": "Estimated annual time saving: 2,850 hours",
+        "costBenefit": "Estimated annual capacity / cost benefit: $185,000"
+      }
+    }
+  },
+  "solution": {
+    "futureState": "Invoices sent to a shared inbox are automatically read, and key fields (supplier, amount, PO number, due date) are extracted and matched against purchase orders. Matched invoices are routed to the right budget owner for one-click approval, with automatic reminders and escalation. The MVP covers PO-backed invoices from the top 50 suppliers.",
+    "workflows": [
+      {
+        "image": "https://placebear.com/1920/1080",
+        "alt": "Future state invoice approval workflow"
+      }
+    ],
+    "keyFeatures": [
+      "Automatic capture of invoices from the shared AP inbox",
+      "Extraction of supplier, amount, PO number and due date from PDF invoices",
+      "Automatic matching of invoices to purchase orders",
+      "Approval routing to budget owners with one-click approve / reject",
+      "Automated reminders and escalation for overdue approvals",
+      "Dashboard showing the status of every invoice in progress"
+    ],
+    "wireframes": [
+      {
+        "image": "https://placebear.com/1920/1080",
+        "alt": "Approval screen wireframe"
+      }
+    ]
+  },
+  "scope": {
+    "goals": [
+      "Reduce average invoice processing time from 9 days to 3 days",
+      "Cut AP team effort per invoice by at least 75%",
+      "Increase invoices paid within terms from 72% to 95%",
+      "Give finance a real-time view of all invoices in progress"
+    ],
+    "nonGoals": [
+      "Non-PO invoices - these need a separate coding process and will follow in phase 2",
+      "Paper invoices - fewer than 3% of volume, to be handled manually",
+      "Changes to the payment run itself - this stays in the existing finance system"
+    ]
+  },
+  "milestones": [
+    {
+      "target": "15.11.26",
+      "milestone": "Discovery complete",
+      "description": "Current process mapped, supplier invoice samples collected, requirements signed off"
+    },
+    {
+      "target": "20.12.26",
+      "milestone": "Extraction and matching build",
+      "description": "Invoice capture, field extraction and PO matching working in test"
+    },
+    {
+      "target": "31.01.27",
+      "milestone": "Approval workflow build",
+      "description": "Routing, approvals, reminders and dashboard complete"
+    },
+    {
+      "target": "28.02.27",
+      "milestone": "Pilot",
+      "description": "Live with 10 suppliers and the AP team"
+    },
+    {
+      "target": "31.03.27",
+      "milestone": "Rollout",
+      "description": "Live for the top 50 suppliers"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Extraction accuracy is too low for some invoice layouts",
+      "impact": "High",
+      "likelihood": "Medium",
+      "mitigation": "Test against samples from all top 50 suppliers early; route low-confidence invoices to manual review"
+    },
+    {
+      "risk": "Budget owners don't adopt the new approval flow",
+      "impact": "Medium",
+      "likelihood": "Medium",
+      "mitigation": "Keep approvals to one click from email; brief budget owners before pilot"
+    },
+    {
+      "risk": "Finance system API access is delayed",
+      "impact": "High",
+      "likelihood": "Low",
+      "mitigation": "Raise access request in discovery; fall back to a CSV export for the pilot"
+    }
+  ],
+  "dependencies": [
+    {
+      "dependency": "Finance system API",
+      "requirement": "Read access to purchase orders and write access to approved invoices",
+      "owner": "IT Platforms",
+      "status": "Requested"
+    },
+    {
+      "dependency": "Shared AP inbox",
+      "requirement": "Service account access to read incoming invoices",
+      "owner": "IT Service Desk",
+      "status": "Approved"
+    },
+    {
+      "dependency": "Budget owner list",
+      "requirement": "Up-to-date mapping of cost centres to approvers",
+      "owner": "Finance",
+      "status": "In progress"
+    }
+  ],
+  "assumptions": [
+    "At least 85% of invoices from the top 50 suppliers include a valid PO number",
+    "Budget owners will approve invoices from email or mobile without logging into the finance system",
+    "Current invoice volumes (around 9,000 per year) stay roughly the same through rollout"
+  ]
+}
