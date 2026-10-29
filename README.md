@@ -16,13 +16,13 @@ A single app can hold multiple PRDs. Each project's content lives in its own JSO
 Clone the repository and install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 Start the local development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Vite will provide a local URL, typically:
@@ -36,7 +36,7 @@ http://localhost:5173
 1. Copy `src/content/projects/template.json` to a new file, e.g. `src/content/projects/my-project.json`. The filename becomes the project's id.
 2. Update the PRD content in the new file.
 3. Add any workflow diagrams, wireframes, or other images to `public/` (e.g. `public/my-project/workflow.png`) and reference them by path in the JSON (`"image": "/my-project/workflow.png"`). Full URLs also work.
-4. Run the project locally with `npm run dev`.
+4. Run the project locally with `pnpm dev`.
 5. Commit and publish the completed PRD.
 
 ## Multiple Projects
