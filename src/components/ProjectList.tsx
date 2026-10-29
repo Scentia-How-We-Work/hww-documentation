@@ -19,7 +19,7 @@ function ProjectList({ projects, missingId }: Props) {
     <main className="min-h-screen">
       <div className="mx-auto max-w-3xl px-8 py-20">
         <div className="mb-5 flex items-baseline justify-between gap-4">
-          <p className="text-sm font-medium text-accent">PRDs and TDSs</p>
+          <p className="text-sm font-medium text-accent">Documentation</p>
           <ThemeToggle />
         </div>
         <h1 className="mb-12 text-6xl font-light leading-none tracking-tighter">Projects</h1>

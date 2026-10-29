@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import projects from "./content/projects";
-import { docHref, resolveView } from "./lib/projects";
+import { docHref, listedProjects, resolveView } from "./lib/projects";
 import DocSwitcher from "./components/DocSwitcher";
 import Nav from "./components/Nav";
 import PrdPage, { prdSections } from "./components/PrdPage";
@@ -14,7 +14,7 @@ const view = resolveView(projects, new URLSearchParams(window.location.search));
 // The PRD or TDS version the URL asks for (versions are numbered from 1 with no gaps)
 const prd = view.page === "doc" && view.kind === "prd" ? view.project.prd[view.version - 1] : null;
 const tds = view.page === "doc" && view.kind === "tds" ? view.project.tds[view.version - 1] : null;
-const title = prd ? prd.pageTitle : tds ? `${tds.documentControl.project} TDS` : "PRDs and TDSs";
+const title = prd ? prd.pageTitle : tds ? `${tds.documentControl.project} TDS` : "Documentation";
 
 function App() {
   const scroller = useRef<HTMLDivElement>(null);
@@ -25,7 +25,7 @@ function App() {
   }, []);
 
   if (view.page === "list") {
-    return <ProjectList projects={projects} missingId={view.missingId} />;
+    return <ProjectList projects={listedProjects(projects)} missingId={view.missingId} />;
   }
 
   const { project, kind, version, missingVersion } = view;
