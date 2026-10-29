@@ -162,28 +162,33 @@
     },
     {
       "target": "[DD.MM.YY]",
+      "milestone": "Foundations and client onboarding",
+      "description": "App deployed with CI, environments, email sending and seed data. Sign-in for every role, with each role in its own area, the super admin list and session rules. Scentia staff set up a client's email domains and administrators, the primary client administrator promotes and demotes others, and welcome emails and activity history are in place"
+    },
+    {
+      "target": "[DD.MM.YY]",
+      "milestone": "Find and book a course",
+      "description": "Employees browse, filter and book courses, with points and eligibility worked out across several contracts. Client administrators set each contract's approval setting and approve or decline from email or the portal, with reminders and automatic closing. Employees see My bookings, change dates, cancel and withdraw requests, and Salesforce session changes are shown and emailed"
+    },
+    {
+      "target": "[DD.MM.YY]",
+      "milestone": "Employee access and requests",
+      "description": "Client administrators add employees one at a time or in bulk, send invitations and remove employees. Employees request courses they can't book, and administrators and the Scentia account manager review and close them. Email preferences and one-click unsubscribe links for employees and administrators"
+    },
+    {
+      "target": "[DD.MM.YY]",
+      "milestone": "Reporting and oversight",
+      "description": "Contract view, points usage log, training progress and CSV exports for client administrators. Client list with usage, renewal and problem flags, and client details, for Scentia staff"
+    },
+    {
+      "target": "[DD.MM.YY]",
+      "milestone": "Renewals",
+      "description": "90-day reminders from Salesforce and contracts flagged as due for renewal. Client administrators renew by invoice request or pay online by card or bank transfer, and Scentia staff track each renewal"
+    },
+    {
+      "target": "[DD.MM.YY]",
       "milestone": "Salesforce integration",
-      "description": "Hourly refresh of clients, contracts, courses, places and enrolments, and writing bookings, changes, cancellations and removals, working in test"
-    },
-    {
-      "target": "[DD.MM.YY]",
-      "milestone": "Participant portal",
-      "description": "Sign-in, course list and filters, booking, My bookings, change or cancel, course requests and email preferences"
-    },
-    {
-      "target": "[DD.MM.YY]",
-      "milestone": "Client admin portal",
-      "description": "Contract view, access and approval settings, approval requests, approved employee lists, administrator roles, teams, booking for employees (individually and in bulk), course requests, training progress, points usage log and exports"
-    },
-    {
-      "target": "[DD.MM.YY]",
-      "milestone": "Internal portal",
-      "description": "Super admin list and break-glass account, client setup and Go live, client list and details, portal settings, client administrator management, renewals tracking and exports"
-    },
-    {
-      "target": "[DD.MM.YY]",
-      "milestone": "Renewals and payments",
-      "description": "Renewal by invoice request and online payment, plus the Salesforce renewal emails"
+      "description": "Live Salesforce reads and writes replace the seeded data used by the earlier milestones, including handling failed writes and retries. A booking made in the portal appears in Salesforce, and a session cancelled in Salesforce shows in the portal"
     },
     {
       "target": "[DD.MM.YY]",
@@ -238,6 +243,12 @@
       "impact": "High",
       "likelihood": "Low",
       "mitigation": "A break-glass account that doesn't rely on sign-in emails, with alerts on every use and credentials changed after use"
+    },
+    {
+      "risk": "The Salesforce integration is built last, on top of seeded data, so differences between the seed data and real Salesforce fields could surface late",
+      "impact": "Medium",
+      "likelihood": "Medium",
+      "mitigation": "Match the seed data to the Salesforce fields listed in the user stories, so switching to live data doesn't need changes elsewhere"
     }
   ],
   "dependencies": [
