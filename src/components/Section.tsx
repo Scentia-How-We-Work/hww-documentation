@@ -13,7 +13,7 @@ function Section({ id, number, title, headline, primary, children }: Props) {
   const HeadlineTag = primary ? "h1" : "h2";
 
   return (
-    <section id={id} className="py-16 scroll-mt-8 min-h-screen snap-start">
+    <section id={id} className="py-16 scroll-mt-8 min-h-screen">
       <div className="mb-12 flex flex-col gap-5">
         <p className="text-sm font-medium text-accent">
           {number} — {title}
