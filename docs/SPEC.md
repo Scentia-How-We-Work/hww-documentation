@@ -53,6 +53,12 @@ shows one at `/?project=<id>`. Used by Scentia How We Work to publish and share 
 None at runtime. Link cards and TDS links point at external pages (for example the mock-ups on
 https://scentia-aim.github.io/HWW-Mock-Ups/ and Notion) but nothing is fetched from them.
 
+## Hosting
+
+Published on GitHub Pages at https://scentia-how-we-work.github.io/hww-documentation/, built and
+deployed from `main` (docs/DEPLOY.md). The site lives under a subpath, so in-app links stay relative
+(`?project=…`, `./`) and never start with `/`.
+
 ## Data
 
 One folder per project in `src/content/projects/`, bundled at build time. The folder name is the

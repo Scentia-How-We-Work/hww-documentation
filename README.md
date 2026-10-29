@@ -58,7 +58,7 @@ In Claude Code: `/scentia:start-work`, `/scentia:integrate-testing`, `/scentia:f
 CI and the pre-push hook run `validate` and `check:versions` alongside the other checks.
 
 Docs: [docs/SPEC.md](docs/SPEC.md) (requirements, source of truth) and
-[docs/DEPLOY.md](docs/DEPLOY.md) (deploy target, not set up yet).
+[docs/DEPLOY.md](docs/DEPLOY.md) (GitHub Pages, published from `main`).
 
 ## Content layout
 
