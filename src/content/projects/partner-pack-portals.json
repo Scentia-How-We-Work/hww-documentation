@@ -1,5 +1,5 @@
 {
-  "pageTitle": "Partner Pack Portals PRD v.1",
+  "pageTitle": "Partner Pack Portals PRD v.2",
   "overview": {
     "title": "Partner Pack Portals",
     "team": "Product Tech and AI",
@@ -96,7 +96,7 @@
     }
   },
   "solution": {
-    "futureState": "A set of portals backed by Salesforce. Employees of client organisations sign in with their work email, browse the courses their contracts cover and book them, spending from a points balance. Client administrators approve bookings, manage who can use each contract, track training progress and points usage, export reports and renew their contracts online. Internal Scentia staff see every client in one place, manage portal settings and administrators, and track renewals. All users sign in with an email link and code; there is no SSO.",
+    "futureState": "A set of portals backed by Salesforce, with data refreshed every hour. Employees of client organisations sign in with their work email, browse every course, and book the ones their contracts cover, spending from a points balance. Client administrators choose who can use each contract and whether bookings need approval, approve requests, book courses for employees one at a time or in groups using teams, track training progress and points usage, export reports and renew their contracts online. Scentia super admins set up and launch each client, see every client in one place, manage portal settings and administrators, and track renewals. All users sign in with an email link and code; there is no SSO.",
     "workflows": [
       {
         "image": "https://placebear.com/1920/1080",
@@ -104,19 +104,24 @@
       }
     ],
     "keyFeatures": [
-      "Participant sign-in with work email, using open (email domain) or whitelist (approved list) access for each contract",
-      "Course list, course details and filters (delivery mode, date, category, location, level), showing points cost and available places",
-      "Booking with an approval setting for each contract (approval required or book directly), automatic contract selection, and points rechecked on submit",
-      "My bookings: status, attendance details, cancellation deadline and calendar invites",
+      "Participant sign-in with work email: contracts start open to anyone with a matching email domain, and client administrators can switch each one to a whitelist (approved list)",
+      "Course list showing every course, with ones the employee can't book greyed out and the reason shown, filters (delivery mode, date, category, location, level), points cost, and \"few places left\" when fewer than 3 remain",
+      "Booking with an approval setting for each contract (approval required or book directly), automatic contract selection (whitelist contracts first, then the contract ending soonest), and places and points rechecked on submit",
+      "Pending requests hold their place and points for up to a month, closing 10 business days before the course starts or when the contract ends",
+      "My bookings: status, attendance details, cancellation deadline, calendar invites, and a reminder email 3 business days before the course",
       "Change or cancel bookings, with points returned if cancelled 10 or more business days before the course starts",
       "Approve or decline booking requests from email or the portal, with reminders and automatic expiry",
-      "Contract view for client administrators: points purchased, used and remaining, usage against time, weekly pace and expiry flags",
-      "Approved employee list management, including bulk paste, invitations and removal",
-      "Training progress view, points usage log and CSV exports that replace the manual client reports",
-      "Requests for courses outside a contract, visible to client administrators and Scentia",
-      "Renewals by invoice request or online payment (card or bank transfer)",
-      "Internal portal: client list, client details, portal settings, client administrator management, renewals tracking and exports",
-      "Salesforce integration to read clients, contracts, courses, places and enrolments, and to write bookings, changes, cancellations and renewals",
+      "Client administrators book, change or cancel courses for employees, individually or for several people at once, without approval",
+      "Teams of employees, used for group bookings, adding people to approved lists, and filtering progress and exports",
+      "Contract view for client administrators: points purchased, used, pending and remaining, usage against time, weekly usage and pace needed, expiry flags, FAQs and three key insights",
+      "Approved employee list management, including bulk paste with checks, invitations, and single or bulk removal",
+      "The primary client administrator promotes and demotes other client administrators",
+      "Training progress view, an uneditable points usage log, and CSV exports that replace the manual client reports",
+      "Requests for courses outside a contract, grouped by course for client administrators and emailed to the Scentia account manager",
+      "Renewals by invoice request or online payment (card or bank transfer), with more points or a 1 to 3 year term",
+      "Internal portal: client setup and Go live, client list with usage and problem flags, client details, portal settings, client administrator management, renewals tracking and exports",
+      "Super admin list controlled by a single owner, plus a break-glass account for when normal sign-in fails",
+      "Salesforce integration to read clients, contracts, courses, places, enrolments and renewal prices, and to write bookings, changes, cancellations, removals and renewals",
       "Email notification preferences with unsubscribe links"
     ],
     "wireframes": [
@@ -129,10 +134,11 @@
   "scope": {
     "goals": [
       "Let employees find and book the courses their contracts cover themselves",
+      "Let client administrators arrange training for their people, booking for individuals or whole teams at once",
       "Give client administrators visibility of points usage and employee progress, so they know whether they're getting value from their contracts",
       "Replace the manually prepared client reports with self-serve CSV exports",
       "Avoid gaps in access by flagging contracts 90 days before they end and letting clients renew in the portal",
-      "Give PP coordinators one view of every client, without checking Salesforce and Moodle reports",
+      "Give super admins one view of every client, without checking Salesforce and Moodle reports",
       "Help clients answer basic questions themselves, with FAQs and support contact details in the portal"
     ],
     "nonGoals": [
@@ -140,6 +146,10 @@
       "Contract emails to clients (renewal reminders, invoices, receipts) - these are sent and managed by Salesforce, not the portal",
       "Internal Scentia users creating, changing, cancelling or approving bookings - internal booking views are read-only",
       "Changing renewal status in the portal - it only updates from Salesforce",
+      "Rolling over unused points - rollovers are arranged with the sales rep and arrive from Salesforce as a new contract",
+      "Live data - Salesforce data refreshes every hour, and the portal doesn't show when it was last refreshed",
+      "Enforcing course prerequisites - they're shown for information only",
+      "Employees choosing which contract a booking uses - the portal assigns it",
       "A dedicated support area for Partner Pack queries - the MVP covers FAQs and support contact details only"
     ]
   },
@@ -147,27 +157,27 @@
     {
       "target": "[DD.MM.YY]",
       "milestone": "Requirements sign-off",
-      "description": "User stories signed off; open Salesforce questions resolved, such as what happens when a booking fails to save and which Salesforce emails already exist"
+      "description": "User stories signed off; open questions resolved, such as what happens when a booking fails to save to Salesforce, which Salesforce emails already exist, and whether the primary client administrator can be set by hand"
     },
     {
       "target": "[DD.MM.YY]",
       "milestone": "Salesforce integration",
-      "description": "Reading clients, contracts, courses, places and enrolments, and writing bookings, changes and cancellations, working in test"
+      "description": "Hourly refresh of clients, contracts, courses, places and enrolments, and writing bookings, changes, cancellations and removals, working in test"
     },
     {
       "target": "[DD.MM.YY]",
       "milestone": "Participant portal",
-      "description": "Sign-in, course list and filters, booking, My bookings, change or cancel, and course requests"
+      "description": "Sign-in, course list and filters, booking, My bookings, change or cancel, course requests and email preferences"
     },
     {
       "target": "[DD.MM.YY]",
       "milestone": "Client admin portal",
-      "description": "Contract view, approval settings and requests, approved employee lists, training progress, points usage log and exports"
+      "description": "Contract view, access and approval settings, approval requests, approved employee lists, administrator roles, teams, booking for employees (individually and in bulk), course requests, training progress, points usage log and exports"
     },
     {
       "target": "[DD.MM.YY]",
       "milestone": "Internal portal",
-      "description": "Client list and details, portal settings, client administrator management, renewals tracking and exports"
+      "description": "Super admin list and break-glass account, client setup and Go live, client list and details, portal settings, client administrator management, renewals tracking and exports"
     },
     {
       "target": "[DD.MM.YY]",
@@ -177,7 +187,7 @@
     {
       "target": "[DD.MM.YY]",
       "milestone": "UAT and pilot",
-      "description": "Testing with the PP coordinators and a pilot with one or two clients"
+      "description": "Testing with the super admins and a pilot with one or two clients"
     },
     {
       "target": "[DD.MM.YY]",
@@ -190,7 +200,7 @@
       "risk": "A booking, change or cancellation fails to save to Salesforce, leaving the portal and Salesforce out of sync. How this is handled is still an open question.",
       "impact": "High",
       "likelihood": "Medium",
-      "mitigation": "Define retry and failure handling; flag failures on the internal client list and client details so coordinators can resolve them"
+      "mitigation": "Define retry and failure handling; show failures with a retry option after bulk actions, and flag them on the internal client list and client details so super admins can resolve them"
     },
     {
       "risk": "The Salesforce email automations the portal relies on (renewal reminders, invoice and bank transfer notifications, receipts) don't exist yet",
@@ -209,12 +219,30 @@
       "impact": "High",
       "likelihood": "Medium",
       "mitigation": "Use a hosted payment provider form so card details are never handled or stored by the portal"
+    },
+    {
+      "risk": "Salesforce data refreshes hourly, so places shown can be out of date and a session may fill before a booking is submitted or approved",
+      "impact": "Medium",
+      "likelihood": "Medium",
+      "mitigation": "Recheck places and points on submit and on approval, and tell the employee why a booking can't go ahead"
+    },
+    {
+      "risk": "Open contracts let anyone with a matching email domain book, including people who have left until their work email stops working",
+      "impact": "Medium",
+      "likelihood": "Low",
+      "mitigation": "Explain open access in the welcome email, and let client administrators switch a contract to a whitelist"
+    },
+    {
+      "risk": "Super admins lose access to the internal portal, for example if sign-in emails can't be delivered",
+      "impact": "High",
+      "likelihood": "Low",
+      "mitigation": "A break-glass account that doesn't rely on sign-in emails, with alerts on every use and credentials changed after use"
     }
   ],
   "dependencies": [
     {
       "dependency": "Salesforce read/write integration",
-      "requirement": "Read clients, contracts, course lists, offerings, places, enrolments and renewal status; write bookings, changes, cancellations, removals and renewals",
+      "requirement": "Read clients, contracts, course lists, offerings, places, enrolments, renewal status and renewal prices every hour; write bookings, changes, cancellations, removals and renewals",
       "owner": "Muzza Khan",
       "status": "Not started"
     },
@@ -229,11 +257,19 @@
       "requirement": "Hosted card payments for online renewals",
       "owner": "Muzza Khan",
       "status": "Not started"
+    },
+    {
+      "dependency": "Break-glass account",
+      "requirement": "A dedicated email address and securely stored credentials (password plus hardware key or authenticator app), retrievable only by named IT staff",
+      "owner": "IT team",
+      "status": "Not started"
     }
   ],
   "assumptions": [
     "All contracts use one points-based model, and Scentia sets the points cost of each course. \"Points\" is a working term and may change.",
     "An employee can be included in more than one of their organisation's contracts",
+    "Sessions must start within the contract term; multi-day courses that finish after the contract ends are still allowed",
+    "If Salesforce shortens a contract's term, bookings after the new end date are kept, because the points are already spent, and flagged to super admins",
     "Course, place, enrolment, attendance and completion data is available from Salesforce",
     "Renewal prices for different points and terms can be read from Salesforce"
   ]
