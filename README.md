@@ -67,8 +67,6 @@ src/content/projects/
 ├── partner-pack-portals/
 │   ├── prd/v1.json
 │   └── tds/v1.json
-├── example-invoice-automation/
-│   └── prd/v1.json          # a TDS can be added later
 └── template/
     ├── prd/v1.json          # blank PRD to copy
     └── tds/v1.json          # blank TDS to copy (from the Notion TDS template)

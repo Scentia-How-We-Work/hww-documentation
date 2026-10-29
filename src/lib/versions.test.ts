@@ -47,4 +47,18 @@ describe("versionViolations", () => {
       `${v2} was edited. Merged versions can't change: add the change as a new version.`,
     ]);
   });
+
+  it("allows deleting a retired project's versions, but not editing or renaming them", () => {
+    const retired = "src/content/projects/example-invoice-automation/prd/v1.json";
+    expect(
+      versionViolations([
+        { status: "D", path: retired },
+        { status: "M", path: retired },
+        { status: "R", path: v2, oldPath: retired },
+      ]),
+    ).toEqual([
+      `${retired} was edited. Merged versions can't change: add the change as a new version.`,
+      `${retired} was renamed. Merged versions can't change: add the change as a new version.`,
+    ]);
+  });
 });
