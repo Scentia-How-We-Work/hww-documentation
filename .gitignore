@@ -1,1 +1,15 @@
 node_modules/
+dist/
+.DS_Store
+
+# Scentia standards
+.env*
+!.env.example
+.dev.vars*
+!.dev.vars.example
+/worktrees/
+/coverage/
+/playwright-report/
+/test-results/
+/reports/
+.stryker-tmp/

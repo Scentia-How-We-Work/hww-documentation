@@ -1,0 +1,8 @@
+{
+  "stack": "c3:react",
+  "tier": "poc",
+  "team": "solo",
+  "mutation": false,
+  "symlink": [".env", ".dev.vars"],
+  "org": "Scentia-AIM"
+}

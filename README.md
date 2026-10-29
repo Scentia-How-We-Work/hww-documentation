@@ -8,35 +8,55 @@ A single app can hold multiple PRDs. Each project's content lives in its own JSO
 
 - React
 - Vite
-- JavaScript
+- TypeScript
 - Tailwind CSS
 
-## Getting Started
+**Tier:** POC (see `.scentia.json`). Follows the
+[Scentia coding standards](https://github.com/Scentia-How-We-Work/coding-standards).
 
-Clone the repository and install dependencies:
+## Setup
 
-```bash
-npm install
-```
-
-Start the local development server:
+Once per machine, install the team Claude Code plugin and the tools that `preflight` checks for:
 
 ```bash
-npm run dev
+brew install gitleaks gh && corepack enable pnpm
+gh auth login
+gh auth setup-git         # lets git clone the internal standards repo with your gh login
+claude plugin marketplace add Scentia-How-We-Work/coding-standards
+claude plugin install scentia@scentia
 ```
 
-Vite will provide a local URL, typically:
+Then in this repo:
 
-```text
-http://localhost:5173
+```bash
+pnpm install
+pnpm dev                  # serves the local `testing` branch at http://localhost:5173
 ```
+
+## Dev workflow
+
+The root checkout stays on the local-only `testing` branch. New work happens in
+`worktrees/<branch>`, and finished work is merged into `testing` to try it out, then sent as a PR.
+In Claude Code: `/scentia:start-work`, `/scentia:integrate-testing`, `/scentia:finish-work`.
+
+## Scripts
+
+| Script                           | Purpose                                                                         |
+| -------------------------------- | ------------------------------------------------------------------------------- |
+| `pnpm dev` / `build` / `preview` | Vite dev server / production build / serve the build locally                    |
+| `pnpm test`                      | Vitest unit tests for the pure lib engine (`src/lib`), with coverage thresholds |
+| `pnpm format` / `format:check`   | Prettier: format everything / check formatting                                  |
+| `pnpm lint` / `typecheck`        | ESLint (including lib purity rules) / TypeScript                                |
+
+Docs: [docs/SPEC.md](docs/SPEC.md) (requirements, source of truth) and
+[docs/DEPLOY.md](docs/DEPLOY.md) (deploy target, not set up yet).
 
 ## Creating a New PRD
 
 1. Copy `src/content/projects/template.json` to a new file, e.g. `src/content/projects/my-project.json`. The filename becomes the project's id.
 2. Update the PRD content in the new file.
 3. Add any workflow diagrams, wireframes, or other images to `public/` (e.g. `public/my-project/workflow.png`) and reference them by path in the JSON (`"image": "/my-project/workflow.png"`). Full URLs also work.
-4. Run the project locally with `npm run dev`.
+4. Run the project locally with `pnpm dev`.
 5. Commit and publish the completed PRD.
 
 ## Multiple Projects
@@ -57,11 +77,12 @@ src/
 ├── components/      # Reusable PRD components
 ├── content/
 │   ├── projects/    # One JSON file per PRD
-│   └── projects.js  # Loads every project JSON
-├── App.jsx          # PRD page structure
+│   └── projects.ts  # Loads every project JSON
+├── lib/             # Pure, unit-tested logic and the PRD types (types.ts)
+├── App.tsx          # PRD page structure
 ├── App.css
 ├── index.css
-└── main.jsx
+└── main.tsx
 ```
 
 ## Components

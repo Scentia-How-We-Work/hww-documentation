@@ -1,0 +1,12 @@
+# Prettier also skips everything in .gitignore. Generated files go here.
+worktrees/
+dist/
+build/
+coverage/
+.wrangler/
+worker-configuration.d.ts
+pnpm-lock.yaml
+playwright-report/
+test-results/
+reports/
+.stryker-tmp/

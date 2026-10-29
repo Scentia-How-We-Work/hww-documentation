@@ -1,6 +1,9 @@
-import ThemeToggle from './ThemeToggle'
+import type { Project } from "../lib/types";
+import ThemeToggle from "./ThemeToggle";
 
-function ProjectList({ projects, missingId }) {
+type Props = { projects: Project[]; missingId: string | null };
+
+function ProjectList({ projects, missingId }: Props) {
   return (
     <main className="min-h-screen">
       <div className="mx-auto max-w-3xl px-8 py-20">
@@ -8,9 +11,7 @@ function ProjectList({ projects, missingId }) {
           <p className="text-sm font-medium text-accent">PRDs</p>
           <ThemeToggle />
         </div>
-        <h1 className="mb-12 text-6xl font-light leading-none tracking-tighter">
-          Projects
-        </h1>
+        <h1 className="mb-12 text-6xl font-light leading-none tracking-tighter">Projects</h1>
 
         {missingId && (
           <p className="mb-8 bg-medium-bg px-4 py-3 text-sm text-medium">
@@ -26,19 +27,17 @@ function ProjectList({ projects, missingId }) {
                 href={`?project=${encodeURIComponent(project.id)}`}
                 className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-1 border-b border-line py-5 transition-transform duration-200 hover:scale-[1.02]"
               >
-                <span className="text-lg text-ink">
-                  {project.prd.pageTitle}
-                </span>
+                <span className="text-lg text-ink">{project.prd.pageTitle}</span>
                 <span className="text-sm text-muted">
                   {project.prd.overview.team} · {project.prd.overview.targetDelivery}
                 </span>
               </a>
-            )
+            );
           })}
         </div>
       </div>
     </main>
-  )
+  );
 }
 
-export default ProjectList
+export default ProjectList;
