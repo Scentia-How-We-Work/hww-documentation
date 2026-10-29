@@ -43,5 +43,11 @@ jobs:
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
+      # Project-specific: PRD and TDS content must validate, and merged versions must not change
+      - run: pnpm validate
+      - name: Check merged PRD and TDS versions are unchanged
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
+        run: pnpm check:versions "$BASE"
       - run: pnpm test
       - run: pnpm build

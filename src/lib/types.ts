@@ -1,4 +1,18 @@
-// The shape of a PRD file in src/content/projects (see template.json).
+// The shapes of the PRD and TDS files in src/content/projects/<id>/{prd,tds}/v<n>.json (see the
+// template project). schemas.ts validates files against these.
+
+export type Status = "Draft" | "In review" | "Approved" | "Superseded";
+
+// Every PRD and TDS file starts with this. Files never change once merged, so the approval log is
+// the list of every version's header.
+export type VersionInfo = {
+  number: number;
+  date: string; // YYYY-MM-DD
+  status: Status;
+  author: string;
+  approvedBy?: string;
+  changes: string;
+};
 
 export type Person = { name: string; role: string; email: string };
 
@@ -10,6 +24,7 @@ export type LinkCard = { link: string; title: string; description: string };
 export type MediaItem = Image | LinkCard;
 
 export type Prd = {
+  version: VersionInfo;
   pageTitle: string;
   overview: {
     title: string;
@@ -47,6 +62,43 @@ export type Prd = {
   assumptions: string[];
 };
 
-export type Project = { id: string; prd: Prd };
+// TDS content is a fixed list of sections (tds.ts) built from these blocks. Text in any block can
+// use **bold**, *italic*, `code` and [links](https://…).
+export type Block =
+  | { type: "text"; text: string }
+  | { type: "heading"; text: string }
+  | { type: "list"; ordered?: boolean; items: string[] }
+  | { type: "table"; columns: string[]; rows: string[][] }
+  | { type: "mermaid"; title?: string; code: string }
+  | { type: "callout"; tone: "info" | "guidance" | "warning"; text: string }
+  | { type: "checklist"; items: { text: string; done: boolean }[] };
+
+export type Subsection = { number: string; title: string; blocks: Block[] };
+
+export type TdsSection = {
+  number: string;
+  title: string;
+  blocks: Block[];
+  subsections?: Subsection[];
+};
+
+export type Tds = {
+  version: VersionInfo;
+  prdVersion?: number; // the PRD version this TDS was written against
+  documentControl: {
+    project: string;
+    tier: string;
+    approver: string;
+    reviewers: string;
+    related: { label: string; url: string }[];
+  };
+  intro?: Block[];
+  sections: TdsSection[];
+};
+
+export type DocKind = "prd" | "tds";
+
+// Each list holds every version of the document, oldest first; empty when there isn't one yet
+export type Project = { id: string; prd: Prd[]; tds: Tds[] };
 
 export type Level = "low" | "medium" | "high";

@@ -20,6 +20,12 @@ pre-push:
     typecheck:
       priority: 4
       run: pnpm typecheck
-    test:
+    validate:
       priority: 5
+      run: pnpm validate
+    check-versions:
+      priority: 6
+      run: pnpm check:versions
+    test:
+      priority: 7
       run: pnpm test

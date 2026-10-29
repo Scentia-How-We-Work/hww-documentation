@@ -1,5 +1,12 @@
 {
-  "pageTitle": "[Project Title] PRD v.1",
+  "version": {
+    "number": 1,
+    "date": "2026-10-29",
+    "status": "Draft",
+    "author": "[Author]",
+    "changes": "[What changed in this version and why]"
+  },
+  "pageTitle": "[Project Title] PRD",
   "overview": {
     "title": "[Project Name]",
     "team": "Product Tech and AI",

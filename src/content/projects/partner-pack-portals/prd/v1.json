@@ -1,5 +1,12 @@
 {
-  "pageTitle": "Partner Pack Portals PRD v.2",
+  "version": {
+    "number": 1,
+    "date": "2026-10-29",
+    "status": "Draft",
+    "author": "Erin Smith",
+    "changes": "First versioned PRD: the PRD as it stood before versioning (then titled v.2), updated from the user stories and epics and linked to the POC mock-ups."
+  },
+  "pageTitle": "Partner Pack Portals PRD",
   "overview": {
     "title": "Partner Pack Portals",
     "team": "Product Tech and AI",

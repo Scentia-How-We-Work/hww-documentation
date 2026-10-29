@@ -1,5 +1,12 @@
 {
-  "pageTitle": "Invoice Approval Automation PRD v.1",
+  "version": {
+    "number": 1,
+    "date": "2026-10-27",
+    "status": "Draft",
+    "author": "Erin Smith",
+    "changes": "First versioned PRD: the example as it stood before versioning."
+  },
+  "pageTitle": "Invoice Approval Automation PRD",
   "overview": {
     "title": "Invoice Approval Automation",
     "team": "Product Tech and AI",
