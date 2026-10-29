@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import projects from "./content/projects";
 import { findProject } from "./lib/projects";
 import Section from "./components/Section";
@@ -10,6 +10,7 @@ import Media from "./components/Media";
 import Commercials from "./components/Commercials";
 import Nav from "./components/Nav";
 import ProjectList from "./components/ProjectList";
+import { useSectionSnap } from "./hooks/useSectionSnap";
 import "./App.css";
 
 const sections = [
@@ -27,6 +28,9 @@ const projectId = new URLSearchParams(window.location.search).get("project");
 const project = findProject(projects, projectId);
 
 function App() {
+  const scroller = useRef<HTMLDivElement>(null);
+  useSectionSnap(scroller);
+
   useEffect(() => {
     document.title = project ? project.prd.pageTitle : "PRDs";
   }, []);
@@ -41,7 +45,10 @@ function App() {
     <main id="top" className="flex h-screen">
       <Nav sections={sections} title={prd.pageTitle} />
 
-      <div className="h-screen min-w-0 flex-1 overflow-y-auto snap-y snap-mandatory scroll-smooth px-16 pb-28">
+      <div
+        ref={scroller}
+        className="h-screen min-w-0 flex-1 overflow-y-auto scroll-smooth px-16 pb-28"
+      >
         <div className="max-w-[880px]">
           <Section id="overview" number="01" title="Overview" headline={prd.overview.title} primary>
             <Overview overview={prd.overview} />
