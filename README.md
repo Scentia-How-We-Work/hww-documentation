@@ -56,6 +56,9 @@ Docs: [docs/SPEC.md](docs/SPEC.md) (requirements, source of truth) and
 1. Copy `src/content/projects/template.json` to a new file, e.g. `src/content/projects/my-project.json`. The filename becomes the project's id.
 2. Update the PRD content in the new file.
 3. Add any workflow diagrams, wireframes, or other images to `public/` (e.g. `public/my-project/workflow.png`) and reference them by path in the JSON (`"image": "/my-project/workflow.png"`). Full URLs also work.
+   To link to something instead, such as a live mock-up, use a link card in `workflows` or
+   `wireframes`: `{ "link": "https://…", "title": "…", "description": "…" }`. Each one shows as a
+   card that opens the link in a new tab.
 4. Run the project locally with `pnpm dev`.
 5. Commit and publish the completed PRD.
 
