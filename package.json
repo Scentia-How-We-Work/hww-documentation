@@ -1,6 +1,6 @@
 {
   "name": "hww-documentation",
-  "description": "PRD and technical design store: renders each PRD JSON file as a microsite.",
+  "description": "PRD and TDS store: renders each project's versioned PRD and TDS JSON files as a microsite.",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,19 +11,25 @@
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.scripts.json",
+    "validate": "tsx scripts/validate-content.ts",
+    "check:versions": "tsx scripts/check-versions.ts",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "prepare": "lefthook install"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "mermaid": "^12.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^22.20.5",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
@@ -32,8 +38,10 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.12.0",
+    "jsdom": "^30.1.3",
     "lefthook": "^2.2.2",
     "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.0",

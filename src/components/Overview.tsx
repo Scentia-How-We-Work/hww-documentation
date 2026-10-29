@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Person as PersonType, Prd } from "../lib/types";
 
-function Row({ label, children }: { label: string; children: ReactNode }) {
+export function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-wrap gap-x-8 gap-y-1.5 border-b border-line py-[18px]">
       <p className="basis-44 pt-0.5 text-xs font-medium uppercase tracking-wider text-subtle">

@@ -1,0 +1,1343 @@
+{
+  "version": {
+    "number": 1,
+    "date": "2026-10-29",
+    "status": "Draft",
+    "author": "[Author]",
+    "changes": "[What changed in this version and why]"
+  },
+  "prdVersion": 1,
+  "documentControl": {
+    "project": "✏️ [Project]",
+    "tier": "✏️ POC ([github.com/Scentia-AIM](https://github.com/Scentia-AIM)) / Production ([github.com/Scentia-How-We-Work](https://github.com/Scentia-How-We-Work))",
+    "approver": "Matt Stejer (Head of Product Technologies & AI)",
+    "reviewers": "✏️ Delivery lead; security reviewer",
+    "related": [
+      {
+        "label": "✏️ User stories",
+        "url": "https://app.notion.com/"
+      },
+      {
+        "label": "✏️ Epics",
+        "url": "https://app.notion.com/"
+      },
+      {
+        "label": "✏️ Repo",
+        "url": "https://github.com/"
+      }
+    ]
+  },
+  "intro": [
+    {
+      "type": "callout",
+      "tone": "info",
+      "text": "**How to use this template**\n1. Copy `template/tds/v1.json` to `<project>/tds/v1.json` and set `prdVersion` to the PRD version it's written against.\n2. Keep the section numbers. Write \"N/A — [reason]\" in a section rather than deleting it, so reviewers can see it was considered. Validation fails on a missing or empty section.\n3. Items marked 🔒 **Mandated** are the Scentia standard. A project may deviate from one only with an ADR (section 17) approved by Matt Stejer.\n4. Items marked ✏️ are project-specific: fill them in.\n5. Delete the 💡 guidance callouts once a section is complete.\n6. Diagrams are Mermaid blocks (section 3.1), so they can be diffed, copied and reviewed as text.\n7. The TDS describes *how* the system is built. Behaviour lives in the user stories and the repo's `docs/SPEC.md`: link to them rather than restating them.\n8. Every change is a new version: copy the latest file to the next number (v2.json, v3.json…) and update its version header. Merged versions never change, and CI fails if one does.\n9. Worked example: the Partner Packs Portal TDS (`partner-pack-portals/tds/v1.json`)."
+    }
+  ],
+  "sections": [
+    {
+      "number": "1",
+      "title": "Overview",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "1.1",
+          "title": "Context and problem",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "Two or three paragraphs: the business problem, who has it, and what happens today. Link the brief."
+            }
+          ]
+        },
+        {
+          "number": "1.2",
+          "title": "Goals",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "Measurable outcomes, e.g. \"reduce coordinator time per enrolment by 70%\"."
+            }
+          ]
+        },
+        {
+          "number": "1.3",
+          "title": "Non-goals",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "1.4",
+          "title": "Scope",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["In scope", "Out of scope"],
+              "rows": [["", ""]]
+            }
+          ]
+        },
+        {
+          "number": "1.5",
+          "title": "Users and roles",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Role", "Description", "Approx. number", "Portal / surface"],
+              "rows": [["", "", "", ""]]
+            }
+          ]
+        },
+        {
+          "number": "1.6",
+          "title": "Glossary",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Term", "Meaning"],
+              "rows": [["", ""]]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "2",
+      "title": "Architecture drivers",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "2.1",
+          "title": "Key functional drivers",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "The five to ten stories or rules that most shape the architecture (e.g. \"places must be rechecked atomically on submit\"). Link each to its story. Appendix A holds the full traceability matrix."
+            }
+          ]
+        },
+        {
+          "number": "2.2",
+          "title": "Non-functional requirements",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Scentia defaults for production-tier apps. Tighten where the project needs it; loosening one needs an ADR."
+            },
+            {
+              "type": "table",
+              "columns": ["Attribute", "Scentia default", "Project target ✏️"],
+              "rows": [
+                ["Availability", "99.9% monthly (≈ 43 min downtime)", ""],
+                ["Recovery point objective (RPO)", "1 hour", ""],
+                ["Recovery time objective (RTO)", "4 hours", ""],
+                ["Restore drill", "Quarterly, results recorded", ""],
+                [
+                  "Latency",
+                  "p95 server response < 500 ms for reads, < 1 s for writes, measured from AU",
+                  ""
+                ],
+                ["Accessibility", "WCAG 2.2 AA", ""],
+                [
+                  "Browsers",
+                  "Last two versions of Chrome, Edge, Safari, Firefox; iOS and Android current",
+                  ""
+                ],
+                ["Data residency", "Personal information at rest in Australia only", ""],
+                ["Audit retention", "7 years", ""],
+                ["Application log retention", "90 days (security events 1 year)", ""],
+                ["Scale", "✏️ Users, peak concurrent users, records per year", ""]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "2.3",
+          "title": "Constraints",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "2.4",
+          "title": "Assumptions",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "3",
+      "title": "Architecture (C4 model)",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "3.1",
+          "title": "Diagram conventions",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 All diagrams are Mermaid code blocks in this page. Use flowchart for C4 levels 1–3 and deployment, sequenceDiagram for runtime flows and erDiagram for the data model."
+            },
+            {
+              "type": "table",
+              "columns": ["C4 element", "Mermaid shape", "Style"],
+              "rows": [
+                ["Person", "Stadium ([ ])", "Blue"],
+                ["Software system in scope", "Rectangle", "Dark blue"],
+                ["External system", "Rectangle", "Grey"],
+                ["Container", "Rectangle, label \"Name [Technology]\"", "Light blue"],
+                ["Database / store", "Cylinder [( )]", "Light blue"],
+                ["Relationship", "Arrow labelled \"verb [protocol]\"", "—"]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Every diagram has a one-line title and shows the trust or tenancy boundary as a subgraph."
+            }
+          ]
+        },
+        {
+          "number": "3.2",
+          "title": "Level 1 — System context",
+          "blocks": [
+            {
+              "type": "mermaid",
+              "code": "flowchart LR\n  user([User role]):::person\n  sys[System name]:::system\n  ext[External system]:::external\n  user -- \"uses [HTTPS]\" --> sys\n  sys -- \"reads/writes [REST]\" --> ext\n  classDef person fill:#08427b,color:#fff,stroke:#052e56\n  classDef system fill:#1168bd,color:#fff,stroke:#0b4884\n  classDef external fill:#999,color:#fff,stroke:#6b6b6b"
+            }
+          ]
+        },
+        {
+          "number": "3.3",
+          "title": "Level 2 — Containers",
+          "blocks": [
+            {
+              "type": "mermaid",
+              "code": "flowchart LR\n  user([User]):::person\n  subgraph cf[Cloudflare]\n    web[Web app and API<br/>TanStack Start on Workers]:::container\n    q[[Queue<br/>Cloudflare Queues]]:::container\n    cron[Scheduled jobs<br/>Cron Triggers]:::container\n  end\n  subgraph au[Australia region]\n    db[(Postgres<br/>via Hyperdrive)]:::container\n  end\n  user -- \"HTTPS\" --> web\n  web -- \"SQL [TLS]\" --> db\n  web -- \"enqueue\" --> q\n  classDef person fill:#08427b,color:#fff,stroke:#052e56\n  classDef container fill:#438dd5,color:#fff,stroke:#2e6295"
+            }
+          ]
+        },
+        {
+          "number": "3.4",
+          "title": "Level 3 — Components",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "Only for the main Worker. Show route groups, src/server services (I/O) and src/lib modules (pure domain logic), and which services call which external systems."
+            }
+          ]
+        },
+        {
+          "number": "3.5",
+          "title": "Deployment view",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "Environments, Cloudflare account, Worker names, database project and region, DNS, and where each secret is held."
+            }
+          ]
+        },
+        {
+          "number": "3.6",
+          "title": "Key runtime flows",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "One sequenceDiagram for each flow that crosses a system boundary or has tricky concurrency (sign-in, payments, sync, approvals). Show failure branches with alt/else."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "4",
+      "title": "Technology stack",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "🔒 **Mandated.** Deviating from a row needs an ADR approved by Matt Stejer. Rows marked *(proposed)* are the current recommendation pending a standards ADR."
+        },
+        {
+          "type": "table",
+          "columns": ["Layer", "Scentia standard", "Notes"],
+          "rows": [
+            [
+              "Runtime",
+              "Cloudflare Workers, nodejs_compat",
+              "Team account cf19a34c4b44339d91604f31451b6416"
+            ],
+            ["Language", "TypeScript, strict mode", "—"],
+            ["Framework", "TanStack Start", "React Router (framework mode) is also supported"],
+            ["UI", "React, Tailwind CSS, shadcn/ui *(proposed)*", "WCAG 2.2 AA"],
+            [
+              "Validation",
+              "Zod at every trust boundary",
+              "Requests, webhooks, queue messages, env"
+            ],
+            [
+              "Domain logic",
+              "Pure functions in src/lib",
+              "No I/O, clock, randomness or framework imports (ESLint-enforced)"
+            ],
+            [
+              "Database",
+              "Postgres in an AU region via Cloudflare Hyperdrive",
+              "Platform (PlanetScale or Supabase) pending a standards ADR. D1 only for POCs with no personal information"
+            ],
+            [
+              "ORM / migrations",
+              "Drizzle ORM and drizzle-kit *(proposed)*",
+              "Migrations in repo, expand-and-contract"
+            ],
+            [
+              "Authentication",
+              "Better Auth (email OTP and magic link)",
+              "Users and sessions in the app's Postgres"
+            ],
+            [
+              "Background work",
+              "Cloudflare Queues, Cron Triggers, Workflows for durable multi-step jobs",
+              "Messages carry IDs only, never personal information"
+            ],
+            ["Cache", "Workers KV", "Non-personal data only"],
+            [
+              "Object storage",
+              "AU object storage for anything with personal information; R2 for non-personal assets",
+              "R2 has no AU jurisdiction"
+            ],
+            ["Email", "Resend", "Offshore processing: see APP 8 in section 11"],
+            ["Payments", "Stripe Checkout (hosted)", "Keeps scope at PCI DSS SAQ-A"],
+            ["Bot protection", "Cloudflare Turnstile *(proposed)*", "Public forms, e.g. sign-in"],
+            ["Rate limiting", "Workers Rate Limiting binding and WAF rules", "—"],
+            [
+              "Observability",
+              "Workers Logs and Traces, Logpush, Sentry",
+              "Sentry PII scrubbing mandatory"
+            ],
+            [
+              "Testing",
+              "Vitest; Playwright (mandatory for production tier); Stryker (optional mutation testing)",
+              "—"
+            ],
+            ["Tooling", "pnpm, ESLint, lefthook, gitleaks", "Applied by the scentia plugin"],
+            ["Source and CI", "GitHub, Actions ci check, squash merges, protected main", "—"],
+            ["Deploy", "Cloudflare Workers Builds from main", "Previews per PR"],
+            ["Diagrams", "Mermaid in Notion", "—"]
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "warning",
+          "text": "The scentia plugin's new-app skill still defaults to D1. Until it's updated, production apps holding personal information must swap D1 for AU Postgres at scaffold time."
+        }
+      ]
+    },
+    {
+      "number": "5",
+      "title": "Hosting and environments",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "5.1",
+          "title": "Environments",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Standard environments:"
+            },
+            {
+              "type": "table",
+              "columns": ["Environment", "Purpose", "Data", "Integrations", "Deployed from"],
+              "rows": [
+                [
+                  "Local",
+                  "Development (pnpm dev, workerd)",
+                  "Seeded synthetic",
+                  "Mocks or sandbox",
+                  "Working tree"
+                ],
+                [
+                  "Preview",
+                  "Per-PR review",
+                  "Seeded synthetic. Never production data",
+                  "Sandbox / test mode",
+                  "Every PR (Workers Builds)"
+                ],
+                [
+                  "Staging",
+                  "Integration and UAT",
+                  "Anonymised copy or synthetic",
+                  "Salesforce sandbox, Stripe test mode, Resend test domain",
+                  "main"
+                ],
+                ["Production", "Live", "Live", "Live", "main, after staging checks"]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "5.2",
+          "title": "Domains and DNS",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️ Hostnames per environment. All DNS in Cloudflare. HSTS on."
+            }
+          ]
+        },
+        {
+          "number": "5.3",
+          "title": "Configuration and secrets",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Worker secrets in deployed environments, .env/.dev.vars locally, names listed in .env.example. No secrets in wrangler.jsonc or the repo (gitleaks enforces). Each secret has an owner and a rotation period (default 12 months, or immediately if exposed)."
+            },
+            {
+              "type": "table",
+              "columns": ["Secret", "Purpose", "Owner", "Rotation"],
+              "rows": [["", "", "", ""]]
+            }
+          ]
+        },
+        {
+          "number": "5.4",
+          "title": "Deployment and rollback",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Workers Builds deploys main. Use Worker versions and gradual deployments for risky changes; roll back by promoting the previous version. Database migrations are expand-and-contract so the previous Worker version keeps working after a migration."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "6",
+      "title": "Data model",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "6.1",
+          "title": "Entity relationship diagram",
+          "blocks": [
+            {
+              "type": "mermaid",
+              "code": "erDiagram\n  ORGANISATION ||--o{ USER : has"
+            }
+          ]
+        },
+        {
+          "number": "6.2",
+          "title": "Entity catalogue",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "One row per entity. \"System of record\" says who owns the truth. When the app holds a copy of data owned elsewhere, say how it's kept in sync (section 7)."
+            },
+            {
+              "type": "table",
+              "columns": [
+                "Entity",
+                "System of record",
+                "Stored in",
+                "Classification",
+                "Retention",
+                "Notes"
+              ],
+              "rows": [["", "", "", "", "", ""]]
+            }
+          ]
+        },
+        {
+          "number": "6.3",
+          "title": "Data classification",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Scentia classification scheme:"
+            },
+            {
+              "type": "table",
+              "columns": ["Class", "Examples", "Handling"],
+              "rows": [
+                ["Public", "Course catalogue", "No restrictions"],
+                ["Internal", "Configuration, aggregate metrics", "Authenticated staff only"],
+                [
+                  "Confidential",
+                  "Contract value, pricing, points balances",
+                  "Tenant-scoped; never in logs"
+                ],
+                [
+                  "Personal",
+                  "Names, emails, enrolments, progress",
+                  "AU at rest; masked in logs; APP obligations"
+                ],
+                [
+                  "Restricted",
+                  "Auth tokens, sign-in codes, payment references",
+                  "Hashed or encrypted; never logged; short-lived"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "6.4",
+          "title": "Multi-tenancy and isolation",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Every tenant-owned table has an organisation_id. All queries go through a repository layer that requires a tenant context. Postgres row-level security as defence in depth *(proposed)*. Cross-tenant access is only for internal roles and is audited."
+            }
+          ]
+        },
+        {
+          "number": "6.5",
+          "title": "Migrations",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "6.6",
+          "title": "Retention and deletion",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "7",
+      "title": "Integrations",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "7.1",
+          "title": "Integration standards",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Every integration must have:"
+            },
+            {
+              "type": "list",
+              "items": [
+                "**Inbound webhooks:** signature verification, replay protection (timestamp window), Zod validation, idempotent processing keyed on the provider's event ID, and a 2xx response only after the event is durably recorded.",
+                "**Outbound writes:** sent through a Queue with an idempotency key, exponential backoff, a dead-letter queue, and an alert when anything lands in the DLQ.",
+                "**Reconciliation:** a scheduled job that compares state and reports drift, for any data held on both sides.",
+                "**Failure visibility:** failed syncs are visible to internal users in the app, not only in logs.",
+                "**Least-privilege credentials:** a dedicated integration user or API key per environment, scoped to the minimum objects and actions."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "7.2",
+          "title": "Integration catalogue",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "Copy this table once per integration."
+            },
+            {
+              "type": "table",
+              "columns": ["Aspect", "Detail"],
+              "rows": [
+                ["System / owner", ""],
+                ["Direction", "In / Out / Both"],
+                ["Protocol and auth", ""],
+                ["Data exchanged", ""],
+                ["Trigger and frequency", ""],
+                ["Volume and limits", ""],
+                ["Idempotency", ""],
+                ["Failure handling", ""],
+                ["Reconciliation", ""],
+                ["Data residency", ""]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "8",
+      "title": "Application design",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "8.1",
+          "title": "Code structure",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 src/lib holds pure domain logic, unit-tested with TDD. src/server does I/O (database, bindings, external APIs) and calls into lib. Routes and components stay thin."
+            }
+          ]
+        },
+        {
+          "number": "8.2",
+          "title": "Domain rules",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "List each non-trivial business rule, the src/lib module that owns it and its inputs (pass time, config and randomness in)."
+            }
+          ]
+        },
+        {
+          "number": "8.3",
+          "title": "Background jobs",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Job", "Trigger", "Schedule / queue", "Idempotent", "On failure"],
+              "rows": [["", "", "", "", ""]]
+            }
+          ]
+        },
+        {
+          "number": "8.4",
+          "title": "API and route contracts",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "8.5",
+          "title": "Concurrency and consistency",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "8.6",
+          "title": "Error handling",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Users see plain-language messages with a reference ID (the request ID). Stack traces never reach the client. Unexpected errors go to Sentry."
+            }
+          ]
+        },
+        {
+          "number": "8.7",
+          "title": "Time, dates and locale",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Store UTC; display in Australia/Sydney unless the user's timezone is known; DD/MM/YYYY in UI and exports. Business-day rules state which public holiday calendar applies."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "9",
+      "title": "Identity and access",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "9.1",
+          "title": "Authentication",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Better Auth email one-time code and magic link. Codes are single-use, short-lived (default 10 minutes), stored hashed, and rate-limited per email and per IP. No account enumeration: the response is the same whether or not an email is known."
+            }
+          ]
+        },
+        {
+          "number": "9.2",
+          "title": "Sessions",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Role", "Absolute lifetime", "Idle timeout", "Notes"],
+              "rows": [["", "", "", ""]]
+            },
+            {
+              "type": "text",
+              "text": "🔒 Session cookies are Secure, HttpOnly, SameSite=Lax and host-only. Sessions are stored server-side and revocable. Role changes and removals take effect on the next request."
+            }
+          ]
+        },
+        {
+          "number": "9.3",
+          "title": "Authorisation (RBAC)",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "Permission matrix: roles across, actions down. Checks happen server-side in src/server on every request; the UI hiding something is never the control."
+            }
+          ]
+        },
+        {
+          "number": "9.4",
+          "title": "Signed action links",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Links that act without sign-in (approve, unsubscribe) carry a single-purpose, single-use, expiring token bound to one record, stored hashed. A confirmation page needs a POST: a GET never changes state, so email link scanners can't trigger actions."
+            }
+          ]
+        },
+        {
+          "number": "9.5",
+          "title": "Privileged access",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Admin consoles (Cloudflare, GitHub, database platform, Stripe, Resend, Sentry, Salesforce) need MFA, named accounts and least privilege. Access is reviewed quarterly."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "10",
+      "title": "Security",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "10.1",
+          "title": "Threat model",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "STRIDE for each container and trust boundary in 3.3. One row per credible threat."
+            },
+            {
+              "type": "table",
+              "columns": ["ID", "Component", "STRIDE", "Threat", "Mitigation", "Status"],
+              "rows": [["", "", "", "", "", ""]]
+            }
+          ]
+        },
+        {
+          "number": "10.2",
+          "title": "Baseline controls",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Mandatory for every app:"
+            },
+            {
+              "type": "list",
+              "items": [
+                "TLS everywhere; HSTS; TLS to the database.",
+                "Strict Content Security Policy (nonce-based), X-Content-Type-Options, Referrer-Policy, frame-ancestors none.",
+                "CSRF protection on all state-changing requests.",
+                "Zod validation on every input; parameterised queries only; output encoding by React.",
+                "Rate limiting on authentication, exports and any expensive endpoint.",
+                "Dependency updates (Renovate or Dependabot), CodeQL and gitleaks in CI.",
+                "Secrets in Worker secrets only; least-privilege API tokens.",
+                "Encryption at rest by the platform; restricted data hashed or encrypted at application level.",
+                "File uploads and CSV inputs: size limits, type checks, and CSV-injection escaping on export."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "10.3",
+          "title": "Payment card scope",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Card data is only ever entered on the payment provider's hosted page (Stripe Checkout), keeping the app at PCI DSS SAQ-A. The app stores only provider IDs and payment status."
+            }
+          ]
+        },
+        {
+          "number": "10.4",
+          "title": "Go-live security gates",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "warning",
+              "text": "All four gates apply to production-tier apps. Thresholds and process are **TBD**."
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Threat model reviewed and signed off before build starts",
+                  "done": false
+                },
+                {
+                  "text": "OWASP ASVS Level 2 self-assessment completed and attached",
+                  "done": false
+                },
+                {
+                  "text": "Dependency scanning and SAST in CI, blocking on high severity",
+                  "done": false
+                },
+                {
+                  "text": "External penetration test before first production release, then annually",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "10.5",
+          "title": "Control mapping",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "Control area",
+                "Section",
+                "Privacy Act (APPs)",
+                "Essential Eight",
+                "ISO 27001:2022 Annex A",
+                "SOC 2"
+              ],
+              "rows": [
+                [
+                  "Access control and RBAC",
+                  "9.3",
+                  "APP 11",
+                  "Restrict admin privileges",
+                  "A.5.15, A.8.2, A.8.3",
+                  "CC6.1, CC6.3"
+                ],
+                [
+                  "Authentication",
+                  "9.1–9.2",
+                  "APP 11",
+                  "MFA (admin consoles)",
+                  "A.5.17, A.8.5",
+                  "CC6.1"
+                ],
+                [
+                  "Secure development",
+                  "8, 10.2, 15",
+                  "APP 11",
+                  "Patch applications, user application hardening",
+                  "A.8.25, A.8.28, A.8.29",
+                  "CC8.1"
+                ],
+                [
+                  "Vulnerability management",
+                  "10.2, 10.4",
+                  "APP 11",
+                  "Patch applications",
+                  "A.8.8",
+                  "CC7.1"
+                ],
+                ["Logging and monitoring", "13", "APP 11", "—", "A.8.15, A.8.16", "CC7.2"],
+                ["Audit trail", "12", "APP 11", "—", "A.8.15", "CC7.2, CC4.1"],
+                ["Backup and recovery", "14", "APP 11", "Regular backups", "A.8.13", "A1.2, A1.3"],
+                ["Cryptography", "10.2", "APP 11", "—", "A.8.24", "CC6.1, CC6.7"],
+                ["Suppliers and cloud", "7, 11.3", "APP 8", "—", "A.5.19–A.5.23", "CC9.2"],
+                [
+                  "Privacy and PII",
+                  "11",
+                  "APP 1, 3, 5, 6, 8, 11, 12, 13",
+                  "—",
+                  "A.5.34",
+                  "P-series"
+                ],
+                ["Data deletion", "6.6, 11", "APP 11.2", "—", "A.8.10", "C1.2"],
+                [
+                  "Incident response",
+                  "14.4",
+                  "Notifiable Data Breaches scheme",
+                  "—",
+                  "A.5.24–A.5.28",
+                  "CC7.3–CC7.5"
+                ],
+                ["Change management", "5.4", "—", "—", "A.8.32", "CC8.1"]
+              ]
+            },
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "Essential Eight mainly covers corporate endpoints. Only the strategies that apply to a hosted web app are mapped; the rest are N/A here and covered by corporate IT."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "11",
+      "title": "Privacy and compliance",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "11.1",
+          "title": "Personal information inventory",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Data", "About whom", "Purpose", "Source", "Stored in", "Retention"],
+              "rows": [["", "", "", "", "", ""]]
+            }
+          ]
+        },
+        {
+          "number": "11.2",
+          "title": "Collection notice and privacy policy (APP 1, 5)",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "11.3",
+          "title": "Cross-border disclosure (APP 8)",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 List every supplier that processes personal information outside Australia, what it receives and how exposure is minimised."
+            },
+            {
+              "type": "table",
+              "columns": ["Supplier", "Location", "Personal information sent", "Minimisation"],
+              "rows": [["", "", "", ""]]
+            }
+          ]
+        },
+        {
+          "number": "11.4",
+          "title": "Access, correction and deletion (APP 12, 13, 11.2)",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "11.5",
+          "title": "Privacy impact assessment",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Required for production-tier apps that collect personal information. Link it here."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "12",
+      "title": "Audit",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "12.1",
+          "title": "What is audited",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 At minimum:"
+            },
+            {
+              "type": "list",
+              "items": [
+                "Sign-in success, failure and lockout; sign-out; session revocation",
+                "Authorisation failures",
+                "Every change made by an administrative or internal role",
+                "Role, permission and access-list changes",
+                "Data exports (who, what filter, row count)",
+                "Financial or balance-affecting events",
+                "Changes to configuration and integration settings"
+              ]
+            }
+          ]
+        },
+        {
+          "number": "12.2",
+          "title": "Audit event schema",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Field", "Type", "Notes"],
+              "rows": [
+                ["id", "UUIDv7", "Time-ordered"],
+                ["occurred_at", "timestamptz (UTC)", "—"],
+                ["actor_type", "enum", "user, system, integration"],
+                ["actor_id", "text", "Null for system"],
+                ["actor_display", "text", "Snapshot of name and email at the time"],
+                ["actor_role", "text", "Role used for the action"],
+                ["organisation_id", "uuid", "Tenant; null for global actions"],
+                ["action", "text", "verb.noun, e.g. booking.approved"],
+                ["target_type / target_id", "text", "Record affected"],
+                [
+                  "changes",
+                  "jsonb",
+                  "Before/after of changed fields; personal information minimised"
+                ],
+                ["reason", "text", "Optional user-supplied reason"],
+                ["channel", "enum", "web, email_link, job, webhook"],
+                ["request_id", "text", "Correlates with logs and Sentry"],
+                ["ip_prefix", "text", "Truncated IP (/24 or /48)"]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "12.3",
+          "title": "Immutability",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Append-only table. The app's database role has INSERT and SELECT only; UPDATE and DELETE are revoked, and a trigger rejects them. Each row stores a hash of the previous row (hash chain) so tampering is detectable *(proposed)*."
+            }
+          ]
+        },
+        {
+          "number": "12.4",
+          "title": "Retention and access",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 7 years, then de-identified. Reading the audit log is itself audited. Audit records are separate from application logs (section 13)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "13",
+      "title": "Logging, monitoring and alerting",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "13.1",
+          "title": "Structured logs",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 JSON logs with: timestamp, level, message, request_id, trace_id, route, status, duration_ms, organisation_id, user_id (internal ID, never email), error."
+            }
+          ]
+        },
+        {
+          "number": "13.2",
+          "title": "What must never be logged",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Sign-in codes, magic-link or action tokens, session IDs, cookies, authorization headers, card or bank details, email bodies, full email addresses (mask as j***@domain), free-text reasons."
+            }
+          ]
+        },
+        {
+          "number": "13.3",
+          "title": "Sentry",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 sendDefaultPii false; a beforeSend hook that scrubs the fields in 13.2; releases tagged with the commit SHA; source maps uploaded in CI; environment tag set."
+            }
+          ]
+        },
+        {
+          "number": "13.4",
+          "title": "Log retention and shipping",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Workers Logs for live debugging. Logpush to AU object storage for 90 days (security events 1 year)."
+            }
+          ]
+        },
+        {
+          "number": "13.5",
+          "title": "Service levels and alerts",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Alert", "Condition", "Severity", "Channel", "Runbook"],
+              "rows": [
+                ["Error rate", "5xx > 2% for 5 min", "High", "✏️", ""],
+                ["Latency", "p95 above NFR for 15 min", "Medium", "✏️", ""],
+                ["DLQ", "Any message in a DLQ", "High", "✏️", ""],
+                ["Job missed", "Scheduled job didn't complete", "Medium", "✏️", ""],
+                ["Auth abuse", "Sign-in rate limit tripped above threshold", "Medium", "✏️", ""]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "14",
+      "title": "Reliability and operations",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "14.1",
+          "title": "Backup and restore",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Postgres point-in-time recovery meeting the 1-hour RPO; restore tested quarterly into a non-production environment with the result recorded."
+            }
+          ]
+        },
+        {
+          "number": "14.2",
+          "title": "Failure modes",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Dependency down", "User impact", "Behaviour", "Recovery"],
+              "rows": [["", "", "", ""]]
+            }
+          ]
+        },
+        {
+          "number": "14.3",
+          "title": "Runbooks",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "14.4",
+          "title": "Incident response",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Severity levels, who is paged, and the Notifiable Data Breaches assessment (within 30 days) for any incident that may involve personal information."
+            }
+          ]
+        },
+        {
+          "number": "14.5",
+          "title": "Support model",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "15",
+      "title": "Testing strategy",
+      "blocks": [
+        {
+          "type": "table",
+          "columns": ["Level", "Tool", "Scope", "Gate"],
+          "rows": [
+            ["Unit", "Vitest", "src/lib, TDD, coverage thresholds", "ci"],
+            [
+              "Integration",
+              "Vitest (Workers pool) with a test Postgres",
+              "src/server, database, queues",
+              "ci"
+            ],
+            [
+              "Contract",
+              "Vitest with recorded fixtures",
+              "External APIs, verified against sandbox",
+              "ci; nightly against sandbox"
+            ],
+            [
+              "End-to-end",
+              "Playwright",
+              "Key journeys per role",
+              "ci (mandatory for production tier)"
+            ],
+            ["Accessibility", "axe in Playwright", "All pages", "ci"],
+            ["Load", "k6 *(proposed)*", "Peak scenarios from 2.2", "Before go-live"],
+            ["Security", "See 10.4", "—", "Before go-live"],
+            ["Mutation", "Stryker", "Business-rule-heavy src/lib", "Optional"]
+          ]
+        }
+      ]
+    },
+    {
+      "number": "16",
+      "title": "Delivery and rollout",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "16.1",
+          "title": "Milestones",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "16.2",
+          "title": "Feature flags",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "16.3",
+          "title": "Data migration and cutover",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        },
+        {
+          "number": "16.4",
+          "title": "Hypercare and decommissioning",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "✏️"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "17",
+      "title": "Decisions, risks and open questions",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "17.1",
+          "title": "Architecture decision records",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "🔒 Any deviation from section 4, any new external system, and any change to data residency needs an ADR approved by Matt Stejer."
+            },
+            {
+              "type": "table",
+              "columns": ["ID", "Title", "Status", "Date", "Approved by"],
+              "rows": [["", "", "Proposed / Accepted / Superseded", "", ""]]
+            },
+            {
+              "type": "heading",
+              "text": "ADR format"
+            },
+            {
+              "type": "text",
+              "text": "**Context** — the problem and forces at play."
+            },
+            {
+              "type": "text",
+              "text": "**Options** — at least two, with trade-offs."
+            },
+            {
+              "type": "text",
+              "text": "**Decision** — what we chose."
+            },
+            {
+              "type": "text",
+              "text": "**Consequences** — what gets easier, what gets harder, and follow-up work."
+            }
+          ]
+        },
+        {
+          "number": "17.2",
+          "title": "Risks",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["ID", "Risk", "Likelihood", "Impact", "Mitigation", "Owner"],
+              "rows": [["", "", "", "", "", ""]]
+            }
+          ]
+        },
+        {
+          "number": "17.3",
+          "title": "Open questions",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["ID", "Question", "Owner", "Due", "Answer"],
+              "rows": [["", "", "", "", ""]]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "A",
+      "title": "Requirements traceability",
+      "blocks": [
+        {
+          "type": "table",
+          "columns": ["Story", "Components", "Domain rules", "Tests"],
+          "rows": [["", "", "", ""]]
+        }
+      ]
+    },
+    {
+      "number": "B",
+      "title": "Email catalogue",
+      "blocks": [
+        {
+          "type": "table",
+          "columns": ["Email", "Recipient", "Trigger", "Sent by", "Essential / optional"],
+          "rows": [["", "", "", "", ""]]
+        }
+      ]
+    },
+    {
+      "number": "C",
+      "title": "Permission matrix",
+      "blocks": [
+        {
+          "type": "callout",
+          "tone": "guidance",
+          "text": "Full RBAC matrix if it's too large for 9.3."
+        }
+      ]
+    }
+  ]
+}

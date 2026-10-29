@@ -2,7 +2,7 @@ import { level } from "../lib/projects";
 import type { Level } from "../lib/types";
 
 // Low / Medium / High values (e.g. risk impact and likelihood) show as coloured tags
-const levelStyles: Record<Level, string> = {
+export const levelStyles: Record<Level, string> = {
   high: "bg-high-bg text-high",
   medium: "bg-medium-bg text-medium",
   low: "bg-low-bg text-low",
