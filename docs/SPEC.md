@@ -99,6 +99,10 @@ Comparing the branch with `main`, CI fails if a version file that's already on `
 deleted or renamed. A change goes in as a new version file. Files that are new in the branch can
 still change until it merges.
 
+The one exception is a project listed in `RETIRED_PROJECTS` (`src/lib/versions.ts`): its versions
+may be deleted, though still never edited or renamed. Only `example-invoice-automation`, the demo
+project, is listed.
+
 ## Non-goals
 
 - Editing documents in the app: they're edited as JSON in the repo.

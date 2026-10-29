@@ -21,11 +21,16 @@ export function parseNameStatus(output: string): FileChange[] {
 
 const verbs: Record<string, string> = { M: "edited", T: "edited", D: "deleted", R: "renamed" };
 
+/** Projects that were removed on purpose: their versions may be deleted, never edited or renamed. */
+export const RETIRED_PROJECTS: readonly string[] = ["example-invoice-automation"];
+
 /** An error for each merged version file the changes edit, delete or rename. */
 export function versionViolations(changes: FileChange[]): string[] {
   return changes.flatMap(({ status, path, oldPath }) => {
     const before = oldPath ?? path;
-    if (!(status in verbs) || !parseDocPath(before)) return [];
+    const doc = parseDocPath(before);
+    if (!(status in verbs) || !doc) return [];
+    if (status === "D" && RETIRED_PROJECTS.includes(doc.projectId)) return [];
     return [
       `${before} was ${verbs[status]}. Merged versions can't change: add the change as a new version.`,
     ];
