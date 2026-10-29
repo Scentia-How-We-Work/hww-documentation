@@ -13,8 +13,8 @@ shows one at `/?project=<id>`. Used by Scentia How We Work to publish and share 
 
 ## Features
 
-- **Project list** at `/`: every project except the template, sorted by title (the latest PRD's page title, or the TDS's
-  project name if there's no PRD), with its team and target delivery (from the PRD) and the latest
+- **Project list** at `/`: every project except the template, under a "Documentation" heading, sorted by name
+  (the latest PRD's overview title, or the TDS's project name if there's no PRD), with its team and target delivery (from the PRD) and the latest
   version of each document, e.g. "PRD v2 · TDS v1". An unknown `?project=` id shows the list with a
   "No project found" message.
 - **Document URLs:** `/?project=<id>&doc=<prd|tds>&v=<n>`.

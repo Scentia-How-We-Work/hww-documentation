@@ -11,7 +11,8 @@ import {
 } from "./projects";
 import type { Prd, Tds } from "./types";
 
-const prd = (pageTitle: string, number = 1) => ({ pageTitle, version: { number } }) as Prd;
+const prd = (pageTitle: string, number = 1, title = pageTitle) =>
+  ({ pageTitle, overview: { title }, version: { number } }) as Prd;
 const tds = (project: string, number = 1) =>
   ({ documentControl: { project }, version: { number } }) as Tds;
 
@@ -76,10 +77,9 @@ describe("projectsFromModules", () => {
 });
 
 describe("projectTitle", () => {
-  it("uses the latest PRD's page title, or the TDS project name when there's no PRD", () => {
-    expect(projectTitle({ id: "a", prd: [prd("Old"), prd("New", 2)], tds: [tds("T")] })).toBe(
-      "New",
-    );
+  it("uses the latest PRD's project name, or the TDS project name when there's no PRD", () => {
+    const prds = [prd("Old PRD", 1, "Old"), prd("New PRD", 2, "New")];
+    expect(projectTitle({ id: "a", prd: prds, tds: [tds("T")] })).toBe("New");
     expect(projectTitle({ id: "a", prd: [], tds: [tds("T")] })).toBe("T");
   });
 });

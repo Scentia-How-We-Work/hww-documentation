@@ -14,7 +14,7 @@ const view = resolveView(projects, new URLSearchParams(window.location.search));
 // The PRD or TDS version the URL asks for (versions are numbered from 1 with no gaps)
 const prd = view.page === "doc" && view.kind === "prd" ? view.project.prd[view.version - 1] : null;
 const tds = view.page === "doc" && view.kind === "tds" ? view.project.tds[view.version - 1] : null;
-const title = prd ? prd.pageTitle : tds ? `${tds.documentControl.project} TDS` : "PRDs and TDSs";
+const title = prd ? prd.pageTitle : tds ? `${tds.documentControl.project} TDS` : "Documentation";
 
 function App() {
   const scroller = useRef<HTMLDivElement>(null);

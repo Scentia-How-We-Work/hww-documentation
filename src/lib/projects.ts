@@ -33,9 +33,9 @@ export function projectsFromModules(modules: Record<string, Prd | Tds>): Project
   return [...byId.values()].sort((a, b) => projectTitle(a).localeCompare(projectTitle(b)));
 }
 
-/** The latest PRD's page title, or the TDS's project name when there's no PRD yet. */
+/** The project's name: the latest PRD's overview title, or the TDS's project name when there's no PRD yet. */
 export function projectTitle(project: Project): string {
-  return project.prd.at(-1)?.pageTitle ?? project.tds.at(-1)!.documentControl.project;
+  return project.prd.at(-1)?.overview.title ?? project.tds.at(-1)!.documentControl.project;
 }
 
 // Holds the blank PRD and TDS to copy: it can be opened by its link, but isn't listed
