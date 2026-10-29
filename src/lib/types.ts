@@ -4,6 +4,11 @@ export type Person = { name: string; role: string; email: string };
 
 export type Image = { image: string; alt: string };
 
+// A card linking out to a page, such as a live mock-up, shown in place of an image
+export type LinkCard = { link: string; title: string; description: string };
+
+export type MediaItem = Image | LinkCard;
+
 export type Prd = {
   pageTitle: string;
   overview: {
@@ -31,9 +36,9 @@ export type Prd = {
   };
   solution: {
     futureState: string;
-    workflows: Image[];
+    workflows: MediaItem[];
     keyFeatures: string[];
-    wireframes: Image[];
+    wireframes: MediaItem[];
   };
   scope: { goals: string[]; nonGoals: string[] };
   milestones: { target: string; milestone: string; description: string }[];

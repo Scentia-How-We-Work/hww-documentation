@@ -127,8 +127,24 @@
     ],
     "wireframes": [
       {
-        "image": "https://placebear.com/1920/1080",
-        "alt": "Placeholder Image"
+        "link": "https://scentia-aim.github.io/HWW-Mock-Ups/mockups/foundations/",
+        "title": "Epic 1: Foundations and client onboarding",
+        "description": "Scentia staff set up a new client, then the client admin and an employee each sign in with an emailed code or link and only see their own area."
+      },
+      {
+        "link": "https://scentia-aim.github.io/HWW-Mock-Ups/mockups/find-and-book/",
+        "title": "Epic 2: Find and book a course",
+        "description": "Browse courses, pick a session, book with points, change or cancel, and see what your learning admin decided. Approvals are in Employee access (Epic 3)."
+      },
+      {
+        "link": "https://scentia-aim.github.io/HWW-Mock-Ups/mockups/employee-access/",
+        "title": "Epic 3: Employee access and requests",
+        "description": "A client admin bulk-adds employees, one requests a course they can’t book, the admin closes it, and the employee unsubscribes from course invitations with one click."
+      },
+      {
+        "link": "https://scentia-aim.github.io/HWW-Mock-Ups/mockups/learning-investment/",
+        "title": "Epic 4: Reporting and oversight",
+        "description": "Harbour Bank’s report on points used, pace against the contract, popular courses and learner feedback, built from the bookings in Epics 1 to 3. Switch between the AIM, IECL and Scentia designs."
       }
     ]
   },

@@ -86,11 +86,11 @@ function App() {
           <Section id="solution" number="03" title="The Solution">
             <Text title="Future State" content={prd.solution.futureState} />
 
-            <Media title="Workflows" images={prd.solution.workflows} />
+            <Media title="Workflows" items={prd.solution.workflows} />
 
             <List title="Key Features" items={prd.solution.keyFeatures} />
 
-            <Media title="Wireframes" images={prd.solution.wireframes} />
+            <Media title="Wireframes" items={prd.solution.wireframes} />
           </Section>
 
           <Section id="scope" number="04" title="Scope">
