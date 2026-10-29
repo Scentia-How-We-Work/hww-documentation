@@ -1,0 +1,14 @@
+# gitleaks: the default rule set plus team rules. Managed by the scentia plugin.
+# A false positive goes in .gitleaksignore (its fingerprint), with a dev's OK.
+title = "Scentia gitleaks config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "committed-env-file"
+description = "A .env or .dev.vars file is committed; only *.example templates belong in git"
+path = '''(^|/)\.(env|dev\.vars)(\.[^/]+)?$'''
+
+[[rules.allowlists]]
+paths = ['''(^|/)\.(env|dev\.vars)\.example$''']

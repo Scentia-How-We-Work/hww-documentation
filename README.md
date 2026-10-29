@@ -11,25 +11,45 @@ A single app can hold multiple PRDs. Each project's content lives in its own JSO
 - JavaScript
 - Tailwind CSS
 
-## Getting Started
+**Tier:** POC (see `.scentia.json`). Follows the
+[Scentia coding standards](https://github.com/Scentia-How-We-Work/coding-standards).
 
-Clone the repository and install dependencies:
+## Setup
+
+Once per machine, install the team Claude Code plugin and the tools that `preflight` checks for:
+
+```bash
+brew install gitleaks gh && corepack enable pnpm
+gh auth login
+gh auth setup-git         # lets git clone the internal standards repo with your gh login
+claude plugin marketplace add Scentia-How-We-Work/coding-standards
+claude plugin install scentia@scentia
+```
+
+Then in this repo:
 
 ```bash
 pnpm install
+pnpm dev                  # serves the local `testing` branch at http://localhost:5173
 ```
 
-Start the local development server:
+## Dev workflow
 
-```bash
-pnpm dev
-```
+The root checkout stays on the local-only `testing` branch. New work happens in
+`worktrees/<branch>`, and finished work is merged into `testing` to try it out, then sent as a PR.
+In Claude Code: `/scentia:start-work`, `/scentia:integrate-testing`, `/scentia:finish-work`.
 
-Vite will provide a local URL, typically:
+## Scripts
 
-```text
-http://localhost:5173
-```
+| Script                           | Purpose                                                                         |
+| -------------------------------- | ------------------------------------------------------------------------------- |
+| `pnpm dev` / `build` / `preview` | Vite dev server / production build / serve the build locally                    |
+| `pnpm test`                      | Vitest unit tests for the pure lib engine (`src/lib`), with coverage thresholds |
+| `pnpm format` / `format:check`   | Prettier: format everything / check formatting                                  |
+| `pnpm lint` / `typecheck`        | ESLint (including lib purity rules) / TypeScript                                |
+
+Docs: [docs/SPEC.md](docs/SPEC.md) (requirements, source of truth) and
+[docs/DEPLOY.md](docs/DEPLOY.md) (deploy target, not set up yet).
 
 ## Creating a New PRD
 

@@ -1,0 +1,25 @@
+# Git hooks, installed by `pnpm install` (prepare script). Never bypass them (--no-verify, LEFTHOOK=0).
+# Managed by the scentia plugin: changes here are overwritten by /scentia:apply-standards.
+pre-commit:
+  commands:
+    gitleaks:
+      run: command -v gitleaks >/dev/null || { echo "gitleaks is not installed (brew install gitleaks)"; exit 1; } && gitleaks git --pre-commit --staged --redact --no-banner .
+
+pre-push:
+  piped: true
+  commands:
+    gitleaks:
+      priority: 1
+      run: command -v gitleaks >/dev/null || { echo "gitleaks is not installed (brew install gitleaks)"; exit 1; } && gitleaks git --redact --no-banner .
+    format:
+      priority: 2
+      run: pnpm format:check
+    lint:
+      priority: 3
+      run: pnpm lint
+    typecheck:
+      priority: 4
+      run: pnpm typecheck
+    test:
+      priority: 5
+      run: pnpm test
