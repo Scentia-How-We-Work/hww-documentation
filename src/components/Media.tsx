@@ -1,4 +1,8 @@
-function Media({ title, images }) {
+import type { Image } from '../lib/types'
+
+type Props = { title?: string; images: Image[] }
+
+function Media({ title, images }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {title && (

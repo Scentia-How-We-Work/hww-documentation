@@ -1,6 +1,9 @@
+import type { Project } from '../lib/types'
 import ThemeToggle from './ThemeToggle'
 
-function ProjectList({ projects, missingId }) {
+type Props = { projects: Project[]; missingId: string | null }
+
+function ProjectList({ projects, missingId }: Props) {
   return (
     <main className="min-h-screen">
       <div className="mx-auto max-w-3xl px-8 py-20">

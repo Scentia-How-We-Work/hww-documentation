@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import projects from './content/projects'
+import { findProject } from './lib/projects'
 import Section from './components/Section'
 import Overview from './components/Overview'
 import Text from './components/Text'
@@ -23,7 +24,7 @@ const sections = [
 ]
 
 const projectId = new URLSearchParams(window.location.search).get('project')
-const project = projects.find((project) => project.id === projectId)
+const project = findProject(projects, projectId)
 
 function App() {
   useEffect(() => {

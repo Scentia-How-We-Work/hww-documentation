@@ -1,16 +1,19 @@
+import { level } from '../lib/projects'
+import type { Level } from '../lib/types'
+
 // Low / Medium / High values (e.g. risk impact and likelihood) show as coloured tags
-const levelStyles = {
+const levelStyles: Record<Level, string> = {
   high: 'bg-high-bg text-high',
   medium: 'bg-medium-bg text-medium',
   low: 'bg-low-bg text-low',
 }
 
-function Cell({ value }) {
-  const level = typeof value === 'string' && levelStyles[value.trim().toLowerCase()]
+function Cell({ value }: { value: string }) {
+  const cellLevel = level(value)
 
-  if (level) {
+  if (cellLevel) {
     return (
-      <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${level}`}>
+      <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${levelStyles[cellLevel]}`}>
         {value}
       </span>
     )
@@ -19,7 +22,14 @@ function Cell({ value }) {
   return value
 }
 
-function Table({ title, columns, rows }) {
+// Each column shows the row field named by its key
+type Props<Row> = {
+  title?: string
+  columns: { key: keyof Row & string; label: string }[]
+  rows: Row[]
+}
+
+function Table<Row extends { [K in keyof Row]: string }>({ title, columns, rows }: Props<Row>) {
   return (
     <div className="flex flex-col gap-3">
       {title && (

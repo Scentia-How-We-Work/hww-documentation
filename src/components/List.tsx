@@ -1,4 +1,6 @@
-function List({ title, items }) {
+type Props = { title?: string; items: string[] }
+
+function List({ title, items }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {title && (

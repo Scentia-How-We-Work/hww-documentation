@@ -1,7 +1,9 @@
 import Header from './Header'
 import ThemeToggle from './ThemeToggle'
 
-function Nav({sections, title}) {
+type Props = { sections: { id: string; title: string }[]; title: string }
+
+function Nav({sections, title}: Props) {
   return (
     <nav className="sticky top-0 flex h-screen w-64 shrink-0 flex-col gap-12 border-r border-line px-8 py-10">
 

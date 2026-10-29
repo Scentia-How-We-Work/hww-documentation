@@ -1,4 +1,15 @@
-function Section({ id, number, title, headline, primary, children }) {
+import type { ReactNode } from 'react'
+
+type Props = {
+  id: string
+  number: string
+  title: string
+  headline?: string
+  primary?: boolean
+  children: ReactNode
+}
+
+function Section({ id, number, title, headline, primary, children }: Props) {
   const HeadlineTag = primary ? 'h1' : 'h2'
 
   return (

@@ -1,4 +1,4 @@
-function Text({ title, content }) {
+function Text({ title, content }: { title: string; content?: string }) {
   return (
     <div className="flex flex-col gap-3">
       <h3 className="text-xs font-medium uppercase tracking-wider text-subtle">{title}</h3>

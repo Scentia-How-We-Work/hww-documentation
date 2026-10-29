@@ -1,4 +1,8 @@
-function Commercials({ content }) {
+import type { Prd } from '../lib/types'
+
+type Props = { content: Prd['problem']['businessCase']['commercialBenefit'] }
+
+function Commercials({ content }: Props) {
   return (
     <div className="flex flex-col gap-3">
       <h4 className="text-xs font-medium uppercase tracking-wider text-subtle">

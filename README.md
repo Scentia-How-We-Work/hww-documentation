@@ -8,7 +8,7 @@ A single app can hold multiple PRDs. Each project's content lives in its own JSO
 
 - React
 - Vite
-- JavaScript
+- TypeScript
 - Tailwind CSS
 
 **Tier:** POC (see `.scentia.json`). Follows the
@@ -77,11 +77,12 @@ src/
 ├── components/      # Reusable PRD components
 ├── content/
 │   ├── projects/    # One JSON file per PRD
-│   └── projects.js  # Loads every project JSON
-├── App.jsx          # PRD page structure
+│   └── projects.ts  # Loads every project JSON
+├── lib/             # Pure, unit-tested logic and the PRD types (types.ts)
+├── App.tsx          # PRD page structure
 ├── App.css
 ├── index.css
-└── main.jsx
+└── main.tsx
 ```
 
 ## Components

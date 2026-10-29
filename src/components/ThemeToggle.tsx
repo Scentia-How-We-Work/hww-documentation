@@ -1,12 +1,14 @@
 import { useState } from 'react'
 
-const options = [
+type Theme = 'light' | 'dark' | 'system'
+
+const options: { value: Theme; label: string }[] = [
   {value: 'light', label: 'Light'},
   {value: 'dark', label: 'Dark'},
   {value: 'system', label: 'System'}
 ]
 
-function getSavedTheme() {
+function getSavedTheme(): Theme {
   try {
     const theme = localStorage.getItem('theme')
     return theme === 'light' || theme === 'dark' ? theme : 'system'
@@ -16,7 +18,7 @@ function getSavedTheme() {
 }
 
 // 'system' clears the override so the colours follow the device's setting
-function applyTheme(theme) {
+function applyTheme(theme: Theme) {
   if (theme === 'system') {
     delete document.documentElement.dataset.theme
   } else {
@@ -37,7 +39,7 @@ function applyTheme(theme) {
 function ThemeToggle() {
   const [theme, setTheme] = useState(getSavedTheme)
 
-  function selectTheme(value) {
+  function selectTheme(value: Theme) {
     setTheme(value)
     applyTheme(value)
   }
