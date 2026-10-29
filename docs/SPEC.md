@@ -13,7 +13,7 @@ shows one at `/?project=<id>`. Used by Scentia How We Work to publish and share 
 
 ## Features
 
-- **Project list** at `/`: every project, sorted by title (the latest PRD's page title, or the TDS's
+- **Project list** at `/`: every project except the template, sorted by title (the latest PRD's page title, or the TDS's
   project name if there's no PRD), with its team and target delivery (from the PRD) and the latest
   version of each document, e.g. "PRD v2 · TDS v1". An unknown `?project=` id shows the list with a
   "No project found" message.
@@ -78,7 +78,8 @@ src/content/projects/<id>/tds/v1.json, v2.json, …
   version it was written against), `documentControl` (project, tier, approver, reviewers, related
   links), optional `intro` blocks and the `sections`. Sections follow the Technical Design Spec
   template in Notion; the list is `STANDARD_SECTIONS` in `src/lib/tds.ts`.
-- **Template:** the `template` project holds a blank PRD and TDS to copy.
+- **Template:** the `template` project holds a blank PRD and TDS to copy. It isn't on the project
+  list, but `?project=template` opens it.
 
 ### Validation (`pnpm validate`, run in CI and on pre-push)
 

@@ -67,7 +67,7 @@ src/content/projects/
 ├── partner-pack-portals/
 │   ├── prd/v1.json
 │   └── tds/v1.json
-└── template/
+└── template/              # not on the project list; open with ?project=template
     ├── prd/v1.json          # blank PRD to copy
     └── tds/v1.json          # blank TDS to copy (from the Notion TDS template)
 ```

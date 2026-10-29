@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import projects from "./content/projects";
-import { docHref, resolveView } from "./lib/projects";
+import { docHref, listedProjects, resolveView } from "./lib/projects";
 import DocSwitcher from "./components/DocSwitcher";
 import Nav from "./components/Nav";
 import PrdPage, { prdSections } from "./components/PrdPage";
@@ -25,7 +25,7 @@ function App() {
   }, []);
 
   if (view.page === "list") {
-    return <ProjectList projects={projects} missingId={view.missingId} />;
+    return <ProjectList projects={listedProjects(projects)} missingId={view.missingId} />;
   }
 
   const { project, kind, version, missingVersion } = view;

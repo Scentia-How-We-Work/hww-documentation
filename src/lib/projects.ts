@@ -38,6 +38,14 @@ export function projectTitle(project: Project): string {
   return project.prd.at(-1)?.pageTitle ?? project.tds.at(-1)!.documentControl.project;
 }
 
+// Holds the blank PRD and TDS to copy: it can be opened by its link, but isn't listed
+const TEMPLATE_ID = "template";
+
+/** The projects shown on the projects list. */
+export function listedProjects(projects: Project[]): Project[] {
+  return projects.filter((project) => project.id !== TEMPLATE_ID);
+}
+
 export function findProject(projects: Project[], id: string | null): Project | undefined {
   return projects.find((project) => project.id === id);
 }

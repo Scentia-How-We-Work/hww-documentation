@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   docHref,
   findProject,
+  listedProjects,
   level,
   parseDocPath,
   projectsFromModules,
@@ -173,5 +174,15 @@ describe("level", () => {
   it("returns undefined for any other text", () => {
     expect(level("Highly likely")).toBeUndefined();
     expect(level("")).toBeUndefined();
+  });
+});
+
+describe("listedProjects", () => {
+  it("leaves the template off the projects list", () => {
+    const projects = projectsFromModules({
+      "./projects/template/prd/v1.json": prd("[Project Title] PRD v.1"),
+      "./projects/a/prd/v1.json": prd("A"),
+    });
+    expect(listedProjects(projects).map((project) => project.id)).toEqual(["a"]);
   });
 });
