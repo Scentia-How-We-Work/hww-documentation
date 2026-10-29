@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import type { Person as PersonType, Prd } from '../lib/types'
+import type { ReactNode } from "react";
+import type { Person as PersonType, Prd } from "../lib/types";
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -7,11 +7,9 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
       <p className="basis-44 pt-0.5 text-xs font-medium uppercase tracking-wider text-subtle">
         {label}
       </p>
-      <div className="min-w-0 flex-1 basis-80 text-base">
-        {children}
-      </div>
+      <div className="min-w-0 flex-1 basis-80 text-base">{children}</div>
     </div>
-  )
+  );
 }
 
 function Person({ person }: { person: PersonType }) {
@@ -26,10 +24,10 @@ function Person({ person }: { person: PersonType }) {
         {person.email}
       </a>
     </div>
-  )
+  );
 }
 
-function Overview({ overview }: { overview: Prd['overview'] }) {
+function Overview({ overview }: { overview: Prd["overview"] }) {
   return (
     <div className="flex flex-col border-t border-ink">
       <Row label="Team">{overview.team}</Row>
@@ -39,7 +37,7 @@ function Overview({ overview }: { overview: Prd['overview'] }) {
       <Row label="Key Stakeholders">
         <div className="flex flex-col gap-3">
           {overview.stakeholders.map(function (stakeholder, index) {
-            return <Person key={index} person={stakeholder} />
+            return <Person key={index} person={stakeholder} />;
           })}
         </div>
       </Row>
@@ -51,12 +49,12 @@ function Overview({ overview }: { overview: Prd['overview'] }) {
       <Row label="Contributors">
         <div className="flex flex-col gap-3">
           {overview.contributors.map(function (contributor, index) {
-            return <Person key={index} person={contributor} />
+            return <Person key={index} person={contributor} />;
           })}
         </div>
       </Row>
     </div>
-  )
+  );
 }
 
-export default Overview
+export default Overview;

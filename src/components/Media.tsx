@@ -1,34 +1,25 @@
-import type { Image } from '../lib/types'
+import type { Image } from "../lib/types";
 
-type Props = { title?: string; images: Image[] }
+type Props = { title?: string; images: Image[] };
 
 function Media({ title, images }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {title && (
-        <h3 className="text-xs font-medium uppercase tracking-wider text-subtle">
-          {title}
-        </h3>
+        <h3 className="text-xs font-medium uppercase tracking-wider text-subtle">{title}</h3>
       )}
 
       <div className="flex flex-col gap-6">
         {images.map(function (item, index) {
           return (
-            <div
-              key={index}
-              className="overflow-hidden border border-line"
-            >
-              <img
-                src={item.image}
-                alt={item.alt}
-                className="block h-auto w-full"
-              />
+            <div key={index} className="overflow-hidden border border-line">
+              <img src={item.image} alt={item.alt} className="block h-auto w-full" />
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
-export default Media
+export default Media;

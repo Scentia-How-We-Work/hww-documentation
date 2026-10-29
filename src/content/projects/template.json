@@ -98,11 +98,7 @@
         "alt": "Placeholder Image"
       }
     ],
-    "keyFeatures": [
-      "[List of features that form the MVP solution in priority order.]",
-      "",
-      ""
-    ],
+    "keyFeatures": ["[List of features that form the MVP solution in priority order.]", "", ""],
     "wireframes": [
       {
         "image": "https://placebear.com/1920/1080",
@@ -111,16 +107,8 @@
     ]
   },
   "scope": {
-    "goals": [
-      "[List of primary goals in priority order, including measurable metrics.]",
-      "",
-      ""
-    ],
-    "nonGoals": [
-      "[List of areas out of scope and why.]",
-      "",
-      ""
-    ]
+    "goals": ["[List of primary goals in priority order, including measurable metrics.]", "", ""],
+    "nonGoals": ["[List of areas out of scope and why.]", "", ""]
   },
   "milestones": [
     {
@@ -138,9 +126,5 @@
     }
   ],
   "dependencies": [],
-  "assumptions": [
-    "",
-    "",
-    ""
-  ]
+  "assumptions": ["", "", ""]
 }

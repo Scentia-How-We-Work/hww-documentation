@@ -25,7 +25,10 @@ describe("projectsFromModules", () => {
 });
 
 describe("findProject", () => {
-  const projects = projectsFromModules({ "./projects/a.json": prd("A"), "./projects/b.json": prd("B") });
+  const projects = projectsFromModules({
+    "./projects/a.json": prd("A"),
+    "./projects/b.json": prd("B"),
+  });
 
   it("finds the project with the given id", () => {
     expect(findProject(projects, "b")?.prd.pageTitle).toBe("B");
