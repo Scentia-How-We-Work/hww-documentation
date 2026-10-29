@@ -14,6 +14,10 @@ Renders Product Requirements Documents (PRDs) as clean, responsive microsites. E
   unknown `?project=` id shows the list with a "No project found" message.
 - **PRD page** at `/?project=<id>`: eight numbered sections (Overview, The Problem, The Solution,
   Scope, Timeline, Risks, Dependencies, Assumptions) with side navigation.
+- **Section snapping:** when scrolling stops, the page glides (about 600 ms, ease-in-out) to the
+  nearest section start. Sections taller than the screen scroll freely and can also settle on
+  their bottom edge. Scrolling, touching or a key press stops a glide; with reduced motion it
+  snaps instantly.
 - **Media:** the Workflows and Mock-ups items in The Solution (`workflows` and `wireframes` in the JSON) are each either an image or a link
   card. Images are shown full width; link cards are shown in a grid and open their link in a new tab.
 - **Levels:** table cells reading Low, Medium or High (any case) show as coloured tags.
