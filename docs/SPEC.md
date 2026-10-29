@@ -14,7 +14,7 @@ Renders Product Requirements Documents (PRDs) as clean, responsive microsites. E
   unknown `?project=` id shows the list with a "No project found" message.
 - **PRD page** at `/?project=<id>`: eight numbered sections (Overview, The Problem, The Solution,
   Scope, Timeline, Risks, Dependencies, Assumptions) with side navigation.
-- **Media:** the Workflows and Wireframes items in The Solution are each either an image or a link
+- **Media:** the Workflows and Mock-ups items in The Solution (`workflows` and `wireframes` in the JSON) are each either an image or a link
   card. Images are shown full width; link cards are shown in a grid and open their link in a new tab.
 - **Levels:** table cells reading Low, Medium or High (any case) show as coloured tags.
 - **Theme:** light, dark or system, remembered in `localStorage`.

@@ -90,7 +90,7 @@ function App() {
 
             <List title="Key Features" items={prd.solution.keyFeatures} />
 
-            <Media title="Wireframes" items={prd.solution.wireframes} />
+            <Media title="Mock-ups" items={prd.solution.wireframes} />
           </Section>
 
           <Section id="scope" number="04" title="Scope">
