@@ -106,14 +106,15 @@
     "keyFeatures": [
       "Participant sign-in with work email: contracts start open to anyone with a matching email domain, and client administrators can switch each one to a whitelist (approved list)",
       "Course list showing every course, with ones the employee can't book greyed out and the reason shown, filters (delivery mode, date, category, location, level), points cost, and \"few places left\" when fewer than 3 remain",
-      "Booking with an approval setting for each contract (approval required or book directly), automatic contract selection (whitelist contracts first, then the contract ending soonest), and places and points rechecked on submit",
+      "Booking with an approval setting for each contract (approval required or book directly), automatic contract selection (whitelist contracts first, then the contract ending soonest), up to 2 requests awaiting approval per employee, and places and points rechecked on submit",
       "Pending requests hold their place and points for up to a month, closing 10 business days before the course starts or when the contract ends",
-      "My bookings: status, attendance details, cancellation deadline, calendar invites, and a reminder email 3 business days before the course",
-      "Change or cancel bookings, with points returned if cancelled 10 or more business days before the course starts",
+      "My bookings: status, attendance details, the actual date to cancel by without using points, calendar invites, and a reminder email 3 business days before the course",
+      "Change dates or cancel bookings, with points returned if cancelled 10 or more business days before the course starts; date changes stay on the same contract and don't need re-approval",
+      "Sessions cancelled by AIM refund their points automatically, whatever the timing, and reschedules move the booking to the new date",
       "Approve or decline booking requests from email or the portal, with reminders and automatic expiry",
       "Client administrators book, change or cancel courses for employees, individually or for several people at once, without approval",
       "Teams of employees, used for group bookings, adding people to approved lists, and filtering progress and exports",
-      "Contract view for client administrators: points purchased, used, pending and remaining, usage against time, weekly usage and pace needed, expiry flags, FAQs and three key insights",
+      "Contract view for client administrators: points purchased, used, pending and remaining, usage against time, weekly usage and pace needed, expiry and low-points alerts, FAQs and three key insights",
       "Approved employee list management, including bulk paste with checks, invitations, and single or bulk removal",
       "The primary client administrator promotes and demotes other client administrators",
       "Training progress view, an uneditable points usage log, and CSV exports that replace the manual client reports",
@@ -121,7 +122,7 @@
       "Renewals by invoice request or online payment (card or bank transfer), with more points or a 1 to 3 year term",
       "Internal portal: client setup and Go live, client list with usage and problem flags, client details, portal settings, client administrator management, renewals tracking and exports",
       "Super admin list controlled by a single owner, plus a break-glass account for when normal sign-in fails",
-      "Salesforce integration to read clients, contracts, courses, places, enrolments and renewal prices, and to write bookings, changes, cancellations, removals and renewals",
+      "Salesforce integration to read clients, contracts, courses, places, enrolments and renewal prices, and to write bookings, changes, cancellations, refunds, removals and renewals",
       "Email notification preferences with unsubscribe links"
     ],
     "wireframes": [
@@ -157,7 +158,7 @@
     {
       "target": "[DD.MM.YY]",
       "milestone": "Requirements sign-off",
-      "description": "User stories signed off; open questions resolved, such as what happens when a booking fails to save to Salesforce, which Salesforce emails already exist, and whether the primary client administrator can be set by hand"
+      "description": "User stories signed off; open questions resolved, such as what happens when a booking fails to save to Salesforce and which Salesforce emails already exist"
     },
     {
       "target": "[DD.MM.YY]",
@@ -242,7 +243,7 @@
   "dependencies": [
     {
       "dependency": "Salesforce read/write integration",
-      "requirement": "Read clients, contracts, course lists, offerings, places, enrolments, renewal status and renewal prices every hour; write bookings, changes, cancellations, removals and renewals",
+      "requirement": "Read clients, contracts, course lists, offerings, places, enrolments, renewal status and renewal prices every hour; write bookings, changes, cancellations, refunds, removals and renewals",
       "owner": "Muzza Khan",
       "status": "Not started"
     },
@@ -268,6 +269,7 @@
   "assumptions": [
     "All contracts use one points-based model, and Scentia sets the points cost of each course. \"Points\" is a working term and may change.",
     "An employee can be included in more than one of their organisation's contracts",
+    "Business days follow one calendar for all clients: national public holidays plus NSW public holidays",
     "Sessions must start within the contract term; multi-day courses that finish after the contract ends are still allowed",
     "If Salesforce shortens a contract's term, bookings after the new end date are kept, because the points are already spent, and flagged to super admins",
     "Course, place, enrolment, attendance and completion data is available from Salesforce",
