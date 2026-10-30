@@ -4,7 +4,7 @@
     "date": "2026-10-30",
     "status": "Draft",
     "author": "Erin Smith",
-    "changes": "Replaced the placeholder workflow image with six workflow diagrams: booking and approval, changing or cancelling a booking, the booking status and points lifecycles, new client setup and go live, and the contract lifecycle and renewal. Made Sam Zhang the owner of the break-glass account dependency, and set requirements sign-off for 06.11.26."
+    "changes": "Replaced the placeholder workflow image with six workflow diagrams: booking and approval, changing or cancelling a booking, the booking status and points lifecycles, new client setup and go live, and the contract lifecycle and renewal. Made Sam Zhang the owner of the break-glass account dependency, and set the target dates for every milestone."
   },
   "pageTitle": "Partner Pack Portals PRD",
   "overview": {
@@ -210,42 +210,42 @@
       "description": "User stories signed off; open questions resolved, such as what happens when a booking fails to save to Salesforce and which Salesforce emails already exist"
     },
     {
-      "target": "[DD.MM.YY]",
+      "target": "13.11.26",
       "milestone": "Foundations and client onboarding",
       "description": "App deployed with CI, environments, email sending and seed data. Sign-in for every role, with each role in its own area, the super admin list and session rules. Scentia staff set up a client's email domains and administrators, the primary client administrator promotes and demotes others, and welcome emails and activity history are in place"
     },
     {
-      "target": "[DD.MM.YY]",
+      "target": "13.11.26",
       "milestone": "Find and book a course",
       "description": "Employees browse, filter and book courses, with points and eligibility worked out across several contracts. Client administrators set each contract's approval setting and approve or decline from email or the portal, with reminders and automatic closing. Employees see My bookings, change dates, cancel and withdraw requests, and Salesforce session changes are shown and emailed"
     },
     {
-      "target": "[DD.MM.YY]",
+      "target": "13.11.26",
       "milestone": "Employee access and requests",
       "description": "Client administrators add employees one at a time or in bulk, send invitations and remove employees. Employees request courses they can't book, and administrators and the Scentia account manager review and close them. Email preferences and one-click unsubscribe links for employees and administrators"
     },
     {
-      "target": "[DD.MM.YY]",
+      "target": "27.11.26",
       "milestone": "Reporting and oversight",
       "description": "Contract view, points usage log, training progress and CSV exports for client administrators. Client list with usage, renewal and problem flags, and client details, for Scentia staff"
     },
     {
-      "target": "[DD.MM.YY]",
+      "target": "27.11.26",
       "milestone": "Renewals",
       "description": "90-day reminders from Salesforce and contracts flagged as due for renewal. Client administrators renew by invoice request or pay online by card or bank transfer, and Scentia staff track each renewal"
     },
     {
-      "target": "[DD.MM.YY]",
+      "target": "27.11.26",
       "milestone": "Salesforce integration",
       "description": "Live Salesforce reads and writes replace the seeded data used by the earlier milestones, including handling failed writes and retries. A booking made in the portal appears in Salesforce, and a session cancelled in Salesforce shows in the portal"
     },
     {
-      "target": "[DD.MM.YY]",
+      "target": "18.12.26",
       "milestone": "UAT and pilot",
       "description": "Testing with the super admins and a pilot with one or two clients"
     },
     {
-      "target": "[DD.MM.YY]",
+      "target": "29.01.27",
       "milestone": "Launch",
       "description": "Live for all Partner Pack clients"
     }
