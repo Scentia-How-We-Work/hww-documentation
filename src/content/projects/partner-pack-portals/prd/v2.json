@@ -4,7 +4,7 @@
     "date": "2026-10-30",
     "status": "Draft",
     "author": "Erin Smith",
-    "changes": "Replaced the placeholder workflow image with six workflow diagrams: booking and approval, changing or cancelling a booking, the booking status and points lifecycles, new client setup and go live, and the contract lifecycle and renewal. Made Sam Zhang the owner of the break-glass account dependency."
+    "changes": "Replaced the placeholder workflow image with six workflow diagrams: booking and approval, changing or cancelling a booking, the booking status and points lifecycles, new client setup and go live, and the contract lifecycle and renewal. Made Sam Zhang the owner of the break-glass account dependency, and set requirements sign-off for 06.11.26."
   },
   "pageTitle": "Partner Pack Portals PRD",
   "overview": {
@@ -205,7 +205,7 @@
   },
   "milestones": [
     {
-      "target": "[DD.MM.YY]",
+      "target": "06.11.26",
       "milestone": "Requirements sign-off",
       "description": "User stories signed off; open questions resolved, such as what happens when a booking fails to save to Salesforce and which Salesforce emails already exist"
     },
