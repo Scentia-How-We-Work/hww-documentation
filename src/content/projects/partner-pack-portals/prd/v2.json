@@ -4,7 +4,7 @@
     "date": "2026-10-30",
     "status": "Draft",
     "author": "Erin Smith",
-    "changes": "Replaced the placeholder workflow image with six workflow diagrams: booking and approval, changing or cancelling a booking, the booking status and points lifecycles, new client setup and go live, and the contract lifecycle and renewal."
+    "changes": "Replaced the placeholder workflow image with six workflow diagrams: booking and approval, changing or cancelling a booking, the booking status and points lifecycles, new client setup and go live, and the contract lifecycle and renewal. Made Sam Zhang the owner of the break-glass account dependency."
   },
   "pageTitle": "Partner Pack Portals PRD",
   "overview": {
@@ -322,7 +322,7 @@
     {
       "dependency": "Break-glass account",
       "requirement": "A dedicated email address and securely stored credentials (password plus hardware key or authenticator app), retrievable only by named IT staff",
-      "owner": "IT team",
+      "owner": "Sam Zhang",
       "status": "Not started"
     }
   ],
