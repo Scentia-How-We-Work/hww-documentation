@@ -36,7 +36,9 @@ function useDarkMode() {
 
 type Rendered = { svg: string } | { error: string } | undefined;
 
-function Mermaid({ code, title }: { code: string; title?: string }) {
+type Props = { code: string; title?: string; description?: string };
+
+function Mermaid({ code, title, description }: Props) {
   const id = `mermaid-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   const dark = useDarkMode();
   const [rendered, setRendered] = useState<Rendered>();
@@ -73,6 +75,8 @@ function Mermaid({ code, title }: { code: string; title?: string }) {
           {title}
         </figcaption>
       )}
+
+      {description && <p className="text-sm leading-6 text-ink-soft">{description}</p>}
 
       {rendered === undefined && <p className="text-sm text-muted">Loading diagram…</p>}
 
