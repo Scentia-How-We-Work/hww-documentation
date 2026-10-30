@@ -84,9 +84,11 @@ describe("validateContent", () => {
     ).toEqual([]);
   });
 
-  it("accepts Mermaid diagrams, with or without a title, as workflows and mock-ups", () => {
+  it("accepts Mermaid diagrams, with or without a title and description, as workflows and mock-ups", () => {
     const data = prd();
-    data.solution.workflows = [{ mermaid: "flowchart LR\n a --> b", title: "Booking" }];
+    data.solution.workflows = [
+      { mermaid: "flowchart LR\n a --> b", title: "Booking", description: "How booking works." },
+    ];
     data.solution.wireframes = [{ mermaid: "sequenceDiagram" }];
     expect(errorsFor("a/prd/v1.json", data)).toEqual([]);
   });

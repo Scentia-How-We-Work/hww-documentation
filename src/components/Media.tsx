@@ -25,7 +25,9 @@ function Card({ card }: { card: LinkCard }) {
 
 // Images and diagrams are shown full width, in their order in the JSON
 function Figure({ item }: { item: Image | Diagram }) {
-  if (isDiagram(item)) return <Mermaid code={item.mermaid} title={item.title} />;
+  if (isDiagram(item)) {
+    return <Mermaid code={item.mermaid} title={item.title} description={item.description} />;
+  }
   return (
     <div className="overflow-hidden border border-line">
       <img src={item.image} alt={item.alt} className="block h-auto w-full" />
