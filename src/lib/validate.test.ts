@@ -84,6 +84,21 @@ describe("validateContent", () => {
     ).toEqual([]);
   });
 
+  it("accepts Mermaid diagrams, with or without a title, as workflows and mock-ups", () => {
+    const data = prd();
+    data.solution.workflows = [{ mermaid: "flowchart LR\n a --> b", title: "Booking" }];
+    data.solution.wireframes = [{ mermaid: "sequenceDiagram" }];
+    expect(errorsFor("a/prd/v1.json", data)).toEqual([]);
+  });
+
+  it("rejects a Mermaid diagram with no code", () => {
+    const data = prd();
+    data.solution.workflows = [{ mermaid: " " }];
+    expect(errorsFor("a/prd/v1.json", data)).toEqual([
+      expect.stringMatching(/ › solution\.workflows\.0/),
+    ]);
+  });
+
   it("rejects files outside the layout", () => {
     expect(validateContent([file("a.json", prd())])).toEqual([
       "src/content/projects/a.json: not a document file. Use projects/<id>/prd/v<n>.json or projects/<id>/tds/v<n>.json",

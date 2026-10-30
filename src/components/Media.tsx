@@ -1,5 +1,6 @@
-import { isLinkCard } from "../lib/media";
-import type { Image, LinkCard, MediaItem } from "../lib/types";
+import { isDiagram, isLinkCard } from "../lib/media";
+import type { Diagram, Image, LinkCard, MediaItem } from "../lib/types";
+import Mermaid from "./Mermaid";
 
 type Props = { title?: string; items: MediaItem[] };
 
@@ -22,8 +23,18 @@ function Card({ card }: { card: LinkCard }) {
   );
 }
 
+// Images and diagrams are shown full width, in their order in the JSON
+function Figure({ item }: { item: Image | Diagram }) {
+  if (isDiagram(item)) return <Mermaid code={item.mermaid} title={item.title} />;
+  return (
+    <div className="overflow-hidden border border-line">
+      <img src={item.image} alt={item.alt} className="block h-auto w-full" />
+    </div>
+  );
+}
+
 function Media({ title, items }: Props) {
-  const images = items.filter((item): item is Image => !isLinkCard(item));
+  const figures = items.filter((item): item is Image | Diagram => !isLinkCard(item));
   const cards = items.filter(isLinkCard);
 
   return (
@@ -32,14 +43,10 @@ function Media({ title, items }: Props) {
         <h3 className="text-xs font-medium uppercase tracking-wider text-subtle">{title}</h3>
       )}
 
-      {images.length > 0 && (
+      {figures.length > 0 && (
         <div className="flex flex-col gap-6">
-          {images.map(function (item, index) {
-            return (
-              <div key={index} className="overflow-hidden border border-line">
-                <img src={item.image} alt={item.alt} className="block h-auto w-full" />
-              </div>
-            );
+          {figures.map(function (item, index) {
+            return <Figure key={index} item={item} />;
           })}
         </div>
       )}

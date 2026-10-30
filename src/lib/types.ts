@@ -21,7 +21,10 @@ export type Image = { image: string; alt: string };
 // A card linking out to a page, such as a live mock-up, shown in place of an image
 export type LinkCard = { link: string; title: string; description: string };
 
-export type MediaItem = Image | LinkCard;
+// A Mermaid diagram, such as a workflow, drawn in the page
+export type Diagram = { mermaid: string; title?: string };
+
+export type MediaItem = Image | LinkCard | Diagram;
 
 export type Prd = {
   version: VersionInfo;

@@ -4,8 +4,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { JSDOM } from "jsdom";
+import { prdDiagrams } from "../src/lib/media";
 import { parseDocPath } from "../src/lib/projects";
-import { tdsSchema } from "../src/lib/schemas";
+import { prdSchema, tdsSchema } from "../src/lib/schemas";
 import { mermaidBlocks } from "../src/lib/tds";
 import { validateContent } from "../src/lib/validate";
 
@@ -27,11 +28,21 @@ const { window } = new JSDOM("");
 Object.assign(globalThis, { window, document: window.document });
 const { default: mermaid } = await import("mermaid");
 
+function diagramsIn(file: { path: string; text: string }) {
+  const kind = parseDocPath(file.path)?.kind;
+  if (kind === "tds") {
+    const tds = tdsSchema.safeParse(JSON.parse(file.text));
+    return tds.success ? mermaidBlocks(tds.data) : [];
+  }
+  if (kind === "prd") {
+    const prd = prdSchema.safeParse(JSON.parse(file.text));
+    return prd.success ? prdDiagrams(prd.data) : [];
+  }
+  return [];
+}
+
 for (const file of files) {
-  if (parseDocPath(file.path)?.kind !== "tds") continue;
-  const tds = tdsSchema.safeParse(JSON.parse(file.text));
-  if (!tds.success) continue;
-  for (const { field, code } of mermaidBlocks(tds.data)) {
+  for (const { field, code } of diagramsIn(file)) {
     try {
       await mermaid.parse(code);
     } catch (error) {

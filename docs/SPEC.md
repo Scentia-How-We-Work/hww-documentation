@@ -41,8 +41,9 @@ shows one at `/?project=<id>`. Used by Scentia How We Work to publish and share 
   nearest section start. Sections taller than the screen scroll freely and can also settle on
   their bottom edge. Scrolling, touching or a key press stops a glide; with reduced motion it
   snaps instantly.
-- **Media:** the Workflows and Mock-ups items in The Solution (`workflows` and `wireframes` in the JSON) are each either an image or a link
-  card. Images are shown full width; link cards are shown in a grid and open their link in a new tab.
+- **Media:** the Workflows and Mock-ups items in The Solution (`workflows` and `wireframes` in the JSON) are each an image, a Mermaid
+  diagram or a link card. Images and diagrams are shown full width, in their order in the JSON; link
+  cards are shown after them in a grid and open their link in a new tab.
 - **Levels:** table cells reading Low, Medium or High (any case) show as coloured tags, in PRD and
   TDS tables.
 - **Dates** show as DD/MM/YYYY.
@@ -72,8 +73,8 @@ src/content/projects/<id>/tds/v1.json, v2.json, …
 - **Version header:** every file starts with `version`: `{ number, date (YYYY-MM-DD), status
 (Draft | In review | Approved | Superseded), author, approvedBy?, changes }`. The approval log is
   the list of every version's header.
-- **PRD:** the `Prd` type in `src/lib/types.ts`. A media item is an image (`{ "image", "alt" }`) or a
-  link card (`{ "link", "title", "description" }`).
+- **PRD:** the `Prd` type in `src/lib/types.ts`. A media item is an image (`{ "image", "alt" }`), a
+  Mermaid diagram (`{ "mermaid", "title"? }`) or a link card (`{ "link", "title", "description" }`).
 - **TDS:** the `Tds` type in `src/lib/types.ts`: the version header, `prdVersion` (optional, the PRD
   version it was written against), `documentControl` (project, tier, approver, reviewers, related
   links), optional `intro` blocks and the `sections`. Sections follow the Technical Design Spec
@@ -92,7 +93,8 @@ Every file under `src/content/projects/` must pass, or CI fails:
 - Each document's versions run v1, v2, v3… with no gaps.
 - A TDS has exactly the standard sections, in order. No section is empty (write "N/A — reason").
   Subsection numbers start with their section's number. Every table row has one cell per column.
-  `prdVersion`, when set, names a PRD version that exists. Every Mermaid diagram parses.
+  `prdVersion`, when set, names a PRD version that exists.
+- Every Mermaid diagram parses, in a TDS or in a PRD's workflows and mock-ups.
 
 ### Versions never change (`pnpm check:versions`, run in CI and on pre-push)
 

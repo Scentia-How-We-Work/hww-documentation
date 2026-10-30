@@ -20,6 +20,7 @@ const person = z.strictObject({ name: z.string(), role: z.string(), email: z.str
 const mediaItem = z.union([
   z.strictObject({ image: z.string(), alt: z.string() }),
   z.strictObject({ link: z.url(), title: z.string(), description: z.string() }),
+  z.strictObject({ mermaid: text, title: text.optional() }),
 ]);
 
 export const prdSchema = z.strictObject({
