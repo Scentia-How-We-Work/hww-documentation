@@ -1,0 +1,2871 @@
+{
+  "version": {
+    "number": 4,
+    "date": "2026-11-03",
+    "status": "Draft",
+    "author": "Muzza Khan",
+    "changes": "Corrected the database setup: staging and production share one Supabase project, \"AIM Partner Packs\" (`wyydvkvewxsjryutrpaa`, Sydney), with a database branch each (`main` for production, `staging` for staging), not a project each (3.3, 3.5, 5.1, 5.3, ADR-002, ADR-011). Export files for both environments are in the `main` branch's Storage (ADR-013). New risks: the `staging` branch is ephemeral, not persistent (R9), and the staging Worker holds an S3 key to production's Storage (R10)."
+  },
+  "prdVersion": 1,
+  "documentControl": {
+    "project": "Partner Packs Portal",
+    "tier": "Production ([github.com/Scentia-How-We-Work](https://github.com/Scentia-How-We-Work))",
+    "approver": "Matt Stejer (Head of Product Technologies & AI)",
+    "reviewers": "Delivery lead (TBC); security reviewer (TBC)",
+    "related": [
+      {
+        "label": "PP Brief",
+        "url": "https://app.notion.com/p/404128b2649480f98312da4389631a67"
+      },
+      {
+        "label": "User Stories",
+        "url": "https://app.notion.com/p/405128b2649480a1951cf018caeb9def"
+      },
+      {
+        "label": "Epics",
+        "url": "https://app.notion.com/p/406128b2649481eea7a1c4a650e2c323"
+      },
+      {
+        "label": "Salesforce Queries w/ Bailey",
+        "url": "https://app.notion.com/p/405128b264948045ab0bdd2e17269cc5"
+      },
+      {
+        "label": "Repo: Scentia-How-We-Work/aim-partner-packs",
+        "url": "https://github.com/Scentia-How-We-Work/aim-partner-packs"
+      },
+      {
+        "label": "Notion original",
+        "url": "https://app.notion.com/p/406128b2649481298823f767571b1b78"
+      },
+      {
+        "label": "Deploy guide (docs/DEPLOY.md)",
+        "url": "https://github.com/Scentia-How-We-Work/aim-partner-packs/blob/main/docs/DEPLOY.md"
+      },
+      {
+        "label": "Scentia coding standards",
+        "url": "https://github.com/Scentia-How-We-Work/coding-standards"
+      }
+    ]
+  },
+  "intro": [
+    {
+      "type": "callout",
+      "tone": "info",
+      "text": "Built from the [Technical Design Spec (TDS) — Template](https://app.notion.com/p/406128b264948158a47ffc6690c30962). This is the worked example for other projects. Behaviour is defined in [User Stories](https://app.notion.com/p/405128b2649480a1951cf018caeb9def); this document defines how it's built."
+    }
+  ],
+  "sections": [
+    {
+      "number": "1",
+      "title": "Overview",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "1.1",
+          "title": "Context and problem",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Partner Packs let a client organisation buy a block of points that its employees spend on Scentia short courses. Today there's no self-service: employees find a course in the public catalogue and email Scentia to book, coordinators enrol them by hand, and premium and qualification pack reports are built by combining Salesforce and Moodle CSV exports for each client. Support queries land in the public programs queue or with account managers."
+            },
+            {
+              "type": "text",
+              "text": "The portal gives employees self-service booking within their contract, gives client administrators approvals, employee lists, usage reporting and renewals, and gives Scentia's two PP coordinators one view across all clients. Salesforce remains the system of record for clients, contracts, courses, offerings and enrolments."
+            }
+          ]
+        },
+        {
+          "number": "1.2",
+          "title": "Goals",
+          "blocks": [
+            {
+              "type": "list",
+              "items": [
+                "Reduce coordinator delivery time by 70% (brief target).",
+                "Employees book eligible courses without emailing Scentia.",
+                "Client administrators see usage and progress at any time, replacing the manually prepared client reports.",
+                "Clients can renew online or request an invoice without contacting their sales rep."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "1.3",
+          "title": "Non-goals",
+          "blocks": [
+            {
+              "type": "list",
+              "items": [
+                "Replacing Salesforce or Moodle as systems of record.",
+                "Single sign-on (all users sign in with an email link and code).",
+                "Public B2C course purchasing.",
+                "Contract emails (renewal reminders, invoices, receipts): Salesforce sends these."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "1.4",
+          "title": "Scope",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["In scope", "Out of scope"],
+              "rows": [
+                [
+                  "Participant portal: sign-in, browse, filter, book, change, cancel, course requests, email preferences",
+                  "Waiting lists (in brief, not in user stories)"
+                ],
+                [
+                  "Client admin portal: contracts and usage, access mode and approval settings, approvals, approved lists, teams, booking for one or several employees, admin roles, progress, points log, renewals, exports",
+                  "Pre-populated carts shared with employees"
+                ],
+                [
+                  "Internal portal: client list, client setup and Go live, client details, settings, admins, renewals, exports, super admin list, break-glass account",
+                  "Support query handling (brief item 3; separate work)"
+                ],
+                [
+                  "Salesforce read/write sync; Stripe card payments; portal emails via Resend",
+                  "Automatic invoice generation (\"Could have\", behind a flag)"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "1.5",
+          "title": "Users and roles",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Role", "Description", "Approx. number", "Surface"],
+              "rows": [
+                [
+                  "Participant",
+                  "Employee of a client organisation included in at least one contract",
+                  "TBC (see Q11)",
+                  "/"
+                ],
+                [
+                  "Client administrator",
+                  "Manages contracts, approvals and approved lists for one organisation",
+                  "Several per client",
+                  "/admin"
+                ],
+                [
+                  "Primary client administrator",
+                  "Client admin set from the Salesforce account/contract owner; can promote and demote admins",
+                  "One per client",
+                  "/admin"
+                ],
+                [
+                  "Internal Scentia user (super admin)",
+                  "PP coordinators and staff on the super admin list",
+                  "≈ 2–5",
+                  "/internal"
+                ],
+                ["Super admin list owner", "Matt Stejer, set in configuration", "1", "/internal"],
+                ["System", "Scheduled jobs and integrations", "—", "—"]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "1.6",
+          "title": "Glossary",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Term", "Meaning"],
+              "rows": [
+                [
+                  "Points",
+                  "Currency of a contract. Each course costs a fixed number of points set by Scentia. Working term."
+                ],
+                [
+                  "Contract",
+                  "A Partner Pack purchase: term, points purchased, included courses, access mode and approval setting"
+                ],
+                [
+                  "Access mode",
+                  "Open (any email on the client's domains) or whitelist (approved list only), per contract"
+                ],
+                [
+                  "Approval setting",
+                  "\"Approval required\" or \"Book directly\", per contract, chosen by the client admin"
+                ],
+                ["Course", "A Scentia short course or qualification"],
+                [
+                  "Offering",
+                  "One scheduled session of a course (Salesforce \"session\" / course date)"
+                ],
+                ["Booking", "An employee's place on an offering, charged to one contract"],
+                ["Booking request", "A booking awaiting client admin approval"],
+                [
+                  "Course request",
+                  "An employee's expression of interest in a course they can't book"
+                ],
+                [
+                  "Points ledger",
+                  "Append-only record of every points movement (the \"points usage log\")"
+                ],
+                ["Business day", "Weekday that isn't a public holiday (calendar TBC, see Q3)"],
+                ["Hold", "A place reserved for a pending booking request"]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "2",
+      "title": "Architecture drivers",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "2.1",
+          "title": "Key functional drivers",
+          "blocks": [
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "**Places and points are rechecked atomically** on submit, approve and change, while Salesforce also sells places through other channels (Book, Approve, Change stories).",
+                "**Contract selection rule**: whitelist contract first, then the contract that ends soonest, falling through on insufficient points or out-of-term dates (stories 3.5 AC 2, 4.2 AC 13).",
+                "**10-business-day rule** decides whether points are returned or consumed, and whether changes are allowed.",
+                "**Holds and auto-expiry**: a pending request holds a place and its points (shown as \"pending\") for one month, until 10 business days before the start, or until the contract ends, whichever is soonest; reminders at 3 days, end of week, then weekly.",
+                "**Approve from email without signing in**, with single-use, expiring, request-bound links.",
+                "**Immutable points ledger and activity history**.",
+                "**Strict tenant isolation**: admins see only their organisation; internal users see all, view-only for bookings.",
+                "**Hourly refresh, live availability**: Salesforce data is refreshed every hour on the hour and the portal shows no freshness timestamps. Availability can't be batch processed, so places remaining are read live from Salesforce at submit, approve and change (stories §2).",
+                "**Large exports run in the background** and are delivered when ready.",
+                "**Salesforce API budget** is already about 50% used daily (Salesforce Queries meeting)."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "2.2",
+          "title": "Non-functional requirements",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Attribute", "Scentia default", "Project target"],
+              "rows": [
+                ["Availability", "99.9% monthly", "99.9%"],
+                ["RPO (recovery point objective)", "1 hour", "1 hour"],
+                ["RTO (recovery time objective)", "4 hours", "4 hours"],
+                ["Restore drill", "Quarterly", "Quarterly"],
+                [
+                  "Latency",
+                  "p95 < 500 ms reads, < 1 s writes (AU)",
+                  "Same; course list < 500 ms with 500 courses"
+                ],
+                [
+                  "Salesforce freshness",
+                  "—",
+                  "Refreshed every hour on the hour; places remaining read live at submit, approve and change; no freshness timestamps shown (stories §2)"
+                ],
+                ["Accessibility", "WCAG 2.2 AA", "WCAG 2.2 AA, required (Scentia standard)"],
+                ["Data residency", "Personal information at rest in AU", "AU"],
+                ["Audit retention", "7 years", "7 years"],
+                ["Log retention", "90 days (security 1 year)", "Same"],
+                [
+                  "Scale",
+                  "—",
+                  "TBC (Q11). Design for 200 clients, 20,000 participants, 50 bookings per hour peak, approved-list pastes of 2,000 rows"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "2.3",
+          "title": "Constraints",
+          "blocks": [
+            {
+              "type": "list",
+              "items": [
+                "Scentia stack (section 4); Cloudflare team account.",
+                "Personal information at rest in Australia.",
+                "No SSO; email link and code for all users.",
+                "Salesforce is the system of record for clients, contracts, courses, offerings, enrolments and renewal status. Salesforce's data model allows only one-to-one relationships for client admins, so client admins beyond the primary live in the portal.",
+                "Salesforce daily API limit is shared with other integrations and already about half used.",
+                "Informatica is being replaced by MuleSoft during or after this build.",
+                "Project timeline 01/10/2026 – 31/12/2026."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "2.4",
+          "title": "Assumptions",
+          "blocks": [
+            {
+              "type": "list",
+              "items": [
+                "A full-copy Salesforce sandbox with anonymised data is available for staging (confirmed).",
+                "An integration user and External Client App can be created at no licence cost (Salesforce Queries meeting).",
+                "The integration user can read an offering's live places remaining through the REST API, and run SOQL delta queries on SystemModstamp for each mirrored object.",
+                "Qualification progress is available in Salesforce (Q6)."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "3",
+      "title": "Architecture (C4 model)",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "3.1",
+          "title": "Diagram conventions",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "As in the template: Mermaid flowcharts for C4, sequenceDiagram for flows, erDiagram for data."
+            }
+          ]
+        },
+        {
+          "number": "3.2",
+          "title": "Level 1 — System context",
+          "blocks": [
+            {
+              "type": "mermaid",
+              "code": "flowchart LR\n  p([Participant<br/>client employee]):::person\n  ca([Client administrator]):::person\n  is([Internal Scentia user<br/>PP coordinator]):::person\n  pp[Partner Packs Portal]:::system\n  sf[Salesforce<br/>clients, contracts, courses,<br/>offerings, enrolments, renewals]:::external\n  rs[Resend<br/>transactional email]:::external\n  st[Stripe<br/>card payments]:::external\n  se[Sentry<br/>errors, logs, alerts]:::external\n  srep([Sales rep / Finance]):::person\n  p -- \"browses, books, cancels [HTTPS]\" --> pp\n  ca -- \"approves, manages lists, renews [HTTPS]\" --> pp\n  is -- \"oversees clients [HTTPS]\" --> pp\n  pp -- \"reads records hourly and places live, writes bookings and renewals [REST, OAuth 2.0]\" --> sf\n  pp -- \"sends portal emails [REST]\" --> rs\n  rs -- \"delivers email\" --> p\n  rs -- \"delivers email\" --> ca\n  pp -- \"creates checkout sessions [REST]\" --> st\n  st -- \"payment events [webhook]\" --> pp\n  pp -- \"errors and logs (scrubbed) [HTTPS]\" --> se\n  sf -- \"contract, invoice and renewal emails\" --> srep\n  sf -- \"renewal reminders, invoices, receipts\" --> ca\n  classDef person fill:#08427b,color:#fff,stroke:#052e56\n  classDef system fill:#1168bd,color:#fff,stroke:#0b4884\n  classDef external fill:#999,color:#fff,stroke:#6b6b6b"
+            }
+          ]
+        },
+        {
+          "number": "3.3",
+          "title": "Level 2 — Containers",
+          "blocks": [
+            {
+              "type": "mermaid",
+              "code": "flowchart LR\n  users([Participants, client admins,<br/>internal users]):::person\n  subgraph cf[Cloudflare - global edge]\n    web[Portal Worker<br/>TanStack Start, React<br/>/, /admin, /internal, /webhooks, /a]:::container\n    qc[Queue consumers<br/>same Worker: email, sf-outbound,<br/>export; sf-sync with Epic 6]:::container\n    cron[Cron Triggers<br/>outbox relay, holds, reminders, problems,<br/>retention; SF sync and reconciliation with Epic 6]:::container\n    q[[Cloudflare Queues<br/>IDs only, plus DLQs]]:::container\n    kv[(Workers KV<br/>non-personal cache)]:::container\n    hd[Hyperdrive<br/>connection pooling]:::container\n  end\n  subgraph au[Australia - Sydney region]\n    db[(Supabase Postgres<br/>app data, auth, ledger, audit;<br/>a branch per environment)]:::container\n    obj[(Supabase Storage<br/>large exports, Logpush;<br/>a bucket per environment)]:::container\n  end\n  sf[Salesforce]:::external\n  rs[Resend]:::external\n  st[Stripe]:::external\n  se[Sentry]:::external\n  users -- \"HTTPS\" --> web\n  web -- \"SQL\" --> hd\n  qc -- \"SQL\" --> hd\n  cron -- \"SQL\" --> hd\n  hd -- \"TLS\" --> db\n  web -- \"enqueue\" --> q\n  cron -- \"enqueue\" --> q\n  q --> qc\n  web --> kv\n  qc -- \"REST\" --> sf\n  web -- \"REST (live places)\" --> sf\n  qc -- \"REST\" --> rs\n  web -- \"REST\" --> st\n  st -- \"webhook\" --> web\n  qc -- \"S3 API\" --> obj\n  web -. \"errors, logs\" .-> se\n  classDef person fill:#08427b,color:#fff,stroke:#052e56\n  classDef container fill:#438dd5,color:#fff,stroke:#2e6295\n  classDef external fill:#999,color:#fff,stroke:#6b6b6b"
+            },
+            {
+              "type": "text",
+              "text": "One Worker serves all three portals, the webhooks, the queue consumers and the crons (ADR-009). Route groups enforce role separation; they share one domain model and one database. Staging and production each run this whole set as separate resources (3.5, ADR-011): they share only the Cloudflare account, the Sentry project and the Supabase project \"AIM Partner Packs\" (`wyydvkvewxsjryutrpaa`, Sydney). Each environment's database is its own branch of that project, a separate Postgres instance with its own credentials and no shared data; both environments' export files are in the `main` branch's Storage (ADR-013)."
+            }
+          ]
+        },
+        {
+          "number": "3.4",
+          "title": "Level 3 — Components (Portal Worker)",
+          "blocks": [
+            {
+              "type": "mermaid",
+              "code": "flowchart TB\n  subgraph routes[Routes - thin]\n    rp[Participant routes /]\n    ra[Client admin routes /admin]\n    ri[Internal routes /internal]\n    rw[Webhooks /webhooks/stripe, resend]\n    rt[Action links /a/token]\n  end\n  subgraph server[src/server - I/O]\n    auth[Auth and session guard<br/>Better Auth, role checks]\n    repo[Tenant-scoped repositories<br/>Drizzle]\n    book[Booking service]\n    contract[Contract and access service]\n    sfc[Salesforce client<br/>OAuth, REST, Composite]\n    sync[Salesforce sync handlers]\n    outbox[Outbox relay]\n    mail[Email service<br/>templates, preferences]\n    pay[Payment service<br/>Stripe Checkout]\n    exp[Export service]\n    audit[Audit writer]\n  end\n  subgraph lib[src/lib - pure domain logic]\n    elig[eligibility]\n    sel[contract-selection]\n    bd[business-days]\n    hold[holds-and-expiry]\n    canc[cancellation-policy]\n    rem[reminder-schedule]\n    pts[points-balance]\n    pace[usage-pace and insights]\n    wl[approved-list paste parsing]\n    csv[csv formatting]\n  end\n  rp --> auth\n  ra --> auth\n  ri --> auth\n  rt --> book\n  rp --> book\n  ra --> book\n  ra --> contract\n  ri --> contract\n  book --> sfc\n  rw --> pay\n  book --> repo\n  book --> outbox\n  book --> mail\n  book --> audit\n  contract --> repo\n  contract --> audit\n  sync --> sfc\n  sync --> repo\n  outbox --> sfc\n  exp --> repo\n  book --> sel\n  book --> elig\n  book --> canc\n  book --> hold\n  book --> pts\n  contract --> wl\n  contract --> pace\n  exp --> csv\n  hold --> bd\n  canc --> bd\n  rem --> bd"
+            }
+          ]
+        },
+        {
+          "number": "3.5",
+          "title": "Deployment view",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Item", "Staging", "Production"],
+              "rows": [
+                ["Cloudflare account", "cf19a34c4b44339d91604f31451b6416", "Same"],
+                [
+                  "Worker",
+                  "`aim-partner-packs-staging` (`env.staging` in `wrangler.jsonc`)",
+                  "`aim-partner-packs-production` (top level of `wrangler.jsonc`)"
+                ],
+                [
+                  "Deploys from",
+                  "`main`, on every merge",
+                  "`production` branch, on every release merge"
+                ],
+                [
+                  "Build command (Workers Builds)",
+                  "`CLOUDFLARE_ENV=staging pnpm run build`",
+                  "`pnpm run build`"
+                ],
+                ["Deploy command", "`npx wrangler deploy`", "`npx wrangler deploy`"],
+                [
+                  "Hostname",
+                  "`workers.dev`; `partnerpacks-staging.aim.com.au` proposed",
+                  "`workers.dev` until go-live, then `partnerpacks.aim.com.au` (confirmed)"
+                ],
+                [
+                  "Supabase project",
+                  "\"AIM Partner Packs\" (`wyydvkvewxsjryutrpaa`, Sydney), shared",
+                  "Same project"
+                ],
+                [
+                  "Database",
+                  "`staging` branch of the Supabase project (ref `lsqibfbygyiryckepugh`), its own Postgres instance; Hyperdrive config `26242ef5dd9742898e1d5a5d80fbb28b`",
+                  "`main` branch, the project's default (ref `wyydvkvewxsjryutrpaa`); Hyperdrive config `9a7d07442cf448d1a76e777c94f2c8be`"
+                ],
+                [
+                  "Export storage",
+                  "Bucket `exports-staging` in the `main` branch's Storage (ADR-013)",
+                  "Bucket `exports-production` in the `main` branch's Storage"
+                ],
+                [
+                  "Queues (each with a `-dlq`)",
+                  "`aim-partner-packs-staging-` + `email`, `sf-outbound`, `export`",
+                  "`aim-partner-packs-` + `email`, `sf-outbound`, `export`"
+                ],
+                ["Workers KV", "Own namespace, provisioned on first deploy", "Own namespace"],
+                [
+                  "Cron Triggers",
+                  "Same five schedules as production (8.3)",
+                  "Five schedules (8.3)"
+                ],
+                [
+                  "Sentry",
+                  "Project `aim-partner-packs`, environment `staging`",
+                  "Same project and DSN, environment `production`"
+                ],
+                [
+                  "Email",
+                  "Resend, only to `EMAIL_ALLOWED_RECIPIENTS` (Scentia test inboxes)",
+                  "Resend, from `partnerpacks@ai-transform.aim.com.au`"
+                ],
+                [
+                  "Masquerade (SPEC 5.11)",
+                  "On (`MASQUERADE_ENABLED=1`)",
+                  "Refused, whatever is set"
+                ]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Sending domain: `ai-transform.aim.com.au` (confirmed 30/10/2026; SPF, DKIM, DMARC), replacing the proposed `notify.aim.com.au`. Supabase branches are separate instances: the `staging` branch has its own database, credentials and Storage, and starts with none of `main`'s data. The app uses Storage only on `main`, for both environments' export files: private buckets, 50 MB per file, `text/csv` only. The `staging` branch is ephemeral (not persistent) today; see R9. There are no per-PR preview Workers: both Workers Builds connections build only their own production branch (ADR-012)."
+            }
+          ]
+        },
+        {
+          "number": "3.6",
+          "title": "Key runtime flows",
+          "blocks": [
+            {
+              "type": "heading",
+              "text": "Sign-in"
+            },
+            {
+              "type": "mermaid",
+              "code": "sequenceDiagram\n  actor U as User\n  participant W as Portal Worker\n  participant DB as Postgres\n  participant R as Resend\n  U->>W: Submit work email (Turnstile token)\n  W->>W: Rate limit per IP and per email\n  W->>DB: Resolve eligibility (live client domains, approved lists, admin, super admin)\n  alt eligible\n    W->>DB: Store hashed 6-digit code and link token (10 min)\n    W->>R: Send sign-in email\n    W-->>U: \"Check your email\" page\n  else matching domain, not on a restricted list\n    W-->>U: No access - contact your L&D team or manager (story 3.1 AC 2)\n  else unrecognised domain or client not live\n    W-->>U: Not recognised, with help (reveals no clients)\n  end\n  U->>W: Open link (page auto-submits a POST#59; button if scripts are off) or enter code\n  U->>W: POST verify\n  W->>DB: Verify, mark used, create session\n  W-->>U: Session cookie, redirect by role"
+            },
+            {
+              "type": "heading",
+              "text": "Booking with approval"
+            },
+            {
+              "type": "mermaid",
+              "code": "sequenceDiagram\n  actor P as Participant\n  actor A as Client admin\n  participant W as Portal Worker\n  participant DB as Postgres\n  participant Q as Queues\n  participant SF as Salesforce\n  P->>W: Submit booking for offering\n  W->>SF: Read places remaining for the offering (live)\n  W->>DB: BEGIN, lock offering and candidate contracts\n  W->>W: lib selects contract, checks places, points, term\n  W->>DB: Insert booking (pending_approval, hold_expires_at, points pending), audit, email outbox\n  W->>DB: COMMIT\n  W->>Q: Enqueue emails\n  Q-->>A: Request email with Approve / Decline links\n  A->>W: Open approve link (page auto-submits a POST)\n  W->>SF: Read places remaining for the offering (live)\n  W->>DB: BEGIN, lock booking, offering, contract\n  alt places and points still available\n    W->>DB: Booking confirmed, ledger debit, SF outbox row\n    W->>Q: Enqueue sf-outbound and emails\n    Q->>SF: Upsert enrolment by Portal_Booking_Id\n    alt Salesforce rejects (full)\n      Q->>DB: Compensate - booking failed, ledger credit, flag problem\n      Q-->>P: Email - booking could not be completed\n    end\n  else no longer available\n    W->>DB: Booking closed with reason\n    W-->>A: Explain why, participant notified\n  end"
+            },
+            {
+              "type": "heading",
+              "text": "Hourly Salesforce refresh"
+            },
+            {
+              "type": "mermaid",
+              "code": "sequenceDiagram\n  participant C as Cron (every hour on the hour)\n  participant Q as sf-sync queue\n  participant SF as Salesforce\n  participant DB as Postgres\n  C->>Q: Enqueue one message per mirrored object\n  Q->>DB: Read sync cursor (last SystemModstamp)\n  Q->>SF: SOQL delta query since the cursor\n  Q->>DB: Upsert mirror rows, advance cursor\n  Q->>DB: Side effects, e.g. offering cancelled or rescheduled - notify bookings#59; new client - Not set up"
+            },
+            {
+              "type": "heading",
+              "text": "Online renewal by card"
+            },
+            {
+              "type": "mermaid",
+              "code": "sequenceDiagram\n  actor A as Client admin\n  participant W as Portal Worker\n  participant SF as Salesforce\n  participant S as Stripe\n  participant DB as Postgres\n  A->>W: Choose points and term\n  W->>SF: Get renewal price (incl. GST)\n  W->>DB: Create renewal (pending_payment, amount)\n  W->>S: Create Checkout Session (amount from server, metadata renewal id)\n  W-->>A: Redirect to Stripe hosted page\n  A->>S: Pay\n  S->>W: checkout.session.completed + signature\n  W->>DB: Verify amount and renewal, mark paid, outbox row\n  W->>SF: (via queue) Online renewal paid - create new contract\n  SF-->>A: Tax invoice or receipt email"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "4",
+      "title": "Technology stack",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "The Scentia standard applies without deviation, with these project choices:"
+        },
+        {
+          "type": "table",
+          "columns": ["Layer", "Choice", "Notes"],
+          "rows": [
+            ["Runtime", "Cloudflare Workers", "—"],
+            ["Framework", "TanStack Start", "Three route groups in one app"],
+            [
+              "Database",
+              "Supabase Postgres, Sydney, via Hyperdrive",
+              "ADR-001 and ADR-002 accepted; Supabase Auth not used"
+            ],
+            ["ORM", "Drizzle", "—"],
+            ["Auth", "Better Auth, email OTP and magic link plugins", "ADR-006"],
+            ["Background", "Queues, Cron Triggers", "No Workflows needed in v1"],
+            ["Email", "Resend", "ADR-007, accepted risk"],
+            ["Payments", "Stripe Checkout", "ADR-008"],
+            [
+              "Object storage",
+              "Supabase Storage (S3-compatible), Sydney",
+              "Large exports and Logpush"
+            ],
+            [
+              "Observability",
+              "Sentry (errors, logs, alerts by email); Workers Logs and Traces; Logpush",
+              "ADR-010"
+            ],
+            ["Testing", "Vitest, Playwright, Stryker", "Mutation testing on: rules-heavy src/lib"],
+            [
+              "Source control",
+              "GitHub, Scentia-How-We-Work org",
+              "Org rulesets protect `main` and `production` (5.5)"
+            ],
+            [
+              "CI",
+              "GitHub Actions, one `ci` job",
+              "Checks only, never deploys: gitleaks, format, lint, typecheck, unit, build, migrations, e2e (15)"
+            ],
+            [
+              "Build and deploy",
+              "Cloudflare Workers Builds",
+              "One connection per Worker (5.4, ADR-012)"
+            ],
+            ["Git hooks", "lefthook with gitleaks", "Pre-commit and pre-push (5.6)"],
+            ["Work tracking", "Notion roadmap", "Projects → Epics → Tickets (5.9)"]
+          ]
+        }
+      ]
+    },
+    {
+      "number": "5",
+      "title": "Hosting and environments",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "5.1",
+          "title": "Environments",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Environment", "Runs", "Data", "Salesforce", "Stripe", "Email"],
+              "rows": [
+                [
+                  "Local",
+                  "`pnpm dev` in the root checkout, on the local-only `testing` branch (5.6); `pnpm dev` in a worktree for its own branch",
+                  "Homebrew Postgres 17, `aim_partner_packs`, seeded synthetic (`pnpm db:seed`)",
+                  "Fixtures (`SF_MODE=fixtures`)",
+                  "Test mode; card option hidden without a key",
+                  "`dev_mailbox` table; Resend only for `EMAIL_ALLOWED_RECIPIENTS`"
+                ],
+                [
+                  "CI",
+                  "The `ci` job on every PR and every push to `main`, against the built Worker",
+                  "Postgres 17 service container, migrated, reset and seeded per run",
+                  "Fixtures",
+                  "None",
+                  "`dev_mailbox` only"
+                ],
+                [
+                  "Staging",
+                  "`aim-partner-packs-staging`, deployed from `main`",
+                  "`staging` branch of the Supabase project. Seeded synthetic with Salesforce field names until Epic 6, then synced from the full-copy sandbox (anonymised)",
+                  "Fixtures until Epic 6, then the full-copy sandbox",
+                  "Test mode",
+                  "Resend, limited to Scentia test inboxes by `EMAIL_ALLOWED_RECIPIENTS`"
+                ],
+                [
+                  "Production",
+                  "`aim-partner-packs-production`, deployed from `production`",
+                  "`main` branch of the Supabase project; live from go-live",
+                  "Production org",
+                  "Live",
+                  "Resend"
+                ]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "There is no per-PR preview environment (ADR-012). Staging is seeded with `ALLOW_REMOTE_RESET=1 pnpm db:seed` against its direct connection; that flag is never set for production. Masquerade runs only off production: the app refuses it when `SENTRY_ENVIRONMENT` is `production`."
+            }
+          ]
+        },
+        {
+          "number": "5.2",
+          "title": "Domains and DNS",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Both Workers serve on their `workers.dev` hostnames today. For go-live production moves to `partnerpacks.aim.com.au` (custom domain on the production Worker); staging's `partnerpacks-staging.aim.com.au` is proposed. Each hostname must be added to the Turnstile widget, and `APP_URL` on that Worker changed to match, because email links, action links and Better Auth callbacks are built from it. Webhook endpoints are on the same hostname under /webhooks/*, with WAF rules limiting methods and body size."
+            }
+          ]
+        },
+        {
+          "number": "5.3",
+          "title": "Configuration and secrets",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Secret / config", "Purpose", "Owner", "Rotation"],
+              "rows": [
+                [
+                  "Hyperdrive config (one per Supabase branch)",
+                  "Postgres access to that environment's branch; holds its DB password",
+                  "Tech lead",
+                  "12 months"
+                ],
+                [
+                  "`APP_URL`",
+                  "Public base URL for links and auth callbacks",
+                  "Tech lead",
+                  "On change"
+                ],
+                ["`BETTER_AUTH_SECRET`", "Session signing", "Tech lead", "12 months"],
+                [
+                  "`TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`",
+                  "Bot check; test keys are refused off localhost",
+                  "Tech lead",
+                  "12 months"
+                ],
+                [
+                  "`SF_MODE`, `SF_INSTANCE_URL`, `SF_CLIENT_ID` / `SF_CLIENT_SECRET`",
+                  "Fixtures or live; OAuth client credentials (integration user)",
+                  "Salesforce admin",
+                  "12 months"
+                ],
+                [
+                  "`RESEND_API_KEY` / `RESEND_WEBHOOK_SECRET`, `EMAIL_FROM`",
+                  "Sending; bounce webhooks; from address",
+                  "Tech lead",
+                  "12 months"
+                ],
+                [
+                  "`EMAIL_ALLOWED_RECIPIENTS` (staging)",
+                  "Only these inboxes get real email",
+                  "Tech lead",
+                  "On change"
+                ],
+                [
+                  "`STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`",
+                  "Payments",
+                  "Finance systems owner",
+                  "12 months"
+                ],
+                [
+                  "`STORAGE_ACCESS_KEY_ID` / `STORAGE_SECRET_ACCESS_KEY`",
+                  "Supabase Storage S3 access key on the `main` branch, on both Workers (R10)",
+                  "Tech lead",
+                  "12 months"
+                ],
+                [
+                  "`STORAGE_ENDPOINT` / `STORAGE_REGION` / `STORAGE_BUCKET`",
+                  "Export storage and the Worker's bucket; unset means exports stay in Postgres (dev and e2e only)",
+                  "Tech lead",
+                  "On change"
+                ],
+                [
+                  "`SENTRY_DSN` / `SENTRY_ENVIRONMENT`",
+                  "Errors and logs; `staging` or `production` per Worker",
+                  "Tech lead",
+                  "—"
+                ],
+                [
+                  "`MASQUERADE_ENABLED` (staging only)",
+                  "Lets super admins masquerade (SPEC 5.11)",
+                  "Tech lead",
+                  "On change"
+                ],
+                ["`SUPER_ADMIN_OWNER_EMAIL`", "Super admin list owner", "Approver", "On change"],
+                [
+                  "`BREAK_GLASS_EMAIL` and credentials",
+                  "Break-glass account (story 5.3); credentials held by IT, not in the Worker",
+                  "IT team",
+                  "After every use"
+                ],
+                [
+                  "`SENTRY_AUTH_TOKEN` (planned, build variable)",
+                  "Source map upload to Sentry; not set up yet",
+                  "Tech lead",
+                  "12 months"
+                ]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "`wrangler.jsonc` holds no secrets. Every variable is listed in `.env.example` with a comment. Deployed values are Worker secrets, set separately on each Worker from local, gitignored files (`wrangler secret bulk .env.staging --env staging`, `wrangler secret bulk .env.production`), and they persist across deploys. Locally they come from `.env`, which is symlinked into every worktree. gitleaks runs on pre-commit, pre-push and in CI, with GitHub push protection on."
+            }
+          ]
+        },
+        {
+          "number": "5.4",
+          "title": "Deployment and rollback",
+          "blocks": [
+            {
+              "type": "mermaid",
+              "code": "flowchart LR\n  wt[Worktree branch]:::git -- \"PR, ci passes,<br/>squash merge\" --> main[main]:::git\n  main -- \"Workers Builds<br/>CLOUDFLARE_ENV=staging\" --> stg[aim-partner-packs-staging]:::worker\n  stg --> qa{QA and UAT<br/>on staging}\n  qa -- \"fix: new PR\" --> wt\n  qa -- \"passed: release PR,<br/>merge commit\" --> prod[production]:::git\n  hf[hotfix/* from production]:::git -. \"urgent only\" .-> prod\n  hf -. \"same fix\" .-> main\n  prod -- \"Workers Builds\" --> pw[aim-partner-packs-production]:::worker\n  classDef git fill:#438dd5,color:#fff,stroke:#2e6295\n  classDef worker fill:#08427b,color:#fff,stroke:#052e56",
+              "title": "From merge to customers"
+            },
+            {
+              "type": "list",
+              "items": [
+                "**Deploy** is Cloudflare Workers Builds, one connection per Worker (3.5). It builds and deploys on every push to that Worker's branch; nothing else deploys. The Cloudflare Vite plugin picks the environment at build time (`CLOUDFLARE_ENV`), so `wrangler deploy --env` has no effect.",
+                "**GitHub Actions** only checks (`ci`, 15) and never deploys. Branch rules make a green `ci` a precondition of every merge into `main` and `production` (5.5).",
+                "**Migrations are not part of the deploy.** They're run by hand against each environment's database before or straight after the code that needs them reaches it (6.5).",
+                "**Manual deploys** are rare and need `wrangler login` on the team account: `CLOUDFLARE_ENV=staging pnpm run build && npx wrangler deploy` for staging, `pnpm run build && npx wrangler deploy` for production.",
+                "**First deploy of an environment:** create its queues and DLQs (`wrangler queues create`), migrate its database, set its secrets; KV namespaces are provisioned on first deploy."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Rollback"
+            },
+            {
+              "type": "text",
+              "text": "Roll a Worker back to its previous version from the dashboard (Deployments) or with `wrangler rollback`; the next build from its branch replaces it, so follow up with a revert PR into `main` (and a release, for production). Migrations are expand-and-contract, so the previous version still runs against the current schema and the database is never rolled back. Staging only: before deploying a version from before masquerade (PR #8), end every masquerade session (docs/DEPLOY.md), or the old code treats one as an ordinary session."
+            }
+          ]
+        },
+        {
+          "number": "5.5",
+          "title": "Source control and branches",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Repository `Scentia-How-We-Work/aim-partner-packs`, production tier, solo team (`.scentia.json`). Rules come from Scentia-How-We-Work org rulesets, applied by `/scentia:protect-repo`; the repo has no branch protection of its own."
+            },
+            {
+              "type": "table",
+              "columns": ["Branch", "Role", "Changes only by", "Rules"],
+              "rows": [
+                [
+                  "`main`",
+                  "Staging; the integration branch every PR targets",
+                  "PR, squash merge (title becomes the commit), branch deleted on merge",
+                  "PR required; `ci` passing on an up-to-date branch; admins included; no force-push or deletion; 0 approvals (solo team)"
+                ],
+                [
+                  "`production`",
+                  "What customers run",
+                  "Release PR from `main` or `release/*`, or a `hotfix/*` PR; merge commit only",
+                  "\"Protect production branch\" ruleset: PR and `ci` required, not strict (it holds merge commits `main` never has), no force-push or deletion. CI rejects heads whose commits aren't on `main`, except `hotfix/*`"
+                ],
+                [
+                  "`<feature>`",
+                  "One piece of work, one Notion ticket",
+                  "Its worktree at `worktrees/<branch>`, branched from `origin/main`",
+                  "PR into `main` only"
+                ],
+                [
+                  "`release/<YYYY-MM-DD>`",
+                  "Releases part of `main`: everything up to the last tested commit",
+                  "Pushed at that commit by `/scentia:release`",
+                  "Deleted on merge"
+                ],
+                [
+                  "`hotfix/<name>`",
+                  "Urgent fix while `main` holds untested work",
+                  "Branched from `origin/production`; PR'd into `production`, then into `main`",
+                  "Only with the dev's say-so; `production` is never merged into `main`"
+                ],
+                [
+                  "`testing`",
+                  "The dev's integration sandbox, served by `pnpm dev` in the root checkout",
+                  "`/scentia:integrate-testing`; rebuilt from `main`",
+                  "Local only: never pushed or PR'd"
+                ]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Merges, approvals and pushes to `main` or `production` are made by the dev on GitHub, never by Claude Code. Nobody bypasses git hooks (`--no-verify`, `LEFTHOOK=0`)."
+            }
+          ]
+        },
+        {
+          "number": "5.6",
+          "title": "Development workflow",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Every change follows the Scentia worktree workflow, driven by the `scentia` Claude Code plugin, which also injects the team standards at session start from `.scentia.json`."
+            },
+            {
+              "type": "list",
+              "items": [
+                "**Start** (`/scentia:start-work`): find or create the Notion ticket, move it to In Progress and assign it (5.9); create `worktrees/<branch>` from `origin/main`, symlink `.env` and `.dev.vars` from the root, run `pnpm install`, and record the ticket in `git config branch.<branch>.notionTask`.",
+                "**Build**: read `docs/SPEC.md` first and update it in the same PR. Business rules go in `src/lib` with the failing test first (TDD), I/O in `src/server`. Customer-facing journeys get Playwright e2e tests with an axe WCAG 2.2 AA scan in the same PR. Stryker mutation testing on rules-heavy `src/lib`. Tick each acceptance criterion on the ticket when it's built and tested.",
+                "**Try it** (`/scentia:integrate-testing`): merge the branch into the local `testing` branch in the root checkout, which `pnpm dev` serves, to test it alongside other unmerged work.",
+                "**Finish** (`/scentia:finish-work`): run `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build`, push, and open a PR into `main` with `Closes <ticket URL>` on the first line and the PR template filled in; set the ticket's `PR Link`.",
+                "**Review** (`/scentia:address-review`): fix review comments in the worktree, push, and reply to each; the reviewer resolves threads.",
+                "**Merge**: the dev squash-merges once `ci` passes. Workers Builds deploys `main` to staging. If the PR added `drizzle/` migrations, the dev migrates staging (6.5). The ticket moves to Testing/QA. Then `/scentia:finish-work` removes the worktree and local branch and rebuilds `testing` from `main`."
+              ],
+              "ordered": true
+            },
+            {
+              "type": "table",
+              "columns": ["Gate", "Runs"],
+              "rows": [
+                ["pre-commit (lefthook)", "gitleaks on staged changes"],
+                ["pre-push (lefthook)", "gitleaks, `format:check`, `lint`, `typecheck`, `test`"],
+                [
+                  "`ci` (GitHub Actions)",
+                  "Everything in 15's CI row; required on `main` and `production`"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "5.7",
+          "title": "Releasing to production",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "`production` changes only through `/scentia:release`, once QA has passed on staging. Nothing reaches customers on merge to `main`."
+            },
+            {
+              "type": "list",
+              "items": [
+                "List what's on `main` but not on `production` (`git log --first-parent origin/production..origin/main`): one squash commit per PR.",
+                "For each PR, find its Notion ticket and status. Tickets still In Progress or Testing/QA haven't passed QA. A PR that adds or redesigns a journey also needs the dev's manual accessibility pass on staging (keyboard alone and a screen reader).",
+                "Choose the head: `main` if everything passed; a `release/<YYYY-MM-DD>` branch pushed at the last commit before the first untested one; or nothing yet.",
+                "Open `Release <YYYY-MM-DD>` into `production`, listing each PR and its ticket. CI's \"Promote only commits already on main\" step fails any head that isn't an ancestor of `origin/main` (bar `hotfix/*`).",
+                "If the release includes migrations, migrate production first (6.5).",
+                "The dev merges with a merge commit (the only method `production` allows). Workers Builds deploys the production Worker.",
+                "Each ticket the release closed moves to On Production and its developer is removed from `Assignee`; `Part of` tickets stay as they are."
+              ],
+              "ordered": true
+            },
+            {
+              "type": "heading",
+              "text": "Hotfixes"
+            },
+            {
+              "type": "text",
+              "text": "Only when production needs a fix now and `main` holds untested work, and only with the dev's say-so. Start `hotfix/<name>` from `origin/production`, PR it into `production` (rebased onto `production`, never `main`) and merge with a merge commit; then push the same branch again and PR it into `main`, squash-merged as usual. `production` is never merged into `main`. The ticket moves to On Production when the `production` PR merges."
+            }
+          ]
+        },
+        {
+          "number": "5.8",
+          "title": "Promotion to the production tier",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "`/scentia:promote-to-prod` is the standard procedure that takes a Scentia app from the POC tier (one Worker, `main` deploys to customers) to this setup. Its \"Staging and production\" steps are also how a production-tier app without a `production` branch gets one. For this app, the end state is what 3.5 and 5.5 describe."
+            },
+            {
+              "type": "table",
+              "columns": ["Step", "What it does", "Who"],
+              "rows": [
+                [
+                  "1. Readiness",
+                  "SPEC current, `src/lib` unit tests passing their coverage thresholds, open PRs merged first",
+                  "Dev"
+                ],
+                [
+                  "2. Standards PR",
+                  "`scaffold.mjs apply --tier production`: Playwright e2e and axe in CI, `env.staging` in `wrangler.jsonc` with every binding repeated for staging resources, production rules in `.scentia.json`, the production `docs/DEPLOY.md`",
+                  "Claude Code, dev merges"
+                ],
+                [
+                  "3. E2E coverage",
+                  "Playwright tests for each main journey in SPEC, each ending in an axe WCAG 2.2 AA scan",
+                  "Claude Code"
+                ],
+                [
+                  "4. Move the repo",
+                  "Transfer from Scentia-AIM to Scentia-How-We-Work; update `origin`",
+                  "Dev confirms (needs org admin)"
+                ],
+                [
+                  "5. Protect",
+                  "`/scentia:protect-repo --tier production`: creates `production` from `main`, allows merge commits for it only, applies the org rulesets",
+                  "Claude Code"
+                ],
+                [
+                  "6. Workers Builds",
+                  "In this order: repoint the existing Worker's production branch from `main` to `production`; add a connection for the staging Worker on `main` (`CLOUDFLARE_ENV=staging pnpm run build`); set staging secrets",
+                  "Dev, in the dashboard"
+                ],
+                [
+                  "7. Tell the team",
+                  "Merges to `main` now go to staging only; customers get them through `/scentia:release`",
+                  "Dev"
+                ],
+                [
+                  "8. Go-live check",
+                  "Each main journey on staging with the keyboard alone and a screen reader; fixes released as normal",
+                  "Dev"
+                ]
+              ]
+            },
+            {
+              "type": "callout",
+              "tone": "info",
+              "text": "The order in step 6 matters: the production Worker is moved off `main` before staging is connected to it, so untested work never reaches customers in between."
+            }
+          ]
+        },
+        {
+          "number": "5.9",
+          "title": "Work tracking (Notion)",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Work is tracked in the Notion roadmap, not GitHub issues: Projects → Epics → Tickets. This app's project is [Partner Packs Portal](https://app.notion.com/p/408128b2649481fbaed3e6bcaf0e043d) (`notion` in `.scentia.json`); chores go in its Maintenance epic. Each ticket's \"User stories\" checklist holds its acceptance criteria, ticked when dev done (built and tested). Every PR closes one ticket (`Closes <ticket URL>`, or `Part of` when it delivers only part of it), and the branch records its ticket in git config. The plugin's skills move tickets through the Notion MCP tools."
+            },
+            {
+              "type": "mermaid",
+              "code": "stateDiagram-v2\n  Backlog --> InProgress: start-work (assigned to the dev)\n  InProgress --> InProgress: finish-work opens the PR (PR Link set)\n  InProgress --> TestingQA: PR merged into main (on staging)\n  TestingQA --> UAT: people, during QA\n  UAT --> Completed: people, QA passed\n  Completed --> OnProduction: release PR merged (dev unassigned)\n  InProgress --> OnProduction: hotfix merged into production",
+              "title": "Ticket status and the git events that move it"
+            },
+            {
+              "type": "table",
+              "columns": ["Status", "Set by", "When"],
+              "rows": [
+                ["Icebox, Backlog", "People", "Planning"],
+                [
+                  "In Progress",
+                  "`/scentia:start-work`",
+                  "Work starts; the dev is assigned. Stays In Progress while the PR is open"
+                ],
+                [
+                  "Testing/QA",
+                  "`/scentia:finish-work`",
+                  "The PR merged into `main`, so it's on staging"
+                ],
+                ["UAT, Completed", "People", "During QA on staging"],
+                [
+                  "On Production",
+                  "`/scentia:release`",
+                  "The release (or hotfix) PR merged into `production`; the developer is removed from `Assignee`"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "6",
+      "title": "Data model",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "6.1",
+          "title": "Entity relationship diagram",
+          "blocks": [
+            {
+              "type": "mermaid",
+              "code": "erDiagram\n  ORGANISATION ||--o{ ORGANISATION_DOMAIN : has\n  ORGANISATION ||--o{ CONTRACT : holds\n  ORGANISATION ||--o{ CLIENT_ADMIN : has\n  ORGANISATION ||--o{ TEAM : has\n  TEAM ||--o{ TEAM_MEMBER : contains\n  USER ||--o{ TEAM_MEMBER : in\n  USER ||--o{ CLIENT_ADMIN : is\n  CONTRACT ||--o{ CONTRACT_COURSE : includes\n  COURSE ||--o{ CONTRACT_COURSE : in\n  COURSE ||--o{ OFFERING : scheduled_as\n  CONTRACT ||--o{ APPROVED_EMPLOYEE : whitelists\n  USER ||--o{ APPROVED_EMPLOYEE : listed_as\n  USER ||--o{ BOOKING : makes\n  OFFERING ||--o{ BOOKING : for\n  CONTRACT ||--o{ BOOKING : charged_to\n  BOOKING ||--o| ENROLMENT_PROGRESS : tracked_by\n  CONTRACT ||--o{ POINTS_LEDGER : records\n  BOOKING ||--o{ POINTS_LEDGER : causes\n  USER ||--o{ COURSE_REQUEST : raises\n  COURSE ||--o{ COURSE_REQUEST : about\n  CONTRACT ||--o{ RENEWAL : renewed_by\n  USER ||--o{ NOTIFICATION_PREFERENCE : sets\n  USER ||--o{ SESSION : has\n  BOOKING {\n    uuid id PK\n    uuid user_id FK\n    uuid offering_id FK\n    uuid contract_id FK\n    text status\n    int points\n    timestamptz hold_expires_at\n    text sf_enrolment_id\n    text sync_status\n    uuid booked_by\n    uuid bulk_action_id\n  }\n  POINTS_LEDGER {\n    uuid id PK\n    uuid contract_id FK\n    uuid booking_id FK\n    int delta\n    text reason\n    uuid actor_id\n    uuid approved_by\n    uuid bulk_action_id\n    timestamptz occurred_at\n  }"
+            }
+          ]
+        },
+        {
+          "number": "6.2",
+          "title": "Entity catalogue",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": [
+                "Entity",
+                "System of record",
+                "Stored in",
+                "Classification",
+                "Retention",
+                "Notes"
+              ],
+              "rows": [
+                [
+                  "organisation",
+                  "Salesforce (Account)",
+                  "Postgres mirror",
+                  "Confidential",
+                  "Contract end + 7 y",
+                  "sf_account_id, name, sales rep, primary admin contact, setup status (not set up, live), synced_at (internal only, not shown)"
+                ],
+                [
+                  "organisation_domain",
+                  "Portal",
+                  "Postgres",
+                  "Internal",
+                  "While client",
+                  "Unique across clients"
+                ],
+                [
+                  "contract",
+                  "Salesforce, plus portal settings",
+                  "Postgres mirror",
+                  "Confidential",
+                  "End + 7 y",
+                  "Dates, status, points purchased, renewal status from SF; access_mode and approval_mode owned by portal"
+                ],
+                [
+                  "contract_course",
+                  "Salesforce",
+                  "Postgres mirror",
+                  "Internal",
+                  "Contract life",
+                  "Courses included per contract"
+                ],
+                [
+                  "course",
+                  "Salesforce",
+                  "Postgres mirror",
+                  "Public",
+                  "While active",
+                  "Name, category, level, description, outcomes, duration, prerequisites, points cost"
+                ],
+                [
+                  "offering",
+                  "Salesforce",
+                  "Postgres mirror",
+                  "Public",
+                  "Start + 2 y",
+                  "Dates, times, mode, location, join details, capacity, places remaining, status"
+                ],
+                [
+                  "user",
+                  "Portal (Better Auth)",
+                  "Postgres",
+                  "Personal",
+                  "Last activity + 7 y, then de-identified",
+                  "Name, work email, time zone (detected from the browser)"
+                ],
+                [
+                  "session, verification",
+                  "Portal (Better Auth)",
+                  "Postgres",
+                  "Restricted",
+                  "Expiry + 30 days",
+                  "Hashed tokens"
+                ],
+                [
+                  "client_admin",
+                  "Portal (primary from SF)",
+                  "Postgres",
+                  "Personal",
+                  "Audit covers history",
+                  "is_primary flag"
+                ],
+                ["super_admin", "Portal; owner from config", "Postgres", "Personal", "—", "—"],
+                [
+                  "approved_employee",
+                  "Portal",
+                  "Postgres",
+                  "Personal",
+                  "Removal + 7 y",
+                  "Contract whitelist entries; invite status"
+                ],
+                [
+                  "team, team_member",
+                  "Portal",
+                  "Postgres",
+                  "Personal",
+                  "While client",
+                  "Story 4.6; shared by the organisation's admins; never shown to employees"
+                ],
+                [
+                  "bulk_action",
+                  "Portal",
+                  "Postgres",
+                  "Internal",
+                  "7 y",
+                  "Links the per-person bookings, changes, cancellations and removals of one bulk action (4.4, 4.9)"
+                ],
+                [
+                  "booking",
+                  "Portal, mirrored to SF enrolment",
+                  "Postgres",
+                  "Personal",
+                  "Contract end + 7 y",
+                  "Status machine in 8.2; booked_by (self or client admin), bulk_action_id"
+                ],
+                [
+                  "enrolment_progress",
+                  "Salesforce",
+                  "Postgres mirror",
+                  "Personal",
+                  "Contract end + 7 y",
+                  "Attendance, completion, progress %"
+                ],
+                [
+                  "points_ledger",
+                  "Portal",
+                  "Postgres, append-only",
+                  "Confidential",
+                  "7 y",
+                  "Section 12.3 controls"
+                ],
+                ["course_request", "Portal", "Postgres", "Personal", "Closure + 7 y", "—"],
+                [
+                  "notification_preference",
+                  "Portal",
+                  "Postgres",
+                  "Personal",
+                  "While user",
+                  "Per email type, per contract"
+                ],
+                [
+                  "action_token",
+                  "Portal",
+                  "Postgres",
+                  "Restricted",
+                  "Expiry + 30 days",
+                  "Hashed, single purpose"
+                ],
+                [
+                  "renewal",
+                  "Portal intent; SF status",
+                  "Postgres",
+                  "Confidential",
+                  "7 y",
+                  "Method, points, term, amount, Stripe session ID, bank reference"
+                ],
+                [
+                  "outbox / sync_cursor",
+                  "Portal",
+                  "Postgres",
+                  "Internal",
+                  "30 days after success",
+                  "Integration plumbing"
+                ],
+                [
+                  "export_job",
+                  "Portal",
+                  "Postgres + AU storage",
+                  "Personal",
+                  "Files 7 days; rows 1 y",
+                  "—"
+                ],
+                ["audit_event", "Portal", "Postgres, append-only", "Personal", "7 y", "Section 12"]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "6.3",
+          "title": "Data classification",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "As per the template scheme."
+            }
+          ]
+        },
+        {
+          "number": "6.4",
+          "title": "Multi-tenancy and isolation",
+          "blocks": [
+            {
+              "type": "list",
+              "items": [
+                "Every tenant-owned table carries organisation_id (denormalised onto booking, ledger and audit for direct filtering).",
+                "Client admin and participant requests run with a tenant context derived from the session; repositories refuse queries without one.",
+                "Postgres row-level security keyed on a per-transaction setting is the second line of defence.",
+                "Internal routes use an explicit cross-tenant context, and booking mutations are not exposed to internal roles (view-only, per stories).",
+                "Integration tests attempt cross-tenant reads and writes for every admin route."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "6.5",
+          "title": "Migrations",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Drizzle migrations in `drizzle/` (`pnpm db:generate`), expand-and-contract so the previous Worker version always runs against the new schema, reviewed in the PR. CI applies every migration to an empty Postgres 17 database on each run."
+            },
+            {
+              "type": "callout",
+              "tone": "warning",
+              "text": "Deploys don't run migrations: Workers Builds deploys code only. After a merge that adds `drizzle/` files, the dev runs `DATABASE_URL=<session pooler URL> pnpm db:migrate` against staging, and against production as part of the release (5.7). A missed migration shows as \"column … does not exist\" errors on that Worker (seen on staging, 02/11/2026). See R8 and Q19."
+            },
+            {
+              "type": "list",
+              "items": [
+                "Use the session pooler connection string of the branch being migrated (`staging` or `main`; each has its own ref and password): the direct `db.<ref>.supabase.co` host is IPv6-only.",
+                "Never migrate a shared database from an unmerged branch. Drizzle applies only migrations newer than the last one recorded, so a migration renumbered on rebase can leave others silently skipped (seen on staging, 02/11/2026).",
+                "A wrong password in a Hyperdrive config makes Supabase ban Cloudflare's egress IPs; fix the password before lifting the ban (14.3)."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "6.6",
+          "title": "Retention and deletion",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "A nightly job purges expired tokens, sessions and export files. A yearly job de-identifies personal information older than its retention period: names and emails are replaced with a stable pseudonym, so the ledger and audit stay intact."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "7",
+      "title": "Integrations",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "7.1",
+          "title": "Salesforce",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Aspect", "Detail"],
+              "rows": [
+                ["Owner", "Salesforce admin (Bailey)"],
+                ["Direction", "Both"],
+                [
+                  "Auth",
+                  "OAuth 2.0 client credentials via an External Client App and a dedicated integration user per environment, least-privilege permission set"
+                ],
+                [
+                  "Inbound",
+                  "Hourly sync every hour on the hour (Cron Trigger): a SOQL delta query on SystemModstamp since the last cursor for each mirrored object (Account, contract, contract course, course, offering, enrolment, renewal), upserted into the mirror, with side effects such as notifying bookings of a cancelled or rescheduled offering. Places remaining are read live for the offering at submit, approve and change, because availability can't be batch processed. No data-freshness timestamps are shown in the portal (stories §2, ADR-003)"
+                ],
+                [
+                  "Outbound",
+                  "Queued writes using Composite API upserts on external ID Portal_Booking_Id__c / Portal_Renewal_Id__c, making retries idempotent"
+                ],
+                [
+                  "Writes",
+                  "Booking confirmed, changed, cancelled (with points returned or consumed); employee removed; renewal invoice requested; online renewal paid; bank transfer chosen (with payment reference)"
+                ],
+                [
+                  "Reads",
+                  "Accounts, contracts, contract courses, courses, offerings with places remaining, offering changes, enrolments and progress, renewal status, renewal pricing, primary admin contact"
+                ],
+                [
+                  "Volume and limits",
+                  "Estimated < 2,000 calls/day at design scale: about 170 for hourly deltas (24 × 7 objects), up to about 1,200 live place checks at the peak booking rate, plus writes. Daily API usage is monitored and alerts at 80% of the share agreed with the SF admin (Q8). Composite API batches up to 25 subrequests"
+                ],
+                [
+                  "Failure handling",
+                  "Exponential backoff (max 8 attempts over ~24 h), then DLQ. Failed bookings shown to internal users as problems (\"Problems are flagged\") and resolvable by retry or cancel"
+                ],
+                [
+                  "Reconciliation",
+                  "Nightly SOQL delta query on SystemModstamp since the last run for each mirrored object, plus a points comparison (SF used vs ledger) per active contract, with drift reported in the internal portal"
+                ],
+                ["Residency", "Salesforce org location TBC; out of portal scope"],
+                [
+                  "Future",
+                  "When MuleSoft replaces Informatica, only the Salesforce client in src/server changes; the portal uses standard REST and SOQL"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "7.2",
+          "title": "Resend",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Aspect", "Detail"],
+              "rows": [
+                ["Direction", "Out (send), in (delivery webhooks)"],
+                ["Auth", "API key; webhooks verified with Svix signatures"],
+                [
+                  "Data",
+                  "Recipient name and email, course and offering details, action links. No points balances, no decline reasons in the subject line"
+                ],
+                [
+                  "Trigger",
+                  "Sign-in emails are sent inline (latency matters); all others go through the email queue"
+                ],
+                [
+                  "Headers",
+                  "List-Unsubscribe and List-Unsubscribe-Post (RFC 8058) on optional emails"
+                ],
+                [
+                  "Failure handling",
+                  "Queue retries; bounces and complaints add the address to a suppression list and flag the user to admins"
+                ],
+                ["Residency", "Processed outside Australia (APP 8 — ADR-007)"]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "7.3",
+          "title": "Stripe",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Aspect", "Detail"],
+              "rows": [
+                ["Direction", "Out (Checkout Sessions), in (webhooks)"],
+                ["Auth", "Restricted secret key; webhook signature verification"],
+                [
+                  "Data",
+                  "Amount, currency AUD, renewal ID metadata, billing contact email. Card data never touches the portal"
+                ],
+                [
+                  "Events",
+                  "checkout.session.completed, checkout.session.expired, payment_intent.payment_failed"
+                ],
+                [
+                  "Idempotency",
+                  "Stripe idempotency keys on create; event IDs deduplicated on receipt"
+                ],
+                [
+                  "Integrity",
+                  "Amount always computed server-side from the Salesforce price and checked again on the webhook"
+                ],
+                ["Residency", "Stripe processes outside Australia (APP 8)"]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "7.4",
+          "title": "Sentry",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Errors and application logs (Sentry Logs), scrubbed per 13.3; log messages and attributes carry IDs, never names or emails. Alerts are Sentry alert rules, delivered by email (13.5). Region outside Australia (APP 8)."
+            }
+          ]
+        },
+        {
+          "number": "7.5",
+          "title": "Moodle",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Not integrated in v1, on the assumption that qualification progress is in Salesforce (Q6)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "8",
+      "title": "Application design",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "8.1",
+          "title": "Code structure",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "src/lib for all rules below (pure, TDD, mutation-tested); src/server for services and repositories; routes/ grouped by portal."
+            }
+          ]
+        },
+        {
+          "number": "8.2",
+          "title": "Domain rules",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Rule", "Module", "Inputs", "Notes"],
+              "rows": [
+                [
+                  "Course eligibility and grey-out reasons",
+                  "eligibility",
+                  "Contracts, contract courses, balances, offering dates",
+                  "Reasons: not in contract; not enough points. A client admin booking for themselves or an employee is checked against the person being booked"
+                ],
+                [
+                  "Contract selection",
+                  "contract-selection",
+                  "Eligible contracts, offering date, points cost",
+                  "Whitelist first, then the contract that ends soonest, fall through on points or term; active contracts only (stories 3.5 AC 2, 4.2 AC 13)"
+                ],
+                [
+                  "Business days",
+                  "business-days",
+                  "Date, holiday calendar",
+                  "Calendar passed in (Q3)"
+                ],
+                [
+                  "Cancellation outcome",
+                  "cancellation-policy",
+                  "Offering start, now, calendar",
+                  "≥ 10 business days: points returned and change allowed; otherwise consumed, cancel only"
+                ],
+                [
+                  "Hold expiry",
+                  "holds-and-expiry",
+                  "Created at, offering start, contract end, calendar",
+                  "min(created + 1 month, start − 10 business days, contract end) (story 3.5 AC 7)"
+                ],
+                [
+                  "Reminder schedule",
+                  "reminder-schedule",
+                  "Created at, now, expiry",
+                  "Day 3, end of that week (Friday), then weekly until expiry"
+                ],
+                [
+                  "Points balance",
+                  "points-balance",
+                  "Purchased, ledger entries, pending requests",
+                  "Used and remaining from the ledger (remaining = purchased + sum(ledger deltas)); pending = points of requests awaiting approval; available = remaining − pending (story 3.5 AC 8)"
+                ],
+                [
+                  "Usage pace and insights",
+                  "usage-pace",
+                  "Contract term, ledger by week, now",
+                  "% used vs % elapsed, weekly average, required weekly pace, behind-pace flag"
+                ],
+                [
+                  "Approved-list paste",
+                  "approved-list-parse",
+                  "Raw text, org domains, existing list",
+                  "Tab or comma, optional header, per-row validation, dedupe"
+                ],
+                [
+                  "CSV output",
+                  "csv",
+                  "Rows, columns",
+                  "DD/MM/YYYY, UTF-8 BOM, formula-injection escaping"
+                ],
+                [
+                  "Approval needed",
+                  "approval-rule",
+                  "Contract approval setting, who is booking, for whom",
+                  "\"Approval required\" contracts need approval, except a client admin booking for themselves or for employees (stories 4.1 AC 8, 4.8 AC 5); a declined session can't be requested again (3.5 AC 10)"
+                ],
+                [
+                  "Places display",
+                  "places-display",
+                  "Places remaining",
+                  "0: fully booked, not selectable; fewer than 3: \"few places left\"; otherwise no count shown"
+                ],
+                [
+                  "Session time display",
+                  "time-display",
+                  "Offering UTC times, venue zone, viewer zone",
+                  "In person: venue's zone; online: viewer's zone; zone label always shown (story 3.4 AC 4)"
+                ]
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Booking status machine"
+            },
+            {
+              "type": "mermaid",
+              "code": "stateDiagram-v2\n  [*] --> pending_approval: submit (approval required)\n  [*] --> confirmed: submit (book directly), admin self-booking, or admin books for employees\n  pending_approval --> confirmed: approved and rechecked\n  pending_approval --> declined: declined\n  pending_approval --> expired: hold expiry or contract end\n  pending_approval --> withdrawn: participant withdraws\n  pending_approval --> closed: recheck failed or removed from list\n  confirmed --> cancelled: participant, admin, removal from list, or offering cancelled\n  confirmed --> confirmed: change of date\n  confirmed --> failed: Salesforce rejected\n  confirmed --> completed: SF completion\n  confirmed --> did_not_attend: SF attendance"
+            }
+          ]
+        },
+        {
+          "number": "8.3",
+          "title": "Background jobs",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Job", "Trigger", "Schedule / queue", "Idempotent", "On failure"],
+              "rows": [
+                [
+                  "Outbox relay",
+                  "Cron `* * * * *`",
+                  "Every minute; feeds `email`, `sf-outbound`, `export`",
+                  "Yes",
+                  "Alert if backlog > 15 min"
+                ],
+                [
+                  "Email sender",
+                  "Outbox relay",
+                  "`email`",
+                  "Yes (outbox ID as Resend idempotency key)",
+                  "5 retries, DLQ"
+                ],
+                [
+                  "SF outbound writer",
+                  "Outbox relay",
+                  "`sf-outbound`",
+                  "Yes (external ID upsert); acknowledges only in fixtures mode until Epic 6",
+                  "8 retries over ~24 h, DLQ, problem flag"
+                ],
+                [
+                  "Export builder",
+                  "Export request over 5,000 rows",
+                  "`export`",
+                  "Yes (only queued or running jobs are built)",
+                  "3 attempts, then failed; requester emailed"
+                ],
+                [
+                  "Hold expiry and request auto-close",
+                  "Cron `*/15 * * * *`",
+                  "Every 15 min",
+                  "Yes",
+                  "Alert if missed"
+                ],
+                [
+                  "Export recovery",
+                  "Cron `*/15 * * * *`",
+                  "Every 15 min",
+                  "Yes (exports still preparing after 2 h)",
+                  "Next run retries"
+                ],
+                [
+                  "Approval reminders",
+                  "Cron `0 * * * *`",
+                  "Hourly, sent 08:00–18:00 Sydney",
+                  "Yes (reminder log)",
+                  "Alert if missed"
+                ],
+                [
+                  "New contract notices",
+                  "Cron `0 * * * *`",
+                  "Hourly",
+                  "Yes (claimed by conditional update)",
+                  "Next run retries"
+                ],
+                [
+                  "Low-points alerts",
+                  "Cron `0 * * * *`",
+                  "Hourly",
+                  "Yes (claimed by conditional update)",
+                  "Next run retries"
+                ],
+                [
+                  "Finish access removals",
+                  "Cron `0 * * * *`",
+                  "Hourly",
+                  "Yes (per-booking recheck under lock)",
+                  "Next run; admin retries"
+                ],
+                [
+                  "Problem checks",
+                  "Cron `0 * * * *`",
+                  "Hourly",
+                  "Yes (dedupe key per problem)",
+                  "Next run retries"
+                ],
+                [
+                  "Course reminder (3 business days before start)",
+                  "Cron `0 21 * * *`",
+                  "Daily, 08:00 Sydney (AEDT)",
+                  "Yes (reminder log)",
+                  "Alert if missed"
+                ],
+                [
+                  "Retention purge",
+                  "Cron `0 16 * * *`",
+                  "Daily, 03:00 Sydney (AEDT)",
+                  "Yes",
+                  "Alert on failure"
+                ],
+                [
+                  "SF hourly sync (Epic 6)",
+                  "Cron, every hour on the hour",
+                  "`sf-sync` (to be added)",
+                  "Yes (SystemModstamp cursor, upsert)",
+                  "Retry, DLQ, alert"
+                ],
+                [
+                  "Nightly reconciliation (Epic 6)",
+                  "Cron",
+                  "02:00 Sydney",
+                  "Yes",
+                  "Alert on failure or drift"
+                ]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Cron expressions are UTC, in `wrangler.jsonc`, and identical on both Workers; each maps to jobs in `src/server/jobs/registry.ts`. Fixed UTC times shift by an hour in Sydney between AEDT and AEST. Each job checks in to its own Sentry cron monitor, `partner-packs-<job name>`, upserted on every check-in."
+            }
+          ]
+        },
+        {
+          "number": "8.4",
+          "title": "API and route contracts",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Server functions per route group, validated with Zod. External endpoints: POST /webhooks/stripe, POST /webhooks/resend, GET+POST /a/:token (action links), GET+POST /unsubscribe/:token."
+            }
+          ]
+        },
+        {
+          "number": "8.5",
+          "title": "Concurrency and consistency",
+          "blocks": [
+            {
+              "type": "list",
+              "items": [
+                "Submit, approve and change run in one Postgres transaction that locks the offering row and the candidate contract rows (SELECT … FOR UPDATE), recomputes places and points, and writes the booking, ledger entry and outbox rows together (transactional outbox).",
+                "Places available = Salesforce places remaining, read live for the offering at submit, approve and change − portal holds and confirmations not yet acknowledged by Salesforce. If Salesforce can't be reached, the mirrored count is used.",
+                "Pending requests hold a place and their points (\"pending\"); places and points are rechecked on approval (stories 3.5 AC 7–8, 4.7).",
+                "Salesforce can still sell the last place through other channels. A Salesforce rejection triggers compensation (booking failed, points returned, participant and coordinators told). See R1 and Q2."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "8.6",
+          "title": "Error handling",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "As per the standard."
+            }
+          ]
+        },
+        {
+          "number": "8.7",
+          "title": "Time, dates and locale",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Offerings store UTC plus the venue's IANA timezone; displayed in the venue timezone for in-person and in the viewer's time zone for online (detected from the browser and stored on the user, so emails and calendar invites use it too). The zone label is always shown (story 3.4 AC 4). Business days use the calendar in Q3."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "9",
+      "title": "Identity and access",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "9.1",
+          "title": "Authentication",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Better Auth email OTP (6 digits) and magic link in one email, valid 10 minutes, single use, stored hashed. Limits: 5 code requests per email per hour, 5 wrong attempts per code, IP rate limits, Turnstile on the email form. Clicking the magic link signs the user in (story 3.1 AC 4): the page it opens submits a POST automatically, with a button if scripts are off, so scanners that only fetch the URL can't consume it. Messages follow story 3.1: a matching domain not on a restricted list is told it has no access; unrecognised domains and clients that aren't live yet get one \"not recognised\" message that reveals no clients. The break-glass account (story 5.3) doesn't use email sign-in: long password plus passkey or authenticator app (Better Auth plugins, Q16)."
+            }
+          ]
+        },
+        {
+          "number": "9.2",
+          "title": "Sessions",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "One session per user; elevated access is time-boxed by when the user last verified."
+            },
+            {
+              "type": "table",
+              "columns": ["Role", "Absolute lifetime", "Idle timeout", "Notes"],
+              "rows": [
+                ["Participant", "90 days", "None", "Per story"],
+                [
+                  "Client admin pages",
+                  "24 hours since last verification",
+                  "None",
+                  "Re-verify to reach /admin after 24 h; participant pages still work"
+                ],
+                ["Internal pages", "8 hours *(proposed)*", "30 minutes *(proposed)*", "Q13"],
+                [
+                  "Break-glass",
+                  "1 hour *(proposed)*",
+                  "15 minutes *(proposed)*",
+                  "Story 5.3; every sign-in alerts IT and the list owner"
+                ]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Role and list membership are read from the database on every request, so demotion or removal applies on the next page load. Removing a super admin revokes their sessions."
+            }
+          ]
+        },
+        {
+          "number": "9.3",
+          "title": "Authorisation",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "See Appendix C for the full matrix. Checks are in src/server guards per route group plus per-record tenant checks."
+            }
+          ]
+        },
+        {
+          "number": "9.4",
+          "title": "Signed action links",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Approve, decline and unsubscribe links carry a random 256-bit token stored hashed, bound to one record and purpose, single use, expiring after 7 days or when the request closes (whichever is first). Approve completes on opening the link and shows the result (story 4.7): the page submits a POST automatically, with a button if scripts are off. Decline opens a page for an optional reason before confirming. Unsubscribe applies straight away (story 3.9), and mail clients can use RFC 8058 one-click. Expired or used links go to sign-in; a request another admin already decided shows its current status."
+            }
+          ]
+        },
+        {
+          "number": "9.5",
+          "title": "Privileged access",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "As per standard. Salesforce integration user can't sign in interactively. The break-glass account can do everything a super admin can, including managing the super admin list, but can't change the list owner or sign in to the client or participant portals; its actions are labelled break-glass in the audit log."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "10",
+      "title": "Security",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "10.1",
+          "title": "Threat model",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["ID", "Component", "STRIDE", "Threat", "Mitigation", "Status"],
+              "rows": [
+                [
+                  "T1",
+                  "Sign-in",
+                  "S",
+                  "Brute-forcing sign-in codes",
+                  "6 digits, 10 min, 5 attempts, IP and email limits",
+                  "Designed"
+                ],
+                [
+                  "T2",
+                  "Sign-in",
+                  "D",
+                  "Email bombing via code requests",
+                  "Per-email limits, Turnstile",
+                  "Designed"
+                ],
+                [
+                  "T3",
+                  "Sign-in",
+                  "I",
+                  "Enumerating client domains or approved lists from error messages",
+                  "Per story 3.1: unrecognised domains and clients not yet live get one message that reveals no clients; the no-access message only reaches addresses on a client's own domain; rate limits and Turnstile slow probing",
+                  "Accepted (Q4)"
+                ],
+                [
+                  "T4",
+                  "Action links",
+                  "T",
+                  "Email scanners (e.g. Safe Links) clicking Approve",
+                  "Opening the link completes the action through an auto-submitted POST (story 4.7), so URL-only scanners can't act; scanners that run scripts remain a residual risk",
+                  "Accepted (Q5)"
+                ],
+                [
+                  "T5",
+                  "Booking",
+                  "T",
+                  "Participant forces a different contract or offering via request tampering",
+                  "Contract chosen server-side; all checks server-side",
+                  "Designed"
+                ],
+                [
+                  "T6",
+                  "Admin routes",
+                  "I",
+                  "Cross-tenant access (IDOR)",
+                  "Tenant-scoped repositories, RLS, tests",
+                  "Designed"
+                ],
+                [
+                  "T7",
+                  "SF sync",
+                  "S/T",
+                  "Spoofed or malformed Salesforce data",
+                  "No inbound endpoint; outbound TLS to the org's My Domain only, OAuth client credentials, Zod validation of every record",
+                  "Designed"
+                ],
+                [
+                  "T8",
+                  "Stripe webhook",
+                  "S/T",
+                  "Forged payment events; amount tampering",
+                  "Signature check; server-side amount verification",
+                  "Designed"
+                ],
+                [
+                  "T9",
+                  "Approved-list paste and exports",
+                  "T",
+                  "CSV formula injection",
+                  "Escaping in csv module",
+                  "Designed"
+                ],
+                [
+                  "T10",
+                  "Exports",
+                  "I",
+                  "Bulk exfiltration of employee data",
+                  "Role checks, audit of every export, rate limits, downloads require sign-in",
+                  "Designed"
+                ],
+                [
+                  "T11",
+                  "Logs / Sentry",
+                  "I",
+                  "Personal information leaking offshore",
+                  "Redaction and scrubbing (13.2, 13.3)",
+                  "Designed"
+                ],
+                [
+                  "T12",
+                  "Roles",
+                  "E",
+                  "Demoted admin keeps access",
+                  "Per-request role lookup",
+                  "Designed"
+                ],
+                [
+                  "T13",
+                  "Points ledger",
+                  "R/T",
+                  "Ledger altered or disputed",
+                  "Append-only, hash chain, audit",
+                  "Designed"
+                ],
+                [
+                  "T14",
+                  "SF integration",
+                  "D",
+                  "API limit exhausted, blocking other Scentia integrations",
+                  "Budget alerting, batching, backoff",
+                  "Designed"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "10.2",
+          "title": "Baseline controls",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "All template controls apply."
+            }
+          ]
+        },
+        {
+          "number": "10.3",
+          "title": "Payment card scope",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Stripe Checkout only, so card data never reaches the portal. PCI DSS approach (e.g. SAQ-A) TBD (Q18). Bank transfer references are not secret but are unique and checksum-validated."
+            }
+          ]
+        },
+        {
+          "number": "10.4",
+          "title": "Go-live security gates",
+          "blocks": [
+            {
+              "type": "callout",
+              "tone": "warning",
+              "text": "The threat model, dependency scanning and WCAG 2.2 AA gates apply. Whether an OWASP ASVS Level 2 self-assessment, PCI DSS attestation and external penetration test are required is TBD (Q18)."
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Threat model reviewed and signed off",
+                  "done": false
+                },
+                {
+                  "text": "OWASP ASVS Level 2 self-assessment (TBD, Q18)",
+                  "done": false
+                },
+                {
+                  "text": "WCAG 2.2 AA met: axe clean on every page",
+                  "done": false
+                },
+                {
+                  "text": "Dependency scanning and SAST blocking on high severity",
+                  "done": false
+                },
+                {
+                  "text": "External penetration test before go-live (TBD, Q18)",
+                  "done": false
+                },
+                {
+                  "text": "PCI DSS attestation (TBD, Q18)",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "10.5",
+          "title": "Control mapping",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "As per the template mapping."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "11",
+      "title": "Privacy and compliance",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "11.1",
+          "title": "Personal information inventory",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Data", "About whom", "Purpose", "Source", "Stored in", "Retention"],
+              "rows": [
+                [
+                  "Name, work email",
+                  "Participants, admins, staff",
+                  "Sign-in, contact",
+                  "Client admin, SF, self",
+                  "Postgres",
+                  "7 y after last activity"
+                ],
+                [
+                  "Bookings, attendance, progress",
+                  "Participants",
+                  "Booking, reporting to employer",
+                  "Portal, SF",
+                  "Postgres",
+                  "Contract end + 7 y"
+                ],
+                [
+                  "Course requests and notes",
+                  "Participants, admins",
+                  "Demand signal",
+                  "Portal",
+                  "Postgres",
+                  "Closure + 7 y"
+                ],
+                [
+                  "Approval decisions and reasons",
+                  "Admins, participants",
+                  "Approvals, audit",
+                  "Portal",
+                  "Postgres",
+                  "7 y"
+                ],
+                [
+                  "Billing contact, PO number",
+                  "Client admins",
+                  "Renewal",
+                  "Portal",
+                  "Postgres, Stripe, SF",
+                  "7 y"
+                ],
+                [
+                  "IP prefix, user agent",
+                  "All users",
+                  "Security, audit",
+                  "Request",
+                  "Postgres, logs",
+                  "7 y (audit), 90 days (logs)"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "11.2",
+          "title": "Collection notice",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Shown on the sign-in page and in invitation emails. Employees are added by their employer, so the invitation email is the APP 5 notice."
+            }
+          ]
+        },
+        {
+          "number": "11.3",
+          "title": "Cross-border disclosure (APP 8)",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Supplier", "Location", "Personal information sent", "Minimisation"],
+              "rows": [
+                [
+                  "Resend",
+                  "US",
+                  "Name, email, course and booking details in emails",
+                  "No balances or reasons in subjects; no attachments"
+                ],
+                [
+                  "Stripe",
+                  "US / global",
+                  "Billing contact email, name",
+                  "Only what Checkout needs"
+                ],
+                [
+                  "Sentry",
+                  "US or EU",
+                  "Errors and logs; no personal information intended",
+                  "Scrubbing; sendDefaultPii false"
+                ],
+                [
+                  "Cloudflare",
+                  "Global edge",
+                  "All request data in transit and in processing",
+                  "No personal information at rest in KV, R2 or queues. See Q9"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "11.4",
+          "title": "Access, correction and deletion",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Coordinators handle requests from the internal portal: export a person's data, correct their name, or de-identify them (ledger and audit stay, linked to a pseudonym)."
+            }
+          ]
+        },
+        {
+          "number": "11.5",
+          "title": "Privacy impact assessment",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Required. To be completed before the threat model sign-off."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "12",
+      "title": "Audit",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "12.1",
+          "title": "What is audited",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Area", "Events"],
+              "rows": [
+                [
+                  "Authentication",
+                  "Code requested, sign-in success or failure, lockout, sign-out, session revoked"
+                ],
+                [
+                  "Contract settings",
+                  "Approval setting changed; access mode changed; domains added or removed; setup steps and Go live"
+                ],
+                [
+                  "Bookings",
+                  "Submitted, approved, declined (with reason), withdrawn, changed, cancelled, expired, failed; who booked and for whom; bulk action link"
+                ],
+                [
+                  "Approved lists",
+                  "Employee added (single or batch, with count), removed (single or bulk, with notify choice), invitation resent; teams created, edited or deleted"
+                ],
+                [
+                  "Roles",
+                  "Client admin promoted, demoted, primary changed (from SF); super admin added or removed; every break-glass sign-in and action, labelled"
+                ],
+                ["Course requests", "Raised, withdrawn, closed (with note)"],
+                [
+                  "Renewals",
+                  "Invoice requested, checkout started, paid, failed, bank transfer chosen"
+                ],
+                ["Exports", "Who, which view, filters, row count"],
+                [
+                  "Internal access",
+                  "Internal user viewed a client (for client-data access reviews)"
+                ]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "The client's \"activity history\" view is a filtered view of these events. The \"points usage log\" is the points_ledger table, which is also immutable."
+            }
+          ]
+        },
+        {
+          "number": "12.2",
+          "title": "Schema",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "As per the template schema."
+            }
+          ]
+        },
+        {
+          "number": "12.3",
+          "title": "Immutability",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "audit_event and points_ledger: INSERT-only role, UPDATE and DELETE revoked, a trigger that rejects them, and a hash chain. Corrections are new compensating entries."
+            }
+          ]
+        },
+        {
+          "number": "12.4",
+          "title": "Retention and access",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "7 years. Client admins see their organisation's activity history and ledger; internal users see all; reading audit records is audited."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "13",
+      "title": "Logging, monitoring and alerting",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "13.1–13.4",
+          "title": "Logs, redaction, Sentry, retention",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "As per the standard, with Sentry receiving errors and application logs (ADR-010), scrubbed per 13.3. Logpush keeps the long-term copy (90 days; security logs 1 year) in Supabase Storage, Sydney."
+            },
+            {
+              "type": "text",
+              "text": "Both Workers report to Sentry project `aim-partner-packs` (org `scentia-how-we-work`) with one DSN, told apart by the `SENTRY_ENVIRONMENT` secret (`staging`, `production`) whatever hostname they're on. The release is the deployed Worker version (`CF_VERSION_METADATA`). Source maps aren't uploaded to Sentry yet, so production stack traces are minified."
+            }
+          ]
+        },
+        {
+          "number": "13.5",
+          "title": "Alerts",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Alert", "Condition", "Severity", "Channel"],
+              "rows": [
+                ["Error rate", "5xx > 2% for 5 min", "High", "Email (Sentry)"],
+                ["SF sync DLQ", "Any message", "High", "Email (Sentry)"],
+                [
+                  "SF API budget",
+                  "> 80% of agreed daily share",
+                  "High",
+                  "Email (Sentry), including the SF admin"
+                ],
+                [
+                  "Reconciliation drift",
+                  "Any contract points mismatch",
+                  "Medium",
+                  "Internal portal + email (Sentry)"
+                ],
+                ["Outbox backlog", "Oldest unsent > 15 min", "High", "Email (Sentry)"],
+                ["Hold expiry / reminders", "Job missed", "Medium", "Email (Sentry)"],
+                ["Email bounces", "Bounce rate > 5% in 24 h", "Medium", "Email (Sentry)"],
+                [
+                  "Stripe webhook failures",
+                  "Any failed signature or processing",
+                  "High",
+                  "Email (Sentry)"
+                ],
+                ["Sign-in abuse", "Rate-limit trips > threshold", "Medium", "Email (Sentry)"]
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Every alert is a Sentry alert rule, delivered by email. Missed jobs use Sentry cron monitors; the API budget, drift, backlog, bounce and sign-in conditions are reported to Sentry as events or logs and alerted on there."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "14",
+      "title": "Reliability and operations",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "14.1",
+          "title": "Backup and restore",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Supabase point-in-time recovery (≥ 7 days) plus daily snapshots kept 35 days, in AU. Quarterly restore drill into staging."
+            }
+          ]
+        },
+        {
+          "number": "14.2",
+          "title": "Failure modes",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Dependency down", "User impact", "Behaviour", "Recovery"],
+              "rows": [
+                [
+                  "Salesforce",
+                  "Data goes stale",
+                  "Browsing continues from the mirror; live place checks fall back to the mirrored count. Bookings are accepted and queued",
+                  "Queue drains; reconciliation catches gaps"
+                ],
+                [
+                  "Resend",
+                  "Sign-in emails fail",
+                  "Sign-in shows \"try again shortly\". Other emails queue",
+                  "Queue retries"
+                ],
+                [
+                  "Stripe",
+                  "No card payments",
+                  "Card option hidden; invoice and bank transfer still available",
+                  "Automatic"
+                ],
+                [
+                  "Postgres",
+                  "Portal down",
+                  "Maintenance page",
+                  "Platform failover or PITR (RTO 4 h)"
+                ],
+                ["Cloudflare", "Portal down", "—", "Cloudflare restoration"]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "14.3",
+          "title": "Runbooks",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "To write: SF DLQ replay; failed booking resolution; reconciliation drift; rotating each secret; restore from PITR; suppressed email address; revoking a user's sessions."
+            },
+            {
+              "type": "text",
+              "text": "In `docs/DEPLOY.md` today: setting each Worker's secrets; migrating staging or production; first deploy of an environment (queues, DLQs, migrations); manual deploys; ending masquerade sessions before rolling staging back past masquerade; export storage and its purge."
+            },
+            {
+              "type": "text",
+              "text": "Add: a Worker that can't reach its database (\"Connection refused\" or \"terminated unexpectedly\"): check the Hyperdrive config's password first, then lift Supabase's network ban on Cloudflare's egress IPs (`supabase network-bans`), in that order or it bans them again; and rolling a Worker back (5.4)."
+            }
+          ]
+        },
+        {
+          "number": "14.4",
+          "title": "Incident response",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Scentia incident process, with an NDB assessment for any incident involving personal information."
+            }
+          ]
+        },
+        {
+          "number": "14.5",
+          "title": "Support model",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Business hours; PP coordinators first line; dev team second line. Out-of-hours on-call TBC."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "15",
+      "title": "Testing strategy",
+      "blocks": [
+        {
+          "type": "table",
+          "columns": ["Level", "Coverage for this project"],
+          "rows": [
+            [
+              "Unit (TDD)",
+              "Every rule in 8.2, including holiday edge cases, month-end hold expiry and contract selection fall-through"
+            ],
+            [
+              "Mutation",
+              "Stryker on contract-selection, cancellation-policy, holds-and-expiry, points-balance, business-days"
+            ],
+            [
+              "Integration",
+              "Booking transactions under concurrency (two submits for the last place), tenant isolation on every admin route, ledger immutability"
+            ],
+            [
+              "Contract",
+              "Salesforce request and response fixtures; nightly run against the full-copy sandbox"
+            ],
+            [
+              "End-to-end (Playwright)",
+              "Each role's main journeys: sign-in, book (both approval modes), approve from email, cancel early and late, paste approved list, admin books for one and several employees (teams), client setup and Go live, renew by card (Stripe test) and invoice"
+            ],
+            ["Accessibility", "axe on every page; WCAG 2.2 AA required"],
+            [
+              "Load",
+              "k6: 2,000-person invitation blast followed by sign-in spike; 50 bookings per hour"
+            ],
+            [
+              "CI (`ci` job)",
+              "Every PR and push to `main`: on PRs into `production`, only commits already on `main` (or `hotfix/*`); gitleaks; format, lint, typecheck; unit tests with coverage thresholds; build; migrations on an empty Postgres 17; Playwright e2e with axe against the built Worker"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "number": "16",
+      "title": "Delivery and rollout",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "16.1",
+          "title": "Milestones",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["Milestone", "Content", "Target"],
+              "rows": [
+                [
+                  "M0 Foundations",
+                  "Scaffold, Postgres, auth, Salesforce read sync, internal client list",
+                  "TBC"
+                ],
+                [
+                  "M1 Participant",
+                  "Browse, filter, book (book directly), my bookings, cancel and change",
+                  "TBC"
+                ],
+                [
+                  "M2 Client admin",
+                  "Approvals and email actions, approved lists, contract view, ledger, roles",
+                  "TBC"
+                ],
+                ["M3 Internal", "Client details, settings, problems, renewals tracking", "TBC"],
+                [
+                  "M4 Renewals and exports",
+                  "Invoice request, Stripe, bank transfer, all CSV exports",
+                  "TBC"
+                ],
+                ["Go-live", "Security gates, pilot with 2–3 clients, then all clients", "TBC"]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "16.2",
+          "title": "Feature flags",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Online payments; automatic invoicing; course requests; per-client pilot enablement."
+            }
+          ]
+        },
+        {
+          "number": "16.3",
+          "title": "Data migration and cutover",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Initial full sync from Salesforce; import existing whitelists if held elsewhere (TBC); coordinators add domains, confirm approval settings and the primary admin, then Go live (story 5.5); client admins choose access modes after Go live (story 4.3)."
+            }
+          ]
+        },
+        {
+          "number": "16.4",
+          "title": "Hypercare and decommissioning",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Two weeks of hypercare per pilot wave. Retire the manually prepared client reports once exports are confirmed equivalent (Export story AC 8)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "17",
+      "title": "Decisions, risks and open questions",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "17.1",
+          "title": "Architecture decision records",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["ID", "Title", "Status", "Summary"],
+              "rows": [
+                [
+                  "ADR-001",
+                  "Postgres in AU instead of D1",
+                  "Accepted",
+                  "D1 has no AU jurisdiction guarantee; personal information must be at rest in AU"
+                ],
+                [
+                  "ADR-002",
+                  "Postgres platform: Supabase",
+                  "Accepted",
+                  "Supabase in Sydney, via Hyperdrive (PlanetScale was the alternative). Its AU S3-compatible storage also covers exports and Logpush, avoiding a third vendor. Supabase Auth is not used. One project, \"AIM Partner Packs\", with a database branch per environment (`main` for production, `staging`)"
+                ],
+                [
+                  "ADR-003",
+                  "Salesforce inbound via hourly delta sync, with live place checks at booking",
+                  "Proposed",
+                  "Stories §2: data refreshed every hour on the hour, no freshness timestamps, and availability can't be batch processed. A Cron Trigger runs SOQL deltas on SystemModstamp; places are read live per offering at submit, approve and change. No Flows, Named Credentials or inbound webhook needed. (Replaces Flow callouts with fetch-on-notify.)"
+                ],
+                [
+                  "ADR-004",
+                  "Booking consistency: local reservation, transactional outbox, external-ID upsert, compensation",
+                  "Proposed",
+                  "Keeps booking fast and resilient to Salesforce outages; accepts rare oversell (R1)"
+                ],
+                [
+                  "ADR-005",
+                  "Portal points ledger as system of record for portal-originated movements",
+                  "Proposed",
+                  "Needs the points-model scoping meeting with Salesforce"
+                ],
+                [
+                  "ADR-006",
+                  "Better Auth for email OTP and magic link",
+                  "Accepted",
+                  "Open source, runs in Workers, data stays in AU Postgres"
+                ],
+                [
+                  "ADR-007",
+                  "Resend for email (offshore processing)",
+                  "Accepted, with risk",
+                  "Accepted APP 8 disclosure; content minimised"
+                ],
+                [
+                  "ADR-008",
+                  "Stripe Checkout",
+                  "Accepted",
+                  "Card data stays with Stripe; PCI DSS approach TBD (Q18). AUD and GST support"
+                ],
+                [
+                  "ADR-009",
+                  "One Worker for all three portals",
+                  "Proposed",
+                  "Shared domain and database; separation by route-group guards"
+                ],
+                [
+                  "ADR-010",
+                  "Sentry for errors, logs and alerting",
+                  "Accepted",
+                  "Errors and application logs go to Sentry, scrubbed. Alerts are Sentry alert rules delivered by email, not a Teams or Slack channel"
+                ],
+                [
+                  "ADR-011",
+                  "Staging on `main`, customers on a protected `production` branch",
+                  "Accepted",
+                  "Production tier standard. Two Workers, each with its own Supabase database branch, Hyperdrive config, KV and queues. `production` changes only through release PRs of commits already on `main` (or hotfixes), merged with a merge commit"
+                ],
+                [
+                  "ADR-012",
+                  "Cloudflare Workers Builds deploys; GitHub Actions only checks",
+                  "Accepted",
+                  "One Workers Builds connection per Worker, building only its branch, so no per-PR previews. CI is the merge gate, not the deployer"
+                ],
+                [
+                  "ADR-013",
+                  "Export files in the `main` branch's Supabase Storage, a bucket per environment",
+                  "Accepted",
+                  "`exports-staging` and `exports-production`, both on the `main` branch of \"AIM Partner Packs\" (Sydney), picked by `STORAGE_BUCKET` (dev decision, 02/11/2026). Databases stay on separate branches. Accepts R10"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "17.2",
+          "title": "Risks",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["ID", "Risk", "Likelihood", "Impact", "Mitigation", "Owner"],
+              "rows": [
+                [
+                  "R1",
+                  "Oversell: Salesforce sells the last place through another channel before the portal's write lands",
+                  "Medium",
+                  "Medium",
+                  "Live place check at submit, approve and change; compensation flow; SF validation rule (Q2)",
+                  "Tech lead"
+                ],
+                [
+                  "R2",
+                  "Salesforce API limit exhausted (already ~50% used)",
+                  "Medium",
+                  "High",
+                  "Fetch-on-notify, Composite batching, budget alerts",
+                  "Tech lead + SF admin"
+                ],
+                [
+                  "R3",
+                  "MuleSoft migration changes the integration path mid-build",
+                  "Medium",
+                  "Medium",
+                  "Isolate SF client in src/server; standard REST and SOQL only",
+                  "Approver"
+                ],
+                [
+                  "R4",
+                  "Corporate email filters delay or consume sign-in and approval emails",
+                  "Medium",
+                  "High",
+                  "DMARC alignment, confirm pages, allowlist guidance for clients",
+                  "Tech lead"
+                ],
+                [
+                  "R5",
+                  "Clients expect fully AU-only processing, but edge and some suppliers process offshore",
+                  "Low",
+                  "High",
+                  "APP 8 disclosures, minimisation, Q9",
+                  "Approver"
+                ],
+                [
+                  "R6",
+                  "Points model in Salesforce not yet scoped",
+                  "High",
+                  "High",
+                  "Scoping meeting before M1",
+                  "Product"
+                ],
+                [
+                  "R7",
+                  "Scope vs Oct–Dec 2026 timeline",
+                  "High",
+                  "Medium",
+                  "Milestones, flags, pilot",
+                  "Delivery lead"
+                ],
+                [
+                  "R8",
+                  "A migration isn't run on staging or production after its code deploys, and the Worker errors",
+                  "Medium",
+                  "High",
+                  "Expand-and-contract migrations; migrate as a release step (5.7); Sentry alerts on the error rate; Q19",
+                  "Tech lead"
+                ],
+                [
+                  "R9",
+                  "The `staging` Supabase branch is ephemeral (`persistent: false`). Supabase recommends persistent branches for staging: only those are guaranteed never to be paused or deleted for inactivity or when a linked PR closes, which would take staging's database with it",
+                  "Low",
+                  "Medium",
+                  "Make it persistent (`supabase branches update staging --persistent --project-ref wyydvkvewxsjryutrpaa`); staging data is synthetic and can be re-seeded",
+                  "Tech lead"
+                ],
+                [
+                  "R10",
+                  "The staging Worker holds an S3 access key to the `main` (production) branch's Storage. Supabase S3 keys aren't scoped to a bucket, so a leaked staging secret exposes production export files",
+                  "Low",
+                  "High",
+                  "Staging secrets limited to the tech lead; rotate the key on any leak; or move `exports-staging` to the `staging` branch's Storage with its own key",
+                  "Tech lead"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "number": "17.3",
+          "title": "Open questions",
+          "blocks": [
+            {
+              "type": "table",
+              "columns": ["ID", "Question", "Owner", "Proposed answer"],
+              "rows": [
+                [
+                  "Q1",
+                  "What happens when a booking fails to save to Salesforce? (from user stories)",
+                  "Product",
+                  "Retries for ~24 h; on rejection, booking marked failed, points returned, participant and coordinators notified; shown in internal Problems"
+                ],
+                [
+                  "Q2",
+                  "Can Salesforce hold a place for a pending request, or reject an over-capacity enrolment?",
+                  "SF admin",
+                  "Add a \"Held\" enrolment status and a capacity validation rule"
+                ],
+                [
+                  "Q3",
+                  "Which public holiday calendar defines business days?",
+                  "Product",
+                  "NSW plus national holidays"
+                ],
+                [
+                  "Q4",
+                  "Sign-in messages reveal whether a domain is a client or an email is on an approved list. Accept, or use a generic response?",
+                  "Product + security",
+                  "Resolved by story 3.1: a matching domain not on a restricted list is told it has no access; unrecognised domains and clients not yet live get one \"not recognised\" message"
+                ],
+                [
+                  "Q5",
+                  "Approve from email in one click, or with a confirm button?",
+                  "Product",
+                  "Resolved by story 4.7: Approve completes on opening (auto-submitted POST); Decline opens a page for an optional reason"
+                ],
+                [
+                  "Q6",
+                  "Is qualification progress (TAE, Mini-MBA) in Salesforce or only in Moodle?",
+                  "SF admin",
+                  "—"
+                ],
+                [
+                  "Q7",
+                  "\"Three key insights\": rule-based or AI-generated?",
+                  "Product",
+                  "Rule-based in v1; AI later, subject to residency"
+                ],
+                [
+                  "Q8",
+                  "Current daily API limit, usage, and the share agreed for the portal",
+                  "SF admin",
+                  "—"
+                ],
+                [
+                  "Q9",
+                  "Is edge processing outside AU acceptable, or is Cloudflare's Data Localization Suite (Enterprise) needed?",
+                  "Approver",
+                  "Acceptable with APP 8 disclosure"
+                ],
+                ["Q10", "Where do renewal prices come from?", "Business", "Salesforce price book"],
+                ["Q11", "Expected numbers of clients, contracts and participants", "Product", "—"],
+                [
+                  "Q12",
+                  "Can the primary client admin be set by hand in the portal?",
+                  "Product",
+                  "No; Salesforce only"
+                ],
+                ["Q13", "Internal session timeouts", "Approver", "30 min idle, 8 h absolute"],
+                [
+                  "Q14",
+                  "Which Salesforce record types and statuses identify Partner Pack contracts?",
+                  "SF admin",
+                  "—"
+                ],
+                [
+                  "Q15",
+                  "Story 3.8 AC 7: a course request made within 10 business days of the start consumes points. Which contract is charged for a course the employee can't book, and does 4.10 AC 9 (points held while a request awaits approval) apply to course requests?",
+                  "Product",
+                  "—"
+                ],
+                [
+                  "Q16",
+                  "Break-glass sign-in method and the dedicated address (story 5.3; IT to create the address)",
+                  "IT",
+                  "Long password plus passkey via Better Auth plugins"
+                ],
+                [
+                  "Q17",
+                  "A booking request made within 10 business days of the start would expire immediately under the hold rule (story 3.5 AC 7). Block it, give it a short hold, or confirm it?",
+                  "Product",
+                  "—"
+                ],
+                [
+                  "Q18",
+                  "Go-live security assurance: is an OWASP ASVS Level 2 self-assessment, a PCI DSS attestation (SAQ-A via Stripe Checkout) or an external penetration test required?",
+                  "Approver",
+                  "TBD"
+                ],
+                [
+                  "Q19",
+                  "Should migrations run automatically before each deploy (for example in the Workers Builds build step, or a GitHub Action on `main` and `production`), and with what database credentials?",
+                  "Tech lead",
+                  "—"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "A",
+      "title": "Requirements traceability",
+      "blocks": [
+        {
+          "type": "table",
+          "columns": ["Story", "Components", "Domain rules"],
+          "rows": [
+            ["Participant: sign in", "auth, contract service", "eligibility (access)"],
+            ["Browse, view, filter courses", "participant routes, repositories", "eligibility"],
+            [
+              "Request a booking / book",
+              "booking service, outbox",
+              "contract-selection, holds-and-expiry, points-balance"
+            ],
+            [
+              "Track my bookings",
+              "participant routes, sync handlers",
+              "cancellation-policy (deadline)"
+            ],
+            ["Change or cancel", "booking service, outbox", "cancellation-policy, business-days"],
+            ["Request unavailable course", "booking service, email", "eligibility"],
+            ["Email preferences (both roles)", "email service", "—"],
+            ["Admin: sign in", "auth (24 h elevation)", "—"],
+            ["View my contracts", "contract service", "points-balance, usage-pace"],
+            ["Approval setting", "contract service, audit", "—"],
+            [
+              "Approve or decline",
+              "action links, booking service",
+              "holds-and-expiry, reminder-schedule"
+            ],
+            ["Course requests", "admin routes, export", "csv"],
+            [
+              "Approved list",
+              "contract service, email",
+              "approved-list-parse, cancellation-policy"
+            ],
+            ["Promote or demote admins", "auth, audit", "—"],
+            ["Training progress", "sync handlers, export", "csv"],
+            ["Points usage log", "points_ledger, export", "csv"],
+            ["Renewal notification", "Salesforce (not portal)", "—"],
+            ["Renew by invoice / online", "payment service, outbox", "—"],
+            ["Exports", "export service", "csv"],
+            ["Internal: sign in, super admins", "auth, config", "—"],
+            [
+              "Client list, details, settings, admins, renewals, exports",
+              "internal routes, contract service",
+              "usage-pace"
+            ],
+            ["Client setup and Go live", "internal routes, contract service, email", "—"],
+            ["Teams", "admin routes, contract service", "approved-list-parse"],
+            [
+              "Book, change or cancel for one or several employees",
+              "booking service, outbox, email",
+              "eligibility, contract-selection, approval-rule, cancellation-policy"
+            ],
+            ["Break-glass account", "auth, audit, email", "—"]
+          ]
+        }
+      ]
+    },
+    {
+      "number": "B",
+      "title": "Email catalogue",
+      "blocks": [
+        {
+          "type": "table",
+          "columns": ["Email", "Recipient", "Sent by", "Essential / optional"],
+          "rows": [
+            ["Sign-in code and link", "Any user", "Portal", "Essential"],
+            ["Booking submitted (pending) / confirmed", "Participant", "Portal", "Essential"],
+            ["Approval decision", "Participant", "Portal", "Essential"],
+            ["Request expired", "Participant, admins", "Portal", "Essential"],
+            ["Offering rescheduled or cancelled", "Participant", "Portal", "Essential"],
+            ["Change or cancellation confirmed", "Participant", "Portal", "Essential"],
+            ["Removed from contract", "Participant", "Portal", "Admin's choice per removal"],
+            ["Invitation to contract", "Participant", "Portal", "Optional"],
+            ["Course request outcome", "Participant", "Portal", "Optional"],
+            [
+              "New booking request",
+              "Client admins",
+              "Portal",
+              "Optional per contract (not for the last recipient)"
+            ],
+            ["Pending request reminder", "Client admins", "Portal", "Optional per contract"],
+            [
+              "New course request",
+              "Client admins, account manager",
+              "Portal",
+              "Optional per contract"
+            ],
+            ["Promoted / demoted / welcome", "Client admin", "Portal", "Essential"],
+            ["Added as super admin", "Internal user", "Portal", "Essential"],
+            ["Export ready", "Requester", "Portal", "Essential"],
+            [
+              "Booked, changed or cancelled for you by an admin",
+              "Participant",
+              "Portal",
+              "Essential"
+            ],
+            [
+              "Course reminder (3 business days before, with joining details and calendar invite)",
+              "Participant",
+              "Portal",
+              "Essential"
+            ],
+            ["New contract arrived", "Client admins", "Portal", "Essential"],
+            ["Break-glass sign-in alert", "IT team, super admin list owner", "Portal", "Essential"],
+            ["90-day renewal reminder", "Client admin, sales rep", "Salesforce", "—"],
+            ["Invoice request notification", "Sales rep, finance", "Salesforce", "—"],
+            ["Tax invoice / receipt", "Client admin", "Salesforce", "—"],
+            ["Bank transfer notification", "Finance", "Salesforce", "—"],
+            ["Online renewal notification", "Sales rep", "Salesforce", "—"]
+          ]
+        }
+      ]
+    },
+    {
+      "number": "C",
+      "title": "Permission matrix",
+      "blocks": [
+        {
+          "type": "table",
+          "columns": [
+            "Action",
+            "Participant",
+            "Client admin",
+            "Primary client admin",
+            "Super admin",
+            "Super admin owner"
+          ],
+          "rows": [
+            [
+              "Browse and book under own contracts",
+              "✅",
+              "✅ if included",
+              "✅ if included",
+              "—",
+              "—"
+            ],
+            [
+              "View contracts, usage, ledger (own org)",
+              "—",
+              "✅",
+              "✅",
+              "✅ all orgs",
+              "✅ all orgs"
+            ],
+            [
+              "Change approval setting",
+              "—",
+              "✅",
+              "✅",
+              "At setup only, then view",
+              "At setup only, then view"
+            ],
+            ["Change access mode (open / whitelist)", "—", "✅", "✅", "View only", "View only"],
+            ["Approve / decline requests", "—", "✅", "✅", "—", "—"],
+            ["Manage approved lists", "—", "✅", "✅", "View only", "View only"],
+            ["Manage teams", "—", "✅", "✅", "View only", "View only"],
+            ["Promote / demote client admins", "—", "—", "✅", "✅", "✅"],
+            ["Renew contract", "—", "✅", "✅", "—", "—"],
+            ["Export own org data", "—", "✅", "✅", "✅", "✅"],
+            ["Set email domains; client setup and Go live", "—", "—", "—", "✅", "✅"],
+            [
+              "Create, change or cancel bookings for others",
+              "—",
+              "✅ one or several employees, no approval needed",
+              "✅ one or several employees, no approval needed",
+              "—",
+              "—"
+            ],
+            ["Manage super admin list", "—", "—", "—", "View", "✅"]
+          ]
+        }
+      ]
+    }
+  ]
+}
