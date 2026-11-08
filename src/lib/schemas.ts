@@ -23,6 +23,15 @@ const mediaItem = z.union([
   z.strictObject({ mermaid: text, title: text.optional(), description: text.optional() }),
 ]);
 
+// The parts of a business case; the summary alone isn't enough
+const BUSINESS_CASE_PARTS = [
+  "comparison",
+  "baseline",
+  "expectedImprovement",
+  "commercialBenefit",
+  "benefits",
+] as const;
+
 export const prdSchema = z.strictObject({
   version: versionSchema,
   pageTitle: text,
@@ -38,22 +47,51 @@ export const prdSchema = z.strictObject({
     headline: z.string(),
     currentState: z.string(),
     strategicAlignment: z.string(),
-    businessCase: z.strictObject({
-      baseline: z.array(z.strictObject({ metric: z.string(), currentState: z.string() })),
-      expectedImprovement: z.array(
-        z.strictObject({
-          metric: z.string(),
-          currentState: z.string(),
-          target: z.string(),
-          improvement: z.string(),
-        }),
+    businessCase: z
+      .strictObject({
+        summary: text.optional(),
+        comparison: z
+          .array(z.strictObject({ area: text, today: text, future: text }))
+          .min(1)
+          .optional(),
+        baseline: z
+          .array(z.strictObject({ metric: z.string(), currentState: z.string() }))
+          .optional(),
+        expectedImprovement: z
+          .array(
+            z.strictObject({
+              metric: z.string(),
+              currentState: z.string(),
+              target: z.string(),
+              improvement: z.string(),
+            }),
+          )
+          .optional(),
+        commercialBenefit: z
+          .strictObject({
+            title: z.string(),
+            timeSaving: z.string(),
+            costBenefit: z.string(),
+          })
+          .optional(),
+        benefits: z
+          .array(
+            z.strictObject({
+              figure: text,
+              label: text,
+              description: text,
+              status: text.optional(),
+            }),
+          )
+          .min(1)
+          .optional(),
+      })
+      .refine(
+        (businessCase) => BUSINESS_CASE_PARTS.some((part) => businessCase[part] !== undefined),
+        {
+          message: `needs at least one of ${BUSINESS_CASE_PARTS.slice(0, -1).join(", ")} or ${BUSINESS_CASE_PARTS.at(-1)}`,
+        },
       ),
-      commercialBenefit: z.strictObject({
-        title: z.string(),
-        timeSaving: z.string(),
-        costBenefit: z.string(),
-      }),
-    }),
   }),
   solution: z.strictObject({
     futureState: z.string(),
