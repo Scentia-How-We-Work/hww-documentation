@@ -2,6 +2,7 @@ import { level } from "../lib/projects";
 import type { Block as BlockType } from "../lib/types";
 import Inline from "./Inline";
 import Mermaid from "./Mermaid";
+import StackedRows from "./StackedRows";
 import { levelStyles } from "./Table";
 
 const calloutStyles: Record<Extract<BlockType, { type: "callout" }>["tone"], string> = {
@@ -59,35 +60,42 @@ function Block({ block }: { block: BlockType }) {
 
     case "table":
       return (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
-            <thead>
-              <tr>
-                {block.columns.map((column, index) => (
-                  <th
-                    key={index}
-                    className="border-b border-ink pb-3 pr-4 align-bottom text-xs font-medium uppercase tracking-wider text-subtle"
-                  >
-                    {column}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="leading-relaxed text-ink-soft">
-              {block.rows.map((row, rowIndex) => (
-                <tr key={rowIndex} className="border-b border-line">
-                  {row.map((value, columnIndex) => (
-                    <td
-                      key={columnIndex}
-                      className={`py-3.5 pr-4 align-top ${columnIndex === 0 ? "text-ink" : ""}`}
+        <div>
+          <StackedRows
+            columns={block.columns}
+            rows={block.rows.map((row) => row.map((value) => <Cell value={value} />))}
+          />
+
+          <div className="hidden overflow-x-auto sm:block">
+            <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+              <thead>
+                <tr>
+                  {block.columns.map((column, index) => (
+                    <th
+                      key={index}
+                      className="border-b border-ink pb-3 pr-4 align-bottom text-xs font-medium uppercase tracking-wider text-subtle"
                     >
-                      <Cell value={value} />
-                    </td>
+                      {column}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="leading-relaxed text-ink-soft">
+                {block.rows.map((row, rowIndex) => (
+                  <tr key={rowIndex} className="border-b border-line">
+                    {row.map((value, columnIndex) => (
+                      <td
+                        key={columnIndex}
+                        className={`py-3.5 pr-4 align-top ${columnIndex === 0 ? "text-ink" : ""}`}
+                      >
+                        <Cell value={value} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       );
 
