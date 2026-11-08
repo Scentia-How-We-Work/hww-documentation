@@ -19,7 +19,7 @@ function Person({ person }: { person: PersonType }) {
       <span className="flex-1 basis-48 text-muted">{person.role}</span>
       <a
         href={`mailto:${person.email}`}
-        className="text-sm text-accent underline underline-offset-4 hover:text-accent-strong"
+        className="min-w-0 text-sm text-accent underline underline-offset-4 [overflow-wrap:anywhere] hover:text-accent-strong"
       >
         {person.email}
       </a>

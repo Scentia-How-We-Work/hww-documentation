@@ -17,12 +17,14 @@ function documents(project: Project) {
 function ProjectList({ projects, missingId }: Props) {
   return (
     <main className="min-h-screen">
-      <div className="mx-auto max-w-3xl px-8 py-20">
-        <div className="mb-5 flex items-baseline justify-between gap-4">
+      <div className="mx-auto max-w-3xl px-4 py-12 sm:px-8 sm:py-20">
+        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-4">
           <p className="text-sm font-medium text-accent">Documentation</p>
           <ThemeToggle />
         </div>
-        <h1 className="mb-12 text-6xl font-light leading-none tracking-tighter">Projects</h1>
+        <h1 className="mb-8 text-4xl font-light leading-none tracking-tighter sm:mb-12 sm:text-6xl">
+          Projects
+        </h1>
 
         {missingId && (
           <p className="mb-8 bg-medium-bg px-4 py-3 text-sm text-medium">

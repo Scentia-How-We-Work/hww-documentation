@@ -33,14 +33,14 @@ function App() {
   const label = kind.toUpperCase();
 
   return (
-    <main id="top" className="flex h-screen">
+    <main id="top" className="flex h-dvh flex-col lg:h-screen lg:flex-row">
       <Nav sections={prd ? prdSections : tdsSections(tds!)} title={title}>
         <DocSwitcher project={project} kind={kind} version={version} />
       </Nav>
 
       <div
         ref={scroller}
-        className="h-screen min-w-0 flex-1 overflow-y-auto scroll-smooth px-16 pb-28"
+        className="relative min-h-0 min-w-0 flex-1 overflow-y-auto scroll-smooth px-4 pb-20 sm:px-8 lg:h-screen lg:px-16 lg:pb-28"
       >
         <div className="max-w-[880px]">
           {missingVersion && (

@@ -1,5 +1,6 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, type CSSProperties } from "react";
 import type { Mermaid as MermaidApi } from "mermaid";
+import { diagramMinWidth } from "../lib/diagram";
 
 // Mermaid is large, so it's only downloaded once a page shows a diagram
 let mermaidLoader: Promise<MermaidApi> | undefined;
@@ -82,7 +83,8 @@ function Mermaid({ code, title, description }: Props) {
 
       {rendered && "svg" in rendered && (
         <div
-          className="overflow-x-auto border border-line p-6 [&_svg]:mx-auto"
+          className="overflow-x-auto border border-line p-3 sm:p-6 [&_svg]:mx-auto [&_svg]:min-w-(--diagram-min)"
+          style={{ "--diagram-min": `${diagramMinWidth(rendered.svg) ?? 0}px` } as CSSProperties}
           dangerouslySetInnerHTML={{ __html: rendered.svg }}
         />
       )}

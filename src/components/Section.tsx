@@ -13,23 +13,23 @@ function Section({ id, number, title, headline, primary, children }: Props) {
   const HeadlineTag = primary ? "h1" : "h2";
 
   return (
-    <section id={id} className="py-16 scroll-mt-8 min-h-screen">
-      <div className="mb-12 flex flex-col gap-5">
+    <section id={id} className="min-h-screen scroll-mt-8 py-10 sm:py-16">
+      <div className="mb-8 flex flex-col gap-4 sm:mb-12 sm:gap-5">
         <p className="text-sm font-medium text-accent">
           {number} — {title}
         </p>
         <HeadlineTag
           className={
             primary
-              ? "text-6xl font-light leading-none tracking-tighter"
-              : "text-[44px] font-light leading-tight tracking-tight"
+              ? "text-4xl font-light leading-none tracking-tighter sm:text-5xl lg:text-6xl"
+              : "text-3xl font-light leading-tight tracking-tight sm:text-4xl lg:text-[44px]"
           }
         >
           {headline || title}
         </HeadlineTag>
       </div>
 
-      <div className="flex flex-col gap-12">{children}</div>
+      <div className="flex flex-col gap-10 sm:gap-12">{children}</div>
     </section>
   );
 }
