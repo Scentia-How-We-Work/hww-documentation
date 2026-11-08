@@ -1,5 +1,6 @@
 import { level } from "../lib/projects";
 import type { Level } from "../lib/types";
+import StackedRows from "./StackedRows";
 
 // Low / Medium / High values (e.g. risk impact and likelihood) show as coloured tags
 export const levelStyles: Record<Level, string> = {
@@ -38,7 +39,12 @@ function Table<Row extends { [K in keyof Row]: string }>({ title, columns, rows 
         <h3 className="text-xs font-medium uppercase tracking-wider text-subtle">{title}</h3>
       )}
 
-      <div className="overflow-x-auto">
+      <StackedRows
+        columns={columns.map((column) => column.label)}
+        rows={rows.map((row) => columns.map((column) => <Cell value={row[column.key]} />))}
+      />
+
+      <div className="hidden overflow-x-auto sm:block">
         <table className="w-full min-w-[640px] border-collapse text-left text-sm">
           <thead>
             <tr>

@@ -46,6 +46,16 @@ shows one at `/?project=<id>`. Used by Scentia How We Work to publish and share 
   cards are shown after them in a grid and open their link in a new tab.
 - **Levels:** table cells reading Low, Medium or High (any case) show as coloured tags, in PRD and
   TDS tables.
+- **Responsive layout:** every page works down to phone width (390 px) with no sideways page
+  scroll.
+  - From 1024 px wide, the navigation is a sidebar. Below that, it's a bar across the top with the
+    document's title and a Menu button that opens the same navigation as a full-screen panel;
+    choosing a section or pressing Escape closes it.
+  - Below 640 px, each table row is shown as a block: its first cell leads, with every other cell
+    beside its column's label. Wider screens show the table, scrolling sideways if it doesn't fit.
+  - Mermaid diagrams shrink to fit, but not below 70% of their natural width; past that, the
+    diagram's box scrolls sideways so its text stays readable.
+  - Headings, spacing and side margins scale down on smaller screens.
 - **Dates** show as DD/MM/YYYY.
 - **Theme:** light, dark or system, remembered in `localStorage`.
 

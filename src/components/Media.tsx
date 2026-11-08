@@ -10,7 +10,7 @@ function Card({ card }: { card: LinkCard }) {
       href={card.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex flex-col gap-3 border border-line p-6 transition-colors hover:border-ink"
+      className="group flex flex-col gap-3 border border-line p-5 transition-colors hover:border-ink sm:p-6"
     >
       <span className="text-base font-medium text-ink">{card.title}</span>
       {card.description && (
