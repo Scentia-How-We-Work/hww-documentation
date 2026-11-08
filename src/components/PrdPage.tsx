@@ -1,4 +1,5 @@
 import type { Prd, VersionInfo } from "../lib/types";
+import Benefits from "./Benefits";
 import Commercials from "./Commercials";
 import List from "./List";
 import Media from "./Media";
@@ -21,6 +22,64 @@ export const prdSections = [
   { id: "versions", title: "Version History" },
 ];
 
+// Shows only the parts this business case has, in a fixed order
+function BusinessCase({ businessCase }: { businessCase: Prd["problem"]["businessCase"] }) {
+  const { summary, comparison, baseline, expectedImprovement, commercialBenefit, benefits } =
+    businessCase;
+
+  return (
+    <div className="flex flex-col gap-8">
+      <Text title="Business Case" content={summary} />
+
+      {comparison && (
+        <div className="flex flex-col gap-4">
+          <h4 className="text-sm font-medium">What Changes</h4>
+          <Table
+            columns={[
+              { key: "area", label: "Process" },
+              { key: "today", label: "Today" },
+              { key: "future", label: "Future State" },
+            ]}
+            rows={comparison}
+          />
+        </div>
+      )}
+
+      {baseline && (
+        <div className="flex flex-col gap-4">
+          <h4 className="text-sm font-medium">Baseline</h4>
+          <Table
+            columns={[
+              { key: "metric", label: "Metric" },
+              { key: "currentState", label: "Current State" },
+            ]}
+            rows={baseline}
+          />
+        </div>
+      )}
+
+      {expectedImprovement && (
+        <div className="flex flex-col gap-4">
+          <h4 className="text-sm font-medium">Expected Improvement</h4>
+          <Table
+            columns={[
+              { key: "metric", label: "Metric" },
+              { key: "currentState", label: "Current" },
+              { key: "target", label: "Target" },
+              { key: "improvement", label: "Improvement" },
+            ]}
+            rows={expectedImprovement}
+          />
+        </div>
+      )}
+
+      {commercialBenefit && <Commercials content={commercialBenefit} />}
+
+      {benefits && <Benefits items={benefits} />}
+    </div>
+  );
+}
+
 // history is every version's header up to this one
 function PrdPage({ prd, history }: { prd: Prd; history: VersionInfo[] }) {
   return (
@@ -34,35 +93,7 @@ function PrdPage({ prd, history }: { prd: Prd; history: VersionInfo[] }) {
 
         <Text title="Strategic Alignment" content={prd.problem.strategicAlignment} />
 
-        <div className="flex flex-col gap-8">
-          <Text title="Business Case" />
-
-          <div className="flex flex-col gap-4">
-            <h4 className="text-sm font-medium">Baseline</h4>
-            <Table
-              columns={[
-                { key: "metric", label: "Metric" },
-                { key: "currentState", label: "Current State" },
-              ]}
-              rows={prd.problem.businessCase.baseline}
-            />
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <h4 className="text-sm font-medium">Expected Improvement</h4>
-            <Table
-              columns={[
-                { key: "metric", label: "Metric" },
-                { key: "currentState", label: "Current" },
-                { key: "target", label: "Target" },
-                { key: "improvement", label: "Improvement" },
-              ]}
-              rows={prd.problem.businessCase.expectedImprovement}
-            />
-          </div>
-
-          <Commercials content={prd.problem.businessCase.commercialBenefit} />
-        </div>
+        <BusinessCase businessCase={prd.problem.businessCase} />
       </Section>
 
       <Section id="solution" number="03" title="The Solution">

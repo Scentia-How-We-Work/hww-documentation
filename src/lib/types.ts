@@ -41,15 +41,21 @@ export type Prd = {
     headline: string;
     currentState: string;
     strategicAlignment: string;
+    // Every part is optional, but a business case needs at least one besides the summary
     businessCase: {
-      baseline: { metric: string; currentState: string }[];
-      expectedImprovement: {
+      summary?: string;
+      // What changes: each process today and in future, without figures
+      comparison?: { area: string; today: string; future: string }[];
+      baseline?: { metric: string; currentState: string }[];
+      expectedImprovement?: {
         metric: string;
         currentState: string;
         target: string;
         improvement: string;
       }[];
-      commercialBenefit: { title: string; timeSaving: string; costBenefit: string };
+      commercialBenefit?: { title: string; timeSaving: string; costBenefit: string };
+      // e.g. { figure: "~$1M", label: "Revenue retained", description, status: "Confirmed" }
+      benefits?: { figure: string; label: string; description: string; status?: string }[];
     };
   };
   solution: {

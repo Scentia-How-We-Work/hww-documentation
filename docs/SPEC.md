@@ -86,6 +86,14 @@ src/content/projects/<id>/tds/v1.json, v2.json, …
 - **PRD:** the `Prd` type in `src/lib/types.ts`. A media item is an image (`{ "image", "alt" }`), a
   Mermaid diagram (`{ "mermaid", "title"?, "description"? }`, with the title and description shown
   above the diagram) or a link card (`{ "link", "title", "description" }`).
+- **PRD business case** (`problem.businessCase`): every part is optional and only the parts present
+  show, in this order: a `summary` paragraph; `comparison`, a "What Changes" table of
+  `{ area, today, future }` rows; the `baseline` and `expectedImprovement` metric tables; the
+  `commercialBenefit` time and cost lines; and `benefits`, a list of
+  `{ figure, label, description, status? }` (e.g. "~$1M", "Revenue retained", …, "Confirmed"). A
+  business case needs at least one part besides the summary. Older versions use the metric tables
+  and `commercialBenefit`; newer ones can use `comparison` and `benefits` when there are no process
+  metrics.
 - **TDS:** the `Tds` type in `src/lib/types.ts`: the version header, `prdVersion` (optional, the PRD
   version it was written against), `documentControl` (project, tier, approver, reviewers, related
   links), optional `intro` blocks and the `sections`. Sections follow the Technical Design Spec

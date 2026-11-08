@@ -101,6 +101,35 @@ describe("validateContent", () => {
     ]);
   });
 
+  it("accepts a business case made of a summary, a before-and-after table and benefits", () => {
+    const data = prd();
+    data.problem.businessCase = {
+      summary: "S",
+      comparison: [{ area: "Booking", today: "By email", future: "Self-serve" }],
+      benefits: [
+        { figure: "~$1M", label: "Revenue retained", description: "D", status: "Confirmed" },
+        { figure: "2 FTE", label: "Capacity freed up", description: "D" },
+      ],
+    };
+    expect(errorsFor("a/prd/v1.json", data)).toEqual([]);
+  });
+
+  it("rejects an empty business case", () => {
+    const data = prd();
+    data.problem.businessCase = { summary: "S" };
+    expect(errorsFor("a/prd/v1.json", data)).toEqual([
+      "src/content/projects/a/prd/v1.json › problem.businessCase: needs at least one of comparison, baseline, expectedImprovement, commercialBenefit or benefits",
+    ]);
+  });
+
+  it("rejects a benefit with no figure", () => {
+    const data = prd();
+    data.problem.businessCase = { benefits: [{ figure: " ", label: "L", description: "D" }] };
+    expect(errorsFor("a/prd/v1.json", data)).toEqual([
+      expect.stringMatching(/ › problem\.businessCase\.benefits\.0\.figure: /),
+    ]);
+  });
+
   it("rejects files outside the layout", () => {
     expect(validateContent([file("a.json", prd())])).toEqual([
       "src/content/projects/a.json: not a document file. Use projects/<id>/prd/v<n>.json or projects/<id>/tds/v<n>.json",

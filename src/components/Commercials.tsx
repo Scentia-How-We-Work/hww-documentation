@@ -1,6 +1,6 @@
 import type { Prd } from "../lib/types";
 
-type Props = { content: Prd["problem"]["businessCase"]["commercialBenefit"] };
+type Props = { content: NonNullable<Prd["problem"]["businessCase"]["commercialBenefit"]> };
 
 function Commercials({ content }: Props) {
   return (
