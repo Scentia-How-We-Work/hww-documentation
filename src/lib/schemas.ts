@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Block, Prd, Tds, VersionInfo } from "./types";
+import type { Block, Prd, Tds, UatGuide, VersionInfo } from "./types";
 
 // Zod schemas for the content files, matching types.ts. Objects are strict, so a misspelt field
 // fails validation instead of being silently ignored.
@@ -145,9 +145,17 @@ const block = z.discriminatedUnion("type", [
     type: z.literal("checklist"),
     items: z.array(z.strictObject({ text, done: z.boolean() })).min(1),
   }),
+  z.strictObject({ type: z.literal("code"), code: z.string().min(1) }),
 ]) satisfies z.ZodType<Block>;
 
 const subsection = z.strictObject({ number: text, title: text, blocks: z.array(block) });
+
+const section = z.strictObject({
+  number: text,
+  title: text,
+  blocks: z.array(block),
+  subsections: z.array(subsection).optional(),
+});
 
 export const tdsSchema = z.strictObject({
   version: versionSchema,
@@ -160,12 +168,13 @@ export const tdsSchema = z.strictObject({
     related: z.array(z.strictObject({ label: text, url: z.url() })),
   }),
   intro: z.array(block).optional(),
-  sections: z.array(
-    z.strictObject({
-      number: text,
-      title: text,
-      blocks: z.array(block),
-      subsections: z.array(subsection).optional(),
-    }),
-  ),
+  sections: z.array(section),
 }) satisfies z.ZodType<Tds>;
+
+export const uatSchema = z.strictObject({
+  version: versionSchema,
+  project: text,
+  title: text,
+  intro: z.array(block).optional(),
+  sections: z.array(section).min(1),
+}) satisfies z.ZodType<UatGuide>;

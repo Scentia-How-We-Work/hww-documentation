@@ -71,8 +71,9 @@ export type Prd = {
   assumptions: string[];
 };
 
-// TDS content is a fixed list of sections (tds.ts) built from these blocks. Text in any block can
-// use **bold**, *italic*, `code` and [links](https://…).
+// TDS and UAT guide content is sections built from these blocks. Text in any block can use **bold**,
+// *italic*, `code` and [links](https://…). A code block is shown as is, keeping its tabs, so it can
+// be copied, e.g. tab-separated rows to paste into a form.
 export type Block =
   | { type: "text"; text: string }
   | { type: "heading"; text: string }
@@ -80,7 +81,8 @@ export type Block =
   | { type: "table"; columns: string[]; rows: string[][] }
   | { type: "mermaid"; title?: string; code: string }
   | { type: "callout"; tone: "info" | "guidance" | "warning"; text: string }
-  | { type: "checklist"; items: { text: string; done: boolean }[] };
+  | { type: "checklist"; items: { text: string; done: boolean }[] }
+  | { type: "code"; code: string };
 
 export type Subsection = { number: string; title: string; blocks: Block[] };
 
@@ -105,9 +107,20 @@ export type Tds = {
   sections: TdsSection[];
 };
 
-export type DocKind = "prd" | "tds";
+// A user acceptance testing (UAT) guide for testers: numbered sections built from blocks, each with
+// optional subsections (e.g. one per journey, numbered "UJ-15")
+export type UatGuide = {
+  version: VersionInfo;
+  project: string; // the project's name, e.g. "Partner Packs Portal"
+  title: string; // e.g. "Partner Packs Portal UAT guide"
+  intro?: Block[];
+  sections: TdsSection[];
+};
 
-// Each list holds every version of the document, oldest first; empty when there isn't one yet
-export type Project = { id: string; prd: Prd[]; tds: Tds[] };
+export type DocKind = "prd" | "tds" | "uat";
+
+// Each list holds every version of the document, oldest first; empty when there isn't one yet. A UAT
+// guide is optional, so uat is only there when the project has one.
+export type Project = { id: string; prd: Prd[]; tds: Tds[]; uat?: UatGuide[] };
 
 export type Level = "low" | "medium" | "high";

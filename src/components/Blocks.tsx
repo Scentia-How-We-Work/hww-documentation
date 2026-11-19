@@ -132,10 +132,18 @@ function Block({ block }: { block: BlockType }) {
           ))}
         </ul>
       );
+
+    // Shown as is, tabs and all, so it can be copied and pasted (e.g. rows into a form)
+    case "code":
+      return (
+        <pre className="overflow-x-auto whitespace-pre bg-low-bg px-5 py-4 font-mono text-sm leading-6 text-ink [tab-size:4]">
+          <code>{block.code}</code>
+        </pre>
+      );
   }
 }
 
-// A TDS section's content, block by block
+// A TDS or UAT guide section's content, block by block
 function Blocks({ blocks }: { blocks: BlockType[] }) {
   return (
     <div className="flex flex-col gap-6">

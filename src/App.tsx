@@ -1,20 +1,28 @@
 import { useEffect, useRef } from "react";
 import projects from "./content/projects";
-import { docHref, listedProjects, resolveView } from "./lib/projects";
+import { DOC_LABELS, docHref, listedProjects, resolveView, versions } from "./lib/projects";
 import DocSwitcher from "./components/DocSwitcher";
 import Nav from "./components/Nav";
 import PrdPage, { prdSections } from "./components/PrdPage";
 import ProjectList from "./components/ProjectList";
 import TdsPage, { tdsSections } from "./components/TdsPage";
+import UatPage, { uatSections } from "./components/UatPage";
 import { useSectionSnap } from "./hooks/useSectionSnap";
 import "./App.css";
 
 const view = resolveView(projects, new URLSearchParams(window.location.search));
 
-// The PRD or TDS version the URL asks for (versions are numbered from 1 with no gaps)
+// The PRD, TDS or UAT guide version the URL asks for (versions are numbered from 1 with no gaps)
 const prd = view.page === "doc" && view.kind === "prd" ? view.project.prd[view.version - 1] : null;
 const tds = view.page === "doc" && view.kind === "tds" ? view.project.tds[view.version - 1] : null;
-const title = prd ? prd.pageTitle : tds ? `${tds.documentControl.project} TDS` : "Documentation";
+const uat = view.page === "doc" && view.kind === "uat" ? view.project.uat![view.version - 1] : null;
+const title = prd
+  ? prd.pageTitle
+  : tds
+    ? `${tds.documentControl.project} TDS`
+    : uat
+      ? uat.title
+      : "Documentation";
 
 function App() {
   const scroller = useRef<HTMLDivElement>(null);
@@ -29,12 +37,12 @@ function App() {
   }
 
   const { project, kind, version, missingVersion } = view;
-  const latest = project[kind].length;
-  const label = kind.toUpperCase();
+  const latest = versions(project, kind).length;
+  const label = DOC_LABELS[kind];
 
   return (
     <main id="top" className="flex h-dvh flex-col lg:h-screen lg:flex-row">
-      <Nav sections={prd ? prdSections : tdsSections(tds!)} title={title}>
+      <Nav sections={prd ? prdSections : tds ? tdsSections(tds) : uatSections(uat!)} title={title}>
         <DocSwitcher project={project} kind={kind} version={version} />
       </Nav>
 
@@ -63,6 +71,7 @@ function App() {
             <PrdPage prd={prd} history={project.prd.slice(0, version).map((p) => p.version)} />
           )}
           {tds && <TdsPage project={project} tds={tds} />}
+          {uat && <UatPage guide={uat} />}
         </div>
       </div>
     </main>

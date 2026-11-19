@@ -1,21 +1,22 @@
 import { formatDate } from "../lib/dates";
-import { docHref } from "../lib/projects";
+import { DOC_LABELS, docHref, versions } from "../lib/projects";
 import type { DocKind, Project } from "../lib/types";
 
-const docs: { kind: DocKind; label: string }[] = [
-  { kind: "prd", label: "PRD" },
-  { kind: "tds", label: "TDS" },
-];
+// PRD and TDS always show, greyed out until written; a UAT guide only shows when there is one
+function docsFor(project: Project): { kind: DocKind; label: string }[] {
+  const kinds: DocKind[] = project.uat ? ["prd", "tds", "uat"] : ["prd", "tds"];
+  return kinds.map((kind) => ({ kind, label: DOC_LABELS[kind] }));
+}
 
 type Props = { project: Project; kind: DocKind; version: number };
 
-// Switches between the project's PRD and TDS, and between versions of the one being shown
+// Switches between the project's PRD, TDS and UAT guide, and between versions of the one being shown
 function DocSwitcher({ project, kind, version }: Props) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-4 text-sm">
-        {docs.map(function (doc) {
-          if (project[doc.kind].length === 0) {
+      <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+        {docsFor(project).map(function (doc) {
+          if (versions(project, doc.kind).length === 0) {
             return (
               <span key={doc.kind} className="text-subtle">
                 {doc.label}
@@ -51,7 +52,7 @@ function DocSwitcher({ project, kind, version }: Props) {
           }}
           className="cursor-pointer border border-line bg-paper px-2 py-1.5 text-sm font-normal normal-case tracking-normal text-ink"
         >
-          {[...project[kind]].reverse().map(function (doc) {
+          {[...versions(project, kind)].reverse().map(function (doc) {
             const info = doc.version;
             return (
               <option key={info.number} value={info.number}>

@@ -1,4 +1,4 @@
-// Validates every PRD and TDS file in src/content/projects (rules in src/lib/validate.ts), then
+// Validates every PRD, TDS and UAT guide file in src/content/projects (rules in src/lib/validate.ts), then
 // parses every Mermaid diagram so a broken one fails here rather than on the page.
 // Usage: pnpm validate
 import { readdirSync, readFileSync } from "node:fs";
@@ -6,7 +6,7 @@ import { join, relative } from "node:path";
 import { JSDOM } from "jsdom";
 import { prdDiagrams } from "../src/lib/media";
 import { parseDocPath } from "../src/lib/projects";
-import { prdSchema, tdsSchema } from "../src/lib/schemas";
+import { prdSchema, tdsSchema, uatSchema } from "../src/lib/schemas";
 import { mermaidBlocks } from "../src/lib/tds";
 import { validateContent } from "../src/lib/validate";
 
@@ -37,6 +37,10 @@ function diagramsIn(file: { path: string; text: string }) {
   if (kind === "prd") {
     const prd = prdSchema.safeParse(JSON.parse(file.text));
     return prd.success ? prdDiagrams(prd.data) : [];
+  }
+  if (kind === "uat") {
+    const uat = uatSchema.safeParse(JSON.parse(file.text));
+    return uat.success ? mermaidBlocks(uat.data) : [];
   }
   return [];
 }
