@@ -1,0 +1,1638 @@
+{
+  "version": {
+    "number": 2,
+    "date": "2026-11-20",
+    "status": "Draft",
+    "author": "Erin Smith",
+    "changes": "Checked against the UAT data: the working UAT address, a third client for UJ-3 (Tallowwood Transport), full emails for people Masquerade can't find by name, the right contracts in UJ-23 and UJ-30, the new Book a course for yourself menu in UJ-41, and smaller fixes"
+  },
+  "project": "Partner Packs Portal",
+  "title": "Partner Packs Portal UAT guide",
+  "sections": [
+    {
+      "number": "1",
+      "title": "Welcome and why we're testing",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "The Partner Packs Portal is where our clients' employees book AIM courses using their company's Partner Pack, where client admins manage their people and contracts, and where Scentia staff look after it all."
+        },
+        {
+          "type": "text",
+          "text": "You know our clients and how they work. We want to know two things:"
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "**Is the portal easy to use?** Could you work out what to do without help?",
+            "**Would it work for our clients?** Does it match how we want them to book, approve and manage training?"
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "info",
+          "text": "You can't break anything. This is a test copy with made-up clients, people and courses. No real emails go to clients, and no real payments are taken."
+        }
+      ]
+    },
+    {
+      "number": "2",
+      "title": "Your testing week",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "**Testing week:** 20.11.26 - 27.11.26",
+            "**Kickoff meeting:** Thursday 19th November, 16:00",
+            "**Feedback goes to: “**Partner Packs Portal UAT” Teams chat. Ez reads every message, may reply with questions, and turns each one into a task for the developers. We'll tell you when something you raised has been fixed, so you can check it."
+          ]
+        },
+        {
+          "type": "text",
+          "text": "There are 25 journeys, grouped by who you're testing as: an employee, a client admin, or Scentia staff. Work through as many as you can during the week, in any order. The journeys are a starting point, not a limit: you're welcome to explore anything else too (see \"Exploring on your own\" in section 5)."
+        },
+        {
+          "type": "text",
+          "text": "Please note:"
+        },
+        {
+          "type": "list",
+          "items": [
+            "The clients, people and courses are all made up, e.g. Delta Air Group, Boronia Builders and Harbour Health.",
+            "Dates are real dates, counted from when the test data was set up. Sessions get closer as the week goes on.",
+            "**Emails aren't part of this round.** While you're masquerading, emails go to the made-up person, so you won't see them. If a screen says an email has been sent, take its word for it.",
+            "No real payments are taken.",
+            "All testers are using the same clients at the same time, so if something isn't as a journey describes, another tester may have changed it. Mention it in the Teams chat rather than waiting.",
+            "If you can't sign in, or you're stuck, post in the Teams chat."
+          ]
+        }
+      ]
+    },
+    {
+      "number": "3",
+      "title": "Getting in",
+      "blocks": [
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Go to [aim-partner-packs-uat.mstejer.workers.dev](https://aim-partner-packs-uat.mstejer.workers.dev).",
+            "Enter your Scentia email address. We'll email you a sign-in link and a code.",
+            "Click the link, or type the code into **Sign-in code**."
+          ]
+        },
+        {
+          "type": "text",
+          "text": "You'll land on the **Clients** page. This is the Scentia staff view. To test as a client admin or an employee, use Masquerade (next section)."
+        }
+      ]
+    },
+    {
+      "number": "4",
+      "title": "Masquerade: testing as a client admin or employee",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Masquerade lets you use the portal as if you were someone else, such as a client admin or an employee, so you see exactly what they see. It only exists on the test portal and will never be on the real one."
+        }
+      ],
+      "subsections": [
+        {
+          "number": "4.1",
+          "title": "How to start",
+          "blocks": [
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Sign in with your own Scentia account.",
+                "Click **Masquerade** in the top menu.",
+                "Under \"Who do you want to masquerade as?\", type part of the person's name or email in **Search by name or email**, then click **Search**.",
+                "Find the person in the list. It shows their role and company, e.g. \"Client admin, Delta Air Group\", and whether they've signed in before. Click **Masquerade** next to them.",
+                "You're now in the portal as them. A bar across the top says **You're masquerading as** and their name."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "4.2",
+          "title": "How to stop",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Click **End masquerade** in the bar. You'll be back on the Masquerade page as yourself, ready to pick someone else."
+            }
+          ]
+        },
+        {
+          "number": "4.3",
+          "title": "Good to know",
+          "blocks": [
+            {
+              "type": "list",
+              "items": [
+                "Everything you do is real for that person: bookings, approvals and seats used. It's all recorded under your name, so we can always see who did what.",
+                "You can't masquerade as another Scentia staff member, or as someone who has no access right now. They'll show in the list without a Masquerade button, with the reason.",
+                "If you're idle for 30 minutes, you'll be signed out and need to start again.",
+                "To switch people, end the masquerade first, then pick the next person."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "4.4",
+          "title": "Who to masquerade as",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Each journey tells you who to be.** It names the person and their company, e.g. \"**Be:** Kai Okafor, Delta Air Group\". Type their name into **Search by name or email**, e.g. `Kai Okafor`, and check the company in the results matches before you click Masquerade. A couple of names appear at more than one company."
+            },
+            {
+              "type": "text",
+              "text": "**To see people at a company,** search for the company part of their email, e.g. `deltaair`, `banksiabank` or `harbourhealth`. You'll see up to 20 of that company's people, with each person's role. If someone you're looking for isn't there, search their name, or type their full email."
+            },
+            {
+              "type": "text",
+              "text": "**To find people from the client's own pages,** go to **Clients**, open the client, then:"
+            },
+            {
+              "type": "list",
+              "items": [
+                "**Overview** lists the client's admins, and which one is the primary admin.",
+                "**Employees and bookings** lists the people who have booked.",
+                "**Access lists** shows who's on each contract's allow list."
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Note the name, then go to **Masquerade** and search for it."
+            },
+            {
+              "type": "text",
+              "text": "**Some journeys ask you to make up a person,** e.g. `yourname.test@banksiabank.example`. Type the whole email into the search. If the client lets anyone with that email domain book, the portal finds them even though they don't exist yet, and you can masquerade as them. If you type a full email, the person may show as \"(no name)\". That's expected."
+            },
+            {
+              "type": "text",
+              "text": "**If someone shows in the results without a Masquerade button,** the reason is shown beside them. For example, they're Scentia staff, or nothing lets them in right now. That's expected for some journeys, e.g. UJ-3 before the client goes live."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "5",
+      "title": "How to test a journey",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Read the goal and do it however seems natural. Don't look for instructions first, because how easy it is to work out is part of what we're testing. When you're done, go through the checklist. If something on it didn't happen or you couldn't find it, send it as feedback."
+        },
+        {
+          "type": "heading",
+          "text": "Tips"
+        },
+        {
+          "type": "list",
+          "items": [
+            "Go with your first reaction. If something made you hesitate, that's worth telling us, even if you worked it out.",
+            "Try to do it yourself before asking for help. If you're stuck for more than a couple of minutes, that's feedback in itself."
+          ]
+        }
+      ],
+      "subsections": [
+        {
+          "number": "5.1",
+          "title": "Exploring on your own",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "You don't have to stick to the journeys or the people they name. If you want to try something else, go for it."
+            },
+            {
+              "type": "list",
+              "items": [
+                "**You can masquerade as anyone** in the test data. See \"Who to masquerade as\" in section 4 for how to find them.",
+                "**Put things back** if you change a setting, such as an approval setting, an allow list or a client's domains, so the other testers aren't caught out.",
+                "**Don't set up Southern Rail, Wattle Energy or Tallowwood Transport outside UJ-3.** Each can only be taken live once, and they're saved for UJ-3.",
+                "**Don't remove a client's original email domain.** It would stop everyone at that client signing in."
+              ]
+            },
+            {
+              "type": "text",
+              "text": "When you send feedback from exploring, write \"Exploring\" as the journey and describe what you were trying to do."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "6",
+      "title": "Giving feedback",
+      "blocks": [],
+      "subsections": [
+        {
+          "number": "6.1",
+          "title": "What we want to hear about",
+          "blocks": [
+            {
+              "type": "list",
+              "items": [
+                "**Confusing:** you weren't sure what to click, what a word meant, or what would happen next.",
+                "**Doesn't fit our clients:** \"Clients would never do it this way\", or \"a client will definitely ask for X and it isn't here.\"",
+                "**Something went wrong:** an error, or a number that looks wrong.",
+                "**Wording:** a label or message that's unclear, too long, or doesn't sound like us.",
+                "**What works well:** tell us this too, so we don't change it."
+              ]
+            }
+          ]
+        },
+        {
+          "number": "6.2",
+          "title": "How to send it",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Post one message per issue in the Teams chat, using this template:"
+            },
+            {
+              "type": "callout",
+              "tone": "guidance",
+              "text": "**Journey:** e.g. \"Exploring\", or UJ-1, Asking for a place and getting it approved\n**I was testing as:** Scentia staff / client admin / employee (and who you masqueraded as)\n**What I was trying to do:**\n**What happened:**\n**What I expected, or what would be better:**\n**How much does it matter?** Stops me / Annoying / Small thing\n**Screenshot:** attach a screenshot if possible"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "7",
+      "title": "Journeys as an employee",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Each journey starts with **goals**. Do them your own way, then go through **Then check**. Masquerade as the person named: search for their name, and check the company matches (see \"Who to masquerade as\" in section 4). Where there's a choice of people, pick one the other testers aren't using and say which in the Teams chat, so you don't trip over each other."
+        }
+      ],
+      "subsections": [
+        {
+          "number": "UJ-15",
+          "title": "Finding a course and booking it straight away",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Kai Okafor, Delta Air Group. He's on the Leadership Pack, which doesn't need approval."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "You're interested in leadership courses you can do online in the next couple of months. Use the filters to find some.",
+                "Clear the filters and find a course on the Leadership Pack. Book a session that's at least a few weeks away.",
+                "Find your new booking and work out how you'd join on the day.",
+                "As **Priya Patel** (Delta Air Group's primary client admin), check the booking used a seat."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Were the filters (Delivery, From, Location, Topic, Level) easy to use and understand?",
+                  "done": false
+                },
+                {
+                  "text": "When nothing matched, was it clear what to do next?",
+                  "done": false
+                },
+                {
+                  "text": "Could you tell from the list what each course costs and when its next session is?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear the booking would be confirmed straight away, with no approval?",
+                  "done": false
+                },
+                {
+                  "text": "Did the booking show how to join, and let you download a calendar invite?",
+                  "done": false
+                },
+                {
+                  "text": "As the admin, could you find the booking in Reports → Seat usage log?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-1",
+          "title": "Asking for a place and getting it approved",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** one of Lena Brooks or Bella Quinn, Delta Air Group. They're on the Premium Partner Pack, which needs approval."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "You'd like to go on *Time and Priority Management*. Ask for a place on a session a few weeks away.",
+                "As **Priya Patel** (client admin), find the request and approve it.",
+                "As the employee again, check your place is confirmed and find out how to join."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Before choosing, could you see how many seats your company has left?",
+                  "done": false
+                },
+                {
+                  "text": "Did session times show the time zone, e.g. AEDT?",
+                  "done": false
+                },
+                {
+                  "text": "Before sending, did it tell you the last day to cancel without using a seat?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear the request was waiting for approval, and who would decide?",
+                  "done": false
+                },
+                {
+                  "text": "As the admin, was it easy to find the request and approve it?",
+                  "done": false
+                },
+                {
+                  "text": "After approval, did the booking show as Confirmed, with joining details and a calendar invite?",
+                  "done": false
+                },
+                {
+                  "text": "As the admin, does Reports → Seat usage log show who approved it?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-19",
+          "title": "A request is declined",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** one of Omar Haddad, Ash Patel or Ben Carter, Delta Air Group. Ash and Ben won't come up by name. Type their full email, `ash.patel@deltaair.example` or `ben.carter@deltaair.example`. (A different Ben Carter is a Lilly Pilly Labs admin.)"
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Ask for places on two different sessions.",
+                "As **Dana Fox** (client admin), decline one with a reason, and approve the other.",
+                "As the employee, find out what happened to each request and why.",
+                "Try asking for the declined session again.",
+                "Ask for a third session, then change your mind and withdraw it."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "As the admin, was it clear how to give a reason when declining?",
+                  "done": false
+                },
+                {
+                  "text": "As the employee, could you see the decline and the reason in My bookings?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear you can't ask for the same session again?",
+                  "done": false
+                },
+                {
+                  "text": "Was withdrawing a request easy, and did it say no seats were used?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-2",
+          "title": "Cancelling or changing a booking",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** these three Delta Air Group employees, in turn."
+            },
+            {
+              "type": "list",
+              "items": [
+                "**Maya Singh** has a booking more than 10 business days away.",
+                "**Theo Park** has a booking less than 10 business days away.",
+                "**Leo Marsh** has a booking about 7 weeks away."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "As Maya, move your booking to a different date.",
+                "As Theo, cancel your booking.",
+                "As Leo, move your booking to a session in the next couple of weeks.",
+                "As **Priya Patel** (client admin), check what happened to the seats."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Did each booking show the actual last date to cancel or change for free?",
+                  "done": false
+                },
+                {
+                  "text": "As Theo, were you warned before cancelling that the seat would still be used?",
+                  "done": false
+                },
+                {
+                  "text": "As Leo, were you warned that moving inside 10 business days uses the seat?",
+                  "done": false
+                },
+                {
+                  "text": "Were the date-change options clear? You should only be offered other sessions of the same course.",
+                  "done": false
+                },
+                {
+                  "text": "As the admin, does the Seat usage log show each change and cancellation?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-18",
+          "title": "When you can't book",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Ravi Kumar, Delta Air Group. He already has 2 booking requests waiting."
+            },
+            {
+              "type": "callout",
+              "tone": "warning",
+              "text": "Please don't approve or decline Ravi's requests, so the others can test this too."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Ask for a place on another session of *Time and Priority Management*.",
+                "Get that request sent. You'll need to withdraw one of your others first.",
+                "Look at the Brisbane session of *Time and Priority Management*, which is fully booked.",
+                "As **Remy Vance** (Boronia Builders), try to book *Executive Leadership Program*."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "When you were blocked, did it explain why and what to do?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear the Brisbane session is full and can't be chosen?",
+                  "done": false
+                },
+                {
+                  "text": "As Remy, was it clear why you can't book the course?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-17",
+          "title": "An employee on more than one contract",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Alex Wong, Delta Air Group. He's on both the Leadership Pack (books straight away) and the Premium Partner Pack (needs approval)."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Book *Time and Priority Management*, which is on both packs.",
+                "Book *Business Writing*, which is only on the Premium Partner Pack.",
+                "Withdraw the request that's waiting for approval.",
+                "As **Priya Patel** (client admin), find out how the portal decides which contract pays for a booking."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Before booking, could you see which contract would be used?",
+                  "done": false
+                },
+                {
+                  "text": "Did *Time and Priority Management* book straight away, from the Leadership Pack?",
+                  "done": false
+                },
+                {
+                  "text": "Did *Business Writing* go for approval, from the Premium Partner Pack?",
+                  "done": false
+                },
+                {
+                  "text": "As the admin, was the explanation of how contracts are chosen easy to follow?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-29",
+          "title": "Asking for a course your company doesn't offer",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** one of Ari Bloom or Wren Lowe, Boronia Builders (type Wren's full email, `wren.lowe@boroniabuild.example`)."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "You'd like to do *Leading Teams*, which Boronia Builders doesn't offer. Ask for it.",
+                "Check you can see your request.",
+                "As **Bea Moss** (Boronia's primary client admin), find out which courses people have asked for, then close the *Leading Teams* requests with a note.",
+                "As yourself (Scentia staff), find Boronia Builders' course requests."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it clear why you couldn't book the course, and that you could ask for it?",
+                  "done": false
+                },
+                {
+                  "text": "Could you see your request in My bookings, under \"Courses I've asked for\"?",
+                  "done": false
+                },
+                {
+                  "text": "As the admin, was it easy to see which courses are most wanted?",
+                  "done": false
+                },
+                {
+                  "text": "Was closing the requests with a note straightforward?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-30",
+          "title": "Choosing which emails you receive",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "You won't see the emails themselves. This journey is about the settings screens."
+            },
+            {
+              "type": "text",
+              "text": "**Be:** Nell Price, Delta Air Group. Type her full email, `nell.price@deltaair.example`."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Find where you choose which emails you get. Turn an optional one off, then back on.",
+                "As **Quinn Ward** (Delta Air Group client admin), stop getting new booking request emails for one contract.",
+                "As **Ivan Ross** (Harbour Health client admin), try to do the same for the **Harbour Health Partner Pack 2027**."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to find Email notifications?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear which emails you can't turn off, and why?",
+                  "done": false
+                },
+                {
+                  "text": "As Ivan, did it explain why you can't turn them off?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "8",
+      "title": "Journeys as a client admin",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Most of these change shared things, like who's on a list or how a contract works. When a journey asks you to change a setting, put it back at the end so the next tester starts from the same place."
+        }
+      ],
+      "subsections": [
+        {
+          "number": "UJ-41",
+          "title": "Booking a course for yourself as an admin",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Tom Nguyen, Delta Air Group. He's a client admin and also an employee on the Premium Partner Pack, which normally needs approval."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Have a look around the client portal and get a feel for what's there.",
+                "Book a course for yourself.",
+                "Find your booking (**My bookings**, in your account menu)."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it clear where you land and what each menu item is for?",
+                  "done": false
+                },
+                {
+                  "text": "Was it easy to find how to book for yourself (Book a course, then **Book → Myself** on a session)?",
+                  "done": false
+                },
+                {
+                  "text": "Was your booking confirmed straight away, without needing approval?",
+                  "done": false
+                },
+                {
+                  "text": "Was it easy to get back to the client portal afterwards?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-27",
+          "title": "Booking, changing and cancelling for one employee",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** June Marsh, Jacaranda Health's primary client admin."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Max Quinn has never used the portal. Book him onto a course.",
+                "Try to book Ivy Cole onto a course.",
+                "Rae Dunn can't make her booked session any more. Move it to a later date.",
+                "Lou Byrne can't attend his booking, which is in the next couple of weeks. Cancel it.",
+                "Rae also has a request waiting. Find it and decide what to do with it.",
+                "As **Rae Dunn**, start booking a course. As **Max Quinn**, find the booking June made for you."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to book for someone else?",
+                  "done": false
+                },
+                {
+                  "text": "When you tried Ivy, did it explain why she can't be booked?",
+                  "done": false
+                },
+                {
+                  "text": "Before moving or cancelling, was it clear whether the seat would be returned or used?",
+                  "done": false
+                },
+                {
+                  "text": "For Rae's waiting request, were you only offered Approve and Decline?",
+                  "done": false
+                },
+                {
+                  "text": "As Rae, was there no option to book for someone else?",
+                  "done": false
+                },
+                {
+                  "text": "As Max, could you see who booked your place?",
+                  "done": false
+                },
+                {
+                  "text": "As June, does Reports → Seat usage log show who made each change and who it was for?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-28",
+          "title": "Booking a group",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Gwen Hart, Grevillea Group's primary client admin."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Book the Leaders team, plus a couple of people whose emails you paste in, onto one session of *Working Well in Teams*.",
+                "The session doesn't have room for everyone. Decide who to leave out.",
+                "Move some of the people booked on another session to a different date.",
+                "Cancel a team's bookings."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to find how to book several people at once?",
+                  "done": false
+                },
+                {
+                  "text": "Before confirming, could you see how many places and seats it would use, and who couldn't be booked and why?",
+                  "done": false
+                },
+                {
+                  "text": "When there wasn't room for everyone, was choosing who to leave out clear?",
+                  "done": false
+                },
+                {
+                  "text": "Before moving or cancelling, could you see whose seats would be returned or used?",
+                  "done": false
+                },
+                {
+                  "text": "Does the Seat usage log show each person separately?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-24",
+          "title": "Adding employees to an allow list",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Bea Lindqvist, Banksia Bank's primary client admin."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Add Ivy Newman to the Partner Pack's allow list, so she can book courses.",
+                "Add Mo Booker too. He can already book through another contract.",
+                "Find someone on the list who hasn't signed in yet, such as Ruth Resend, and resend their invitation.",
+                "A manager has sent you a list of new starters. Paste it in and add them. Add your initials to each email, e.g. jo.tester.ab@banksiabank.example, so you don't clash with the other testers:"
+              ]
+            },
+            {
+              "type": "code",
+              "code": "First name\tLast name\tEmail\nJo\tTester\tjo.tester@banksiabank.example\nSam\tSample\tsam.sample@banksiabank.example\nSam\tSample\tsam.sample@banksiabank.example\nPat\tTypo\tpat.typo@banksiabank\nKim\tElsewhere\tkim@othercompany.example"
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to find where to manage who can book (People)?",
+                  "done": false
+                },
+                {
+                  "text": "When you added Mo, did it explain what that means for his bookings?",
+                  "done": false
+                },
+                {
+                  "text": "When you pasted the list, were the duplicate, the broken email and the other company's email clearly flagged?",
+                  "done": false
+                },
+                {
+                  "text": "Could you fix or remove those rows before adding?",
+                  "done": false
+                },
+                {
+                  "text": "Does the list show each person's status, e.g. invited or signed in?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-25",
+          "title": "Removing several employees at once",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Bea Lindqvist, Banksia Bank's primary client admin."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Ben Adams and Bella Adams have left Banksia Bank. Remove them from every allow list in one go.",
+                "Check what happened to their bookings."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Before confirming, could you see each person's bookings and whether their seats would be returned or used?",
+                  "done": false
+                },
+                {
+                  "text": "Was the warning about seats being used clear?",
+                  "done": false
+                },
+                {
+                  "text": "After removing them, was it clear who was removed?",
+                  "done": false
+                },
+                {
+                  "text": "Does the Seat usage log show each cancelled booking?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-4",
+          "title": "Removing an employee who has bookings",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Bea Lindqvist, Banksia Bank's primary client admin."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Nate Olsen has moved to a role that isn't covered by the Partner Pack. Remove him from its allow list. He has a booking coming up soon and a request waiting.",
+                "Check what happened to his bookings and the contract's seats.",
+                "As **Nate Olsen**, see what's changed for you."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Before removing him, could you see his bookings and request, and what would happen to each?",
+                  "done": false
+                },
+                {
+                  "text": "Were you warned that the seat for his soon booking would still be used?",
+                  "done": false
+                },
+                {
+                  "text": "As Nate, was it clear his bookings were cancelled and what he can still book?",
+                  "done": false
+                },
+                {
+                  "text": "Does the Seat usage log show why each seat was returned or used?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-26",
+          "title": "Teams",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Wren Hale, Waratah Water's primary client admin."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Create a team with your initials in the name, e.g. \"Graduates AB\". Add a few people by searching, and a couple by pasting emails.",
+                "Add your team to a contract's allow list.",
+                "Book your team onto a session.",
+                "As **Otto Park, Waratah Water's other client admin** (search \"waratah\" in Masquerade if you'd rather see both admins), find your team and rename it.",
+                "As Wren, remove someone from the team, then delete it.",
+                "As **Pip Lane** (a Waratah Water employee), look around the portal."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was creating a team and adding people straightforward?",
+                  "done": false
+                },
+                {
+                  "text": "When adding the team to the allow list, was it clear what that does?",
+                  "done": false
+                },
+                {
+                  "text": "When booking the team, were people who can't be booked clearly flagged?",
+                  "done": false
+                },
+                {
+                  "text": "As Pip, did you see no mention of teams anywhere?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-23",
+          "title": "Changing how a contract works",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Max Mode, a Banksia Bank client admin."
+            },
+            {
+              "type": "callout",
+              "tone": "warning",
+              "text": "This changes a contract for everyone. Agree a time in the Teams chat so you're not doing it at the same time as another tester, and put both settings back at the end."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Look at the **Banksia Bank Leadership Pack**. Find out who can use it, and whether bookings need approval.",
+                "Change it so bookings are confirmed straight away.",
+                "Change it so only people on its allow list can use it.",
+                "As **Mo Booker** (who has a booking on it), see what's changed for you.",
+                "Put both settings back."
+              ]
+            },
+            {
+              "type": "text",
+              "text": "To test as a new employee, masquerade by typing a made-up Banksia Bank email, e.g. yourname.test@banksiabank.example. While the contract is open to everyone at Banksia Bank, the portal lets you in as them."
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to find these settings?",
+                  "done": false
+                },
+                {
+                  "text": "Before switching to allow-list only, did the warning make clear who would lose access?",
+                  "done": false
+                },
+                {
+                  "text": "As Mo, was your existing booking still there?",
+                  "done": false
+                },
+                {
+                  "text": "Were the settings easy to put back?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-8",
+          "title": "Promoting and demoting admins",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Grace Lee, Harbour Health's primary client admin."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Make a new colleague a client admin. Use a made-up Harbour Health email with your initials, e.g. ab.newadmin@harbourhealth.example.",
+                "Try the same with someone from another company, e.g. someone@othercompany.example.",
+                "Noah Williams no longer needs to be an admin. Remove his admin role, then add it back.",
+                "As **Noah Williams** (before you remove him), look at the admins page."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to find the admins page (People → Who are the admins?)?",
+                  "done": false
+                },
+                {
+                  "text": "Did it explain why someone from another company can't be an admin?",
+                  "done": false
+                },
+                {
+                  "text": "Before removing Noah, were you asked to confirm?",
+                  "done": false
+                },
+                {
+                  "text": "As Noah, was it clear you can see the admins but can't change them?",
+                  "done": false
+                },
+                {
+                  "text": "Is there no way for Grace to remove herself?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-32",
+          "title": "Checking how a contract is being used",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Lena Hart, Mallee Minerals' primary client admin."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Your manager asks: \"Are we using our Partner Pack, and will we use it all before it ends?\" Find the answer.",
+                "Look at an older contract that has ended.",
+                "As **Priya Patel** (Delta Air Group), find out how many requests are waiting for your decision."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Could you answer your manager's question from the Contracts page?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear the contract ends soon, what happens to unused seats, and how to renew?",
+                  "done": false
+                },
+                {
+                  "text": "Was it easy to switch between contracts?",
+                  "done": false
+                },
+                {
+                  "text": "Would a client admin you work with understand these numbers?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-33",
+          "title": "Training progress, the seat usage log and exports",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** Priya Nair, Ironbark Logistics' primary client admin."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Your manager wants to know who has done which courses this year. Find out, and filter it down to one team.",
+                "Open one employee and look at everything they've booked.",
+                "Export the list and open it in Excel.",
+                "As **Nina Ward** (Quandong Foods' primary client admin), find every time seats were used or returned in the last month, and export that.",
+                "Export a contract summary."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to see who's completed, not started, or didn't attend?",
+                  "done": false
+                },
+                {
+                  "text": "Did the filters do what you expected?",
+                  "done": false
+                },
+                {
+                  "text": "Did the exports open cleanly in Excel, with dates as DD/MM/YYYY?",
+                  "done": false
+                },
+                {
+                  "text": "Did the exports match what was on screen?",
+                  "done": false
+                },
+                {
+                  "text": "Is there anything a client would expect in a report that's missing?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": "9",
+      "title": "Journeys as Scentia staff",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "For these, you're yourself: no masquerading, except where a journey asks you to check what a client sees."
+        }
+      ],
+      "subsections": [
+        {
+          "number": "UJ-35",
+          "title": "Reviewing all clients and spotting problems",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** yourself."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Your manager asks: \"Which clients need our attention this week?\" Use the Clients page to find out.",
+                "Find the clients whose contracts are due for renewal in the next 90 days.",
+                "Find a client that's using its seats too slowly. (Tuart Timber is one.)",
+                "Export the list you've filtered, and open it in Excel.",
+                "Export all clients' bookings for the next month, and open it in Excel."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Could you tell at a glance which clients need attention, and why?",
+                  "done": false
+                },
+                {
+                  "text": "Did the search, filters and sorting do what you expected?",
+                  "done": false
+                },
+                {
+                  "text": "Did the exports open cleanly in Excel, with dates as DD/MM/YYYY?",
+                  "done": false
+                },
+                {
+                  "text": "Did the exports match what was on screen?",
+                  "done": false
+                },
+                {
+                  "text": "Is anything missing that you'd want when looking after clients?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-36",
+          "title": "Looking at one client in detail",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** yourself, then **Ruth Kemp** (Kurrajong Clinics' primary client admin) to compare. Do this one by Wednesday 25 November: Kurrajong's only waiting request closes around 26 November."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "A client calls with a question about their account. Open Kurrajong Clinics and get familiar with everything you can see about them.",
+                "Find out which booking requests are waiting, and how long they've waited.",
+                "Find out what's changed recently, and who changed it.",
+                "Find any problems that need sorting out.",
+                "As **Ruth Kemp**, look at her contracts and seat usage log, and compare them with what you saw."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to find your way around the client's tabs?",
+                  "done": false
+                },
+                {
+                  "text": "Did the numbers match what Ruth sees?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear which problems need action, and how to mark them resolved?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear you can look at bookings but not change them?",
+                  "done": false
+                },
+                {
+                  "text": "Could you answer a client's typical questions from these screens?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-14",
+          "title": "Editing a live client's settings",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** yourself."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Delta Air Group has bought another company, and its staff should be able to book too. Add a new email domain for Delta Air Group, using your initials, e.g. deltaair-ab.example.",
+                "Check it works: in Masquerade, type a made-up email on your new domain, e.g. jo@deltaair-ab.example, and see what they can book.",
+                "Start removing Delta Air Group's original domain (deltaair.example), but **don't confirm**. Just look at what it tells you.",
+                "Remove the domain you added.",
+                "Look at Delta Air Group's contracts. Try to change who can use them and whether they need approval."
+              ]
+            },
+            {
+              "type": "callout",
+              "tone": "warning",
+              "text": "Don't confirm removing deltaair.example. It would stop everyone at Delta Air Group signing in."
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to find where domains are managed (Set-up and admins)?",
+                  "done": false
+                },
+                {
+                  "text": "Before removing a domain, was it clear how many people and bookings would be affected?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear that the contract settings belong to the client, and you can only view them?",
+                  "done": false
+                },
+                {
+                  "text": "Does the client's Activity tab show your domain changes?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-12",
+          "title": "Adding and removing a client's admins",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** yourself."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Mallee Minerals wants a new client admin. Add one, using a made-up Mallee email with your initials, e.g. ab.admin@malleeminerals.example.",
+                "Try adding someone from another company, e.g. someone@othercompany.example.",
+                "Masquerade as your new admin and see where they land.",
+                "Remove the new admin.",
+                "Try to remove Mallee Minerals' primary client admin."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it easy to find how to add an admin?",
+                  "done": false
+                },
+                {
+                  "text": "Did it explain why someone from another company can't be added?",
+                  "done": false
+                },
+                {
+                  "text": "Before removing an admin, were you asked to confirm?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear why the primary admin can't be removed here, and where that's changed instead?",
+                  "done": false
+                },
+                {
+                  "text": "Does the client's Activity tab show who added and removed the admin?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-38",
+          "title": "Contracts due for renewal",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** yourself, then **Noor Haddad** (Lilly Pilly Labs' primary client admin)."
+            },
+            {
+              "type": "callout",
+              "tone": "info",
+              "text": "Renewing a contract is for a later round of testing. Look at the renewal screens, but don't go through with a renewal."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Find out which contracts are coming up for renewal, and where each renewal is up to.",
+                "Find any that are close to lapsing.",
+                "Export the list and open it in Excel.",
+                "As **Noor Haddad**, find out which of your contracts are due for renewal, and what you'd need to do."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it clear where each renewal is up to?",
+                  "done": false
+                },
+                {
+                  "text": "Did contracts close to lapsing stand out?",
+                  "done": false
+                },
+                {
+                  "text": "As Noor, was it clear which contracts are due and what to do next?",
+                  "done": false
+                },
+                {
+                  "text": "Did the export match the page?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "number": "UJ-3",
+          "title": "Setting up a new client and taking it live",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "**Be:** yourself. Each tester takes a different client: Southern Rail, Wattle Energy or Tallowwood Transport. Say which one you're taking in the Teams chat first, because once a client is live it can't be set up again."
+            },
+            {
+              "type": "heading",
+              "text": "Goals"
+            },
+            {
+              "type": "list",
+              "ordered": true,
+              "items": [
+                "Your client has just signed its first Partner Pack. Find it on the Clients page.",
+                "Before you start, check in Masquerade whether anyone from the client can get in yet. Type the client contact's email: `lee.walker@southernrail.example` (Southern Rail), `morgan.reid@wattleenergy.example` (Wattle Energy) or `hamish.kerr@tallowwoodtransport.example` (Tallowwood Transport).",
+                "Get the client set up and take it live. While adding the email domain, try a typo first (e.g. without the dot), and another client's domain (e.g. deltaair.example). Southern Rail's domain is already added, so if you take Southern Rail, try these when adding a second domain.",
+                "Leave set-up halfway, go back to the Clients page, then return to it.",
+                "Once it's live, masquerade as the client's primary admin and see what they see."
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "Then check"
+            },
+            {
+              "type": "checklist",
+              "items": [
+                {
+                  "text": "Was it clear what still needed doing before the client could go live?",
+                  "done": false
+                },
+                {
+                  "text": "Did it explain why the typo and the other client's domain weren't accepted?",
+                  "done": false
+                },
+                {
+                  "text": "When you came back, did set-up carry on where you left off?",
+                  "done": false
+                },
+                {
+                  "text": "Before going live, did Masquerade explain why the client's people can't get in?",
+                  "done": false
+                },
+                {
+                  "text": "Was it clear what going live does, and who gets told?",
+                  "done": false
+                },
+                {
+                  "text": "As the primary admin, did the contract look right: open to everyone at the client, with approval required?",
+                  "done": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
