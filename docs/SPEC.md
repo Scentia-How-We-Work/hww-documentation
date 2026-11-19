@@ -44,10 +44,6 @@ guides.
 - **Mermaid diagrams:** the Mermaid library loads only on pages that have a diagram. Diagrams follow
   the light/dark theme, redrawing when it changes. A diagram that can't be drawn shows the error and
   its source.
-- **Section snapping:** when scrolling stops, the page glides (about 600 ms, ease-in-out) to the
-  nearest section start. Sections taller than the screen scroll freely and can also settle on
-  their bottom edge. Scrolling, touching or a key press stops a glide; with reduced motion it
-  snaps instantly.
 - **Media:** the Workflows and Mock-ups items in The Solution (`workflows` and `wireframes` in the JSON) are each an image, a Mermaid
   diagram or a link card. Images and diagrams are shown full width, in their order in the JSON; link
   cards are shown after them in a grid and open their link in a new tab.
