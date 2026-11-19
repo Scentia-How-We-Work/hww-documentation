@@ -1,18 +1,23 @@
-import type { DocKind, Level, Prd, Project, Tds } from "./types";
+import type { DocKind, Level, Prd, Project, Tds, UatGuide } from "./types";
+
+type Doc = Prd | Tds | UatGuide;
 
 export type DocPath = { projectId: string; kind: DocKind; version: number };
 
-/** The project, document kind and version a content file holds: projects/<id>/<prd|tds>/v<n>.json. */
+/** What each kind of document is called. */
+export const DOC_LABELS: Record<DocKind, string> = { prd: "PRD", tds: "TDS", uat: "UAT guide" };
+
+/** The project, document kind and version a content file holds: projects/<id>/<prd|tds|uat>/v<n>.json. */
 export function parseDocPath(path: string): DocPath | undefined {
-  const match = path.match(/projects\/([^/]+)\/(prd|tds)\/v([1-9]\d*)\.json$/);
+  const match = path.match(/projects\/([^/]+)\/(prd|tds|uat)\/v([1-9]\d*)\.json$/);
   if (!match) return undefined;
   return { projectId: match[1], kind: match[2] as DocKind, version: Number(match[3]) };
 }
 
-/** Projects from content modules keyed by file path, each with its PRD and TDS versions. */
-export function projectsFromModules(modules: Record<string, Prd | Tds>): Project[] {
+/** Projects from content modules keyed by file path, each with its PRD, TDS and UAT guide versions. */
+export function projectsFromModules(modules: Record<string, Doc>): Project[] {
   const byId = new Map<string, Project>();
-  const numbers = new Map<Prd | Tds, number>();
+  const numbers = new Map<Doc, number>();
 
   for (const [path, doc] of Object.entries(modules)) {
     const parsed = parseDocPath(path);
@@ -21,21 +26,35 @@ export function projectsFromModules(modules: Record<string, Prd | Tds>): Project
     byId.set(parsed.projectId, project);
     numbers.set(doc, parsed.version);
     if (parsed.kind === "prd") project.prd.push(doc as Prd);
-    else project.tds.push(doc as Tds);
+    else if (parsed.kind === "tds") project.tds.push(doc as Tds);
+    else (project.uat ??= []).push(doc as UatGuide);
   }
 
-  const byVersion = (a: Prd | Tds, b: Prd | Tds) => numbers.get(a)! - numbers.get(b)!;
+  const byVersion = (a: Doc, b: Doc) => numbers.get(a)! - numbers.get(b)!;
   for (const project of byId.values()) {
     project.prd.sort(byVersion);
     project.tds.sort(byVersion);
+    project.uat?.sort(byVersion);
   }
 
   return [...byId.values()].sort((a, b) => projectTitle(a).localeCompare(projectTitle(b)));
 }
 
-/** The project's name: the latest PRD's overview title, or the TDS's project name when there's no PRD yet. */
+/** Every version of one of a project's documents, oldest first; empty when it doesn't have one. */
+export function versions(project: Project, kind: DocKind): Doc[] {
+  return project[kind] ?? [];
+}
+
+/**
+ * The project's name: the latest PRD's overview title, or else the TDS's project name, or else the
+ * UAT guide's.
+ */
 export function projectTitle(project: Project): string {
-  return project.prd.at(-1)?.overview.title ?? project.tds.at(-1)!.documentControl.project;
+  return (
+    project.prd.at(-1)?.overview.title ??
+    project.tds.at(-1)?.documentControl.project ??
+    project.uat!.at(-1)!.project
+  );
 }
 
 // Holds the blank PRD and TDS to copy: it can be opened by its link, but isn't listed
@@ -54,18 +73,22 @@ export type View =
   | { page: "list"; missingId: string | null }
   | { page: "doc"; project: Project; kind: DocKind; version: number; missingVersion?: string };
 
+const KINDS: DocKind[] = ["prd", "tds", "uat"];
+
 /**
- * What the URL asks for: ?project=<id>&doc=<prd|tds>&v=<n>. Without doc it's the PRD (or the TDS if
- * there's no PRD); without v, or with an unknown one, it's the latest version.
+ * What the URL asks for: ?project=<id>&doc=<prd|tds|uat>&v=<n>. Without doc, or when the project
+ * doesn't have the one asked for, it's the first the project has of the PRD, TDS and UAT guide;
+ * without v, or with an unknown one, it's the latest version.
  */
 export function resolveView(projects: Project[], params: URLSearchParams): View {
   const projectId = params.get("project");
   const project = findProject(projects, projectId);
   if (!project) return { page: "list", missingId: projectId };
 
-  const asked = params.get("doc") === "tds" ? "tds" : "prd";
-  const kind: DocKind = project[asked].length > 0 ? asked : asked === "prd" ? "tds" : "prd";
-  const latest = project[kind].length;
+  const asked = KINDS.find((kind) => kind === params.get("doc"));
+  const has = (kind: DocKind) => versions(project, kind).length > 0;
+  const kind = asked && has(asked) ? asked : KINDS.find(has)!;
+  const latest = versions(project, kind).length;
 
   const v = params.get("v");
   if (v === null) return { page: "doc", project, kind, version: latest };

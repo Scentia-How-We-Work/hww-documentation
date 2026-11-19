@@ -1,7 +1,7 @@
 import { parseDocPath, type DocPath } from "./projects";
-import { prdSchema, tdsSchema } from "./schemas";
+import { prdSchema, tdsSchema, uatSchema } from "./schemas";
 import { STANDARD_SECTIONS } from "./tds";
-import type { Block, Tds, VersionInfo } from "./types";
+import type { Block, Tds, TdsSection, UatGuide, VersionInfo } from "./types";
 
 // Validates every content file (scripts/validate-content.ts reads them; CI runs it). Errors name
 // the file and the field, e.g. "…/tds/v1.json › sections.3.blocks.2.columns: …".
@@ -29,7 +29,8 @@ export function validateContent(files: ContentFile[]): string[] {
       continue;
     }
 
-    const result = (doc.kind === "prd" ? prdSchema : tdsSchema).safeParse(data);
+    const schema = { prd: prdSchema, tds: tdsSchema, uat: uatSchema }[doc.kind];
+    const result = schema.safeParse(data);
     if (!result.success) {
       for (const issue of result.error.issues) {
         const field = issue.path.join(".");
@@ -49,6 +50,9 @@ export function validateContent(files: ContentFile[]): string[] {
       if (tds.prdVersion && !prdVersions.some((other) => other.doc.version === tds.prdVersion)) {
         errors.push(at("prdVersion", `PRD v${tds.prdVersion} doesn't exist for this project`));
       }
+    }
+    if (doc.kind === "uat") {
+      errors.push(...sectionErrors((result.data as UatGuide).sections).map(([f, m]) => at(f, m)));
     }
   }
 
@@ -84,25 +88,35 @@ function tdsErrors(tds: Tds): FieldError[] {
     }
   }
 
+  errors.push(...sectionErrors(tds.sections));
   tds.sections.forEach((section, i) => {
+    section.subsections?.forEach((subsection, s) => {
+      if (!subsection.number.startsWith(`${section.number}.`)) {
+        errors.push([
+          `sections.${i}.subsections.${s}.number`,
+          `"${subsection.number}" should start with "${section.number}."`,
+        ]);
+      }
+    });
+  });
+
+  return errors;
+}
+
+/** In a TDS or UAT guide: no section is empty, and every table row has one cell per column. */
+function sectionErrors(sections: TdsSection[]): FieldError[] {
+  return sections.flatMap((section, i) => {
+    const errors: FieldError[] = [];
     const subsections = section.subsections ?? [];
     if (section.blocks.length === 0 && subsections.length === 0) {
       errors.push([`sections.${i}`, 'is empty. Write "N/A — reason" rather than leaving it empty']);
     }
     errors.push(...tableErrors(section.blocks, `sections.${i}`));
     subsections.forEach((subsection, s) => {
-      const field = `sections.${i}.subsections.${s}`;
-      if (!subsection.number.startsWith(`${section.number}.`)) {
-        errors.push([
-          `${field}.number`,
-          `"${subsection.number}" should start with "${section.number}."`,
-        ]);
-      }
-      errors.push(...tableErrors(subsection.blocks, field));
+      errors.push(...tableErrors(subsection.blocks, `sections.${i}.subsections.${s}`));
     });
+    return errors;
   });
-
-  return errors;
 }
 
 function tableErrors(blocks: Block[], field: string): FieldError[] {

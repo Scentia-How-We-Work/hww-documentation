@@ -4,11 +4,12 @@ import ThemeToggle from "./ThemeToggle";
 
 type Props = { projects: Project[]; missingId: string | null };
 
-// What a project has so far, e.g. "PRD v2 · TDS v1"
+// What a project has so far, e.g. "PRD v2 · TDS v1 · UAT guide v1"
 function documents(project: Project) {
   return [
     project.prd.length > 0 && `PRD v${project.prd.length}`,
     project.tds.length > 0 && `TDS v${project.tds.length}`,
+    project.uat && `UAT guide v${project.uat.length}`,
   ]
     .filter(Boolean)
     .join(" · ");

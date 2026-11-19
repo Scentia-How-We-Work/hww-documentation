@@ -1,4 +1,4 @@
-import type { Block, Tds } from "./types";
+import type { Block, TdsSection } from "./types";
 
 // Every TDS has these sections, in this order, after 0. Document control (from the Technical Design
 // Spec template in Notion). A section that doesn't apply says "N/A — reason" rather than going.
@@ -25,8 +25,11 @@ export const STANDARD_SECTIONS = [
   { number: "C", title: "Permission matrix" },
 ] as const;
 
-/** Every Mermaid diagram in a TDS with its field, so validation can parse each one. */
-export function mermaidBlocks(tds: Tds): { field: string; code: string }[] {
+/** Every Mermaid diagram in a TDS or UAT guide with its field, so validation can parse each one. */
+export function mermaidBlocks(tds: {
+  intro?: Block[];
+  sections: TdsSection[];
+}): { field: string; code: string }[] {
   const found: { field: string; code: string }[] = [];
   const collect = (blocks: Block[], field: string) =>
     blocks.forEach((block, b) => {

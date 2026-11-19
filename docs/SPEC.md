@@ -4,10 +4,11 @@ Source of truth for behaviour. Update it in the same PR as any behaviour change.
 
 ## Goals
 
-Renders each project's Product Requirements Document (PRD) and Technical Design Specification (TDS)
-as clean, responsive microsites. Each document is versioned: every version is its own JSON file in
+Renders each project's Product Requirements Document (PRD), Technical Design Specification (TDS) and,
+optionally, user acceptance testing (UAT) guide as clean, responsive microsites. Each document is versioned: every version is its own JSON file in
 `src/content/projects/<id>/`, and a merged version never changes. The app lists every project and
-shows one at `/?project=<id>`. Used by Scentia How We Work to publish and share PRDs and TDSs.
+shows one at `/?project=<id>`. Used by Scentia How We Work to publish and share PRDs, TDSs and UAT
+guides.
 
 ## Users
 
@@ -15,25 +16,31 @@ shows one at `/?project=<id>`. Used by Scentia How We Work to publish and share 
 
 - **Project list** at `/`: every project except the template, under a "Documentation" heading, sorted by name
   (the latest PRD's overview title, or the TDS's project name if there's no PRD), with its team and target delivery (from the PRD) and the latest
-  version of each document, e.g. "PRD v2 · TDS v1". An unknown `?project=` id shows the list with a
+  version of each document, e.g. "PRD v2 · TDS v1 · UAT guide v1". An unknown `?project=` id shows the list with a
   "No project found" message.
-- **Document URLs:** `/?project=<id>&doc=<prd|tds>&v=<n>`.
-  - Without `doc`, the PRD shows, or the TDS when there's no PRD. Asking for a document the project
-    doesn't have shows the other one.
+- **Document URLs:** `/?project=<id>&doc=<prd|tds|uat>&v=<n>`.
+  - Without `doc`, or when the project doesn't have the document asked for, the first one it has of
+    the PRD, TDS and UAT guide shows.
   - Without `v`, the latest version shows. An unknown `v` shows the latest version with a "There's no
     v<n>" message; an older version shows a message linking to the latest.
-- **PRD/TDS switch and version picker** in the side navigation. A project can have a PRD, a TDS or
-  both, added at different times; a document it doesn't have yet shows greyed out. The picker lists
-  every version of the current document, newest first, with its status and date.
+- **PRD/TDS/UAT guide switch and version picker** in the side navigation. A project can have a PRD, a
+  TDS or both, added at different times; a document it doesn't have yet shows greyed out. A UAT guide
+  is optional: its "UAT guide" link only shows when the project has one. The picker lists every
+  version of the current document, newest first, with its status and date.
 - **PRD page:** nine numbered sections (Overview, The Problem, The Solution, Scope, Timeline, Risks,
   Dependencies, Assumptions, Version History) with side navigation. Version History lists every
   version up to the one shown.
 - **TDS page:** section 0, Document control (from `documentControl` and the version headers, with
   the approval log and a link to the PRD version the TDS was written against), then the standard
   sections 1–17 and appendices A–C, each with its subsections. Content is blocks: text, headings,
-  bulleted and numbered lists, tables, Mermaid diagrams, callouts (info, guidance, warning) and
-  checklists. TDS text can use `**bold**`, `*italic*`, `` `code` `` and `[links](https://…)`; links
+  bulleted and numbered lists, tables, Mermaid diagrams, callouts (info, guidance, warning),
+  checklists and code. A code block shows its text as is in a monospace box, keeping tabs, so it can
+  be copied (e.g. tab-separated rows for testers to paste into a form). TDS text can use `**bold**`, `*italic*`, `` `code` `` and `[links](https://…)`; links
   open in a new tab, and only http, https and mailto links are made links.
+- **UAT guide page:** a guide for testers. Its own numbered sections, each with its subsections (e.g.
+  one per journey, numbered "UJ-15"), built from the same blocks as a TDS. The first section is
+  headed with the guide's title and its version, status and date. The page title is the guide's
+  title.
 - **Mermaid diagrams:** the Mermaid library loads only on pages that have a diagram. Diagrams follow
   the light/dark theme, redrawing when it changes. A diagram that can't be drawn shows the error and
   its source.
@@ -78,6 +85,7 @@ project id.
 ```text
 src/content/projects/<id>/prd/v1.json, v2.json, …
 src/content/projects/<id>/tds/v1.json, v2.json, …
+src/content/projects/<id>/uat/v1.json, v2.json, …   (optional)
 ```
 
 - **Version header:** every file starts with `version`: `{ number, date (YYYY-MM-DD), status
@@ -98,6 +106,10 @@ src/content/projects/<id>/tds/v1.json, v2.json, …
   version it was written against), `documentControl` (project, tier, approver, reviewers, related
   links), optional `intro` blocks and the `sections`. Sections follow the Technical Design Spec
   template in Notion; the list is `STANDARD_SECTIONS` in `src/lib/tds.ts`.
+- **UAT guide:** the `UatGuide` type in `src/lib/types.ts`: the version header, `project` (the
+  project's name), `title`, optional `intro` blocks and `sections` (`{ number, title, blocks,
+subsections? }`, the same shape as TDS sections, but the guide chooses its own). Subsection numbers
+  are free text, e.g. "4.1" or "UJ-15".
 - **Template:** the `template` project holds a blank PRD and TDS to copy. It isn't on the project
   list, but `?project=template` opens it.
 
@@ -105,7 +117,7 @@ src/content/projects/<id>/tds/v1.json, v2.json, …
 
 Every file under `src/content/projects/` must pass, or CI fails:
 
-- It sits at `<id>/prd/v<n>.json` or `<id>/tds/v<n>.json` and is valid JSON.
+- It sits at `<id>/prd/v<n>.json`, `<id>/tds/v<n>.json` or `<id>/uat/v<n>.json` and is valid JSON.
 - It matches its schema (`src/lib/schemas.ts`). Objects are strict, so an unknown or misspelt field
   fails.
 - `version.number` matches the file name, and `approvedBy` is set when the status is Approved.
@@ -113,11 +125,13 @@ Every file under `src/content/projects/` must pass, or CI fails:
 - A TDS has exactly the standard sections, in order. No section is empty (write "N/A — reason").
   Subsection numbers start with their section's number. Every table row has one cell per column.
   `prdVersion`, when set, names a PRD version that exists.
-- Every Mermaid diagram parses, in a TDS or in a PRD's workflows and mock-ups.
+- A UAT guide has at least one section, and no section is empty. Every table row has one cell per
+  column.
+- Every Mermaid diagram parses, in a TDS, a UAT guide or a PRD's workflows and mock-ups.
 
 ### Versions never change (`pnpm check:versions`, run in CI and on pre-push)
 
-Comparing the branch with `main`, CI fails if a version file that's already on `main` is edited,
+This applies to UAT guides too. Comparing the branch with `main`, CI fails if a version file that's already on `main` is edited,
 deleted or renamed. A change goes in as a new version file. Files that are new in the branch can
 still change until it merges.
 
