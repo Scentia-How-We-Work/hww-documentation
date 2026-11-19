@@ -143,7 +143,6 @@ src/
 ├── content/
 │   ├── projects/    # <id>/prd/v<n>.json and <id>/tds/v<n>.json
 │   └── projects.ts  # Loads every version file
-├── hooks/           # Section snapping
 ├── lib/             # Pure, unit-tested logic: types, schemas, validation, versions, routing
 ├── App.tsx          # Picks the project list, PRD page or TDS page from the URL
 ├── App.css

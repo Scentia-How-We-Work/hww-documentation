@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import projects from "./content/projects";
 import { DOC_LABELS, docHref, listedProjects, resolveView, versions } from "./lib/projects";
 import DocSwitcher from "./components/DocSwitcher";
@@ -7,7 +7,6 @@ import PrdPage, { prdSections } from "./components/PrdPage";
 import ProjectList from "./components/ProjectList";
 import TdsPage, { tdsSections } from "./components/TdsPage";
 import UatPage, { uatSections } from "./components/UatPage";
-import { useSectionSnap } from "./hooks/useSectionSnap";
 import "./App.css";
 
 const view = resolveView(projects, new URLSearchParams(window.location.search));
@@ -25,9 +24,6 @@ const title = prd
       : "Documentation";
 
 function App() {
-  const scroller = useRef<HTMLDivElement>(null);
-  useSectionSnap(scroller);
-
   useEffect(() => {
     document.title = title;
   }, []);
@@ -46,10 +42,7 @@ function App() {
         <DocSwitcher project={project} kind={kind} version={version} />
       </Nav>
 
-      <div
-        ref={scroller}
-        className="relative min-h-0 min-w-0 flex-1 overflow-y-auto scroll-smooth px-4 pb-20 sm:px-8 lg:h-screen lg:px-16 lg:pb-28"
-      >
+      <div className="relative min-h-0 min-w-0 flex-1 overflow-y-auto scroll-smooth px-4 pb-20 sm:px-8 lg:h-screen lg:px-16 lg:pb-28">
         <div className="max-w-[880px]">
           {missingVersion && (
             <p className="mt-10 bg-medium-bg px-4 py-3 text-sm text-medium">
